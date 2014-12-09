@@ -48,7 +48,7 @@ modules_python2.7.5 = python/2.7.5, samtools/samtools-0.1.19_gnu446, pysam/0.7.7
 
 ###########################################
 #MAKE SURE YOU CHANGE THIS to avoid e-mails to default user
-qsub_email          = gusef@bu.edu
+qsub_email          = name@bu.edu
 qsub_send_email     = FALSE
 qsub_memory         = 2g
 qsub_suffix         = pbs
@@ -97,11 +97,11 @@ tophat_exec                 =   tophat2     #on SCC we don't need to specify the
 #The tophat index refers to the prefix of a bowtie2 index that must be built prior to running tophat2
 tophat_index                =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/Bowtie2Index/genome
 tophat_qual                 =   none        #  can be none, --solexa-quals or --solexa1.3-quals
-tophat_N                    =   2          #--read-mismatches   #Default is 2	
+tophat_N                    =   2           #--read-mismatches   #Default is 2	
 tophat_gap_length           =   2                                #Default is 2
 tophat_edit_dist            =   2                               #Default is 2
-mate_inner_dist             =   50
-mate_std_dev                =   150
+mate_inner_dist             =   50          #Standard is 50
+mate_std_dev                =   20		  #Standard is 20
 
 ############################################################################################################################################
 #BAMQC
