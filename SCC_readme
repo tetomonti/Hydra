@@ -1,0 +1,8 @@
+To get latest version:
+git fetch origin
+
+To add a file:
+git add file (or *)
+git commit -m 'message'
+git push origin master
+
