@@ -1,14 +1,14 @@
-#Last edited on 11/05/2014 by Daniel Gusenleitner
+#Last edited on 11/04/2014 by Vinay Kartha
 #########################################################################################################
 # Standard parameters
 #########################################################################################################
 
 #working directory where a results and report directory will be created
-working_dir	    =	  my_working_dir/
+working_dir	    =	   /restricted/projectnb/montilab-p/projects/superfund/project4/test/RNASeq_pipeline_test_results/
 
 #file that contains 2 or 3 columns with fastq | [fastq2]  | stub
 # See /restricted/projectnb/montilab-p/projects/superfund/project4/scripts/filenames_example.txt for an example template
-raw_filenames	  =	   filenames_example.txt
+raw_filenames	  =	   /restricted/projectnb/montilab-p/projects/superfund/project4/test/filenames_p4_paired_test.txt
 
 #Does the raw_filenames file have a header
 raw_file_header =    TRUE
@@ -20,6 +20,8 @@ paired	        =    TRUE
 clean_run       =    FALSE
 
 #directory that contains all the python scripts
+#scripts_dir	    = 	 /restricted/projectnb/montilab-p/CBMrepository/users/gusef/RNASeq_pipeline/
+#Latest version with edits
 scripts_dir         =    /restricted/projectnb/montilab-p/projects/superfund/project4/scripts/RNASeq_pipeline/ 
 
 #should everything also be printed on the command line
@@ -29,8 +31,9 @@ verbose         =    TRUE
 aligner = tophat     #right now only 'skip' and 'tophat' are allowed
 
 #choose which of the programs you want to run to quantify reads
-run_cufflinks = TRUE   # NOTE: Cufflinks does not work with single-end data and will not be run by default if your data is not paired-end sequencing data
+run_cufflinks = FALSE   # NOTE: Cufflinks does not work with single-end data and will not be run by default if your data is not paired-end sequencing data
 run_htseq = TRUE
+run_featureCount = TRUE
 
 #Option to run only the initial fastqc, then clip the standard illumina adapters and finally run another fastqc
 #used to check if all adapters were trimmed before running the actual alignment
@@ -48,7 +51,7 @@ modules_python2.7.5 = python/2.7.5, samtools/samtools-0.1.19_gnu446, pysam/0.7.7
 
 ###########################################
 #MAKE SURE YOU CHANGE THIS to avoid e-mails to default user
-qsub_email          = name@bu.edu
+qsub_email          = user@bu.edu
 qsub_send_email     = FALSE
 qsub_memory         = 2g
 qsub_suffix         = pbs
@@ -63,10 +66,10 @@ qsub_num_processors = 4-8
 # TRIMMING
 ############################################################################################################################################
 do_trimming      =     FALSE
-trimming_exec    =     fastx_trimmer	   #on SCC we don't need to specify the location of the executable we just need to load the proper module
-trimming_mode    =     -l    		   # can be -l (last base to keep), -f (first base to keep), or -t (trim N nucleotides at the end)
-trimming_value   =     45               # value that goes with the mode
-trimming_quality_value    =     -Q33    # optional: Q33 works for sanger
+trimming_exec    =     fastx_trimmer    #on SCC we don't need to specify the location of the executable we just need to load the proper module
+trimming_mode    =     -l    # can be -l (last base to keep), -f (first base to keep), or -t (trim N nucleotides at the end)
+trimming_value   =     45    # value that goes with the mode
+trimming_quality_value    =     -Q33  # optional: Q33 works for sanger
 
 ############################################################################################################################################
 # CUTADAPT
@@ -95,13 +98,13 @@ fastqc_exec      =      	/restricted/projectnb/montilab-p/tools/FastQC_v0.10.1/f
 ############################################################################################################################################
 tophat_exec                 =   tophat2     #on SCC we don't need to specify the location of the executable we just need to load the proper module
 #The tophat index refers to the prefix of a bowtie2 index that must be built prior to running tophat2
-tophat_index                =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/Bowtie2Index/genome
+tophat_index                =   /restricted/projectnb/montilab-p/projects/superfund/project4/killifish.genome/Version3_Assembly/bowtie2_index/killiv3
 tophat_qual                 =   none        #  can be none, --solexa-quals or --solexa1.3-quals
-tophat_N                    =   2           #--read-mismatches   #Default is 2	
+tophat_N                    =   2          #--read-mismatches   #Default is 2	
 tophat_gap_length           =   2                                #Default is 2
 tophat_edit_dist            =   2                               #Default is 2
-mate_inner_dist             =   50          #Standard is 50
-mate_std_dev                =   20		  #Standard is 20
+mate_inner_dist             =   50          #default is 50
+mate_std_dev                =   20          #default is 20
 
 ############################################################################################################################################
 #BAMQC
@@ -113,8 +116,8 @@ bamqc_script                =  run_bamqc.py
 #CUFFLINKS
 ############################################################################################################################################
 cufflinks_exec           = cufflinks     #on SCC we don't need to specify the location of the executable we just need to load the proper module
-cufflinks_G              =  /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Annotation/Archives/archive-2014-05-23-16-03-55/Genes/genes.gtf  # -G/--GTF <reference_annotation.(gtf/gff)>
-cufflinks_b              = /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa             #-b/--frag-bias-correct <genome.fa>
+cufflinks_G              =  /restricted/projectnb/montilab-p/projects/superfund/project4/killifish.genome/gene.models/kfish2rae5g.main.pub_nomRNA.gff  # -G/--GTF <reference_annotation.(gtf/gff)>
+cufflinks_b              = /restricted/projectnb/montilab-p/projects/superfund/project4/killifish.genome/Version3_Assembly/killifish20130322asm.fa             #-b/--frag-bias-correct <genome.fa>
 cufflinks_compatible_hits = inactive           #Cufflinks counts only those fragments compatible with some reference transcript towards the number of mapped hits used in the FPKM denominator. (can be 'active' to turn it on) 
 cufflinks_library_type   = fr-unstranded
 
@@ -132,6 +135,18 @@ sam_exec      =  samtools     #To run samtools view and pipe into htseq-count
 HTSeq_s       =  no           #stranded? (yes/no/reverse)
 HTSeq_t       =  exon
 HTSeq_m       =  intersection-nonempty        #union, intersection-strict and intersection-nonempty
-HTSeq_id      =  Parent       #Default, for most gtf files: gene_id
-HTSeq_gft     =  /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Annotation/Archives/archive-2014-05-23-16-03-55/Genes/genes.gtf  
+HTSeq_id      =  gene_id       #Default, for most gtf files: gene_id
+HTSeq_gft     =  /restricted/projectnb/montilab-p/projects/superfund/project4/killifish.genome/gene.models/kfish2rae5g.main.pub_edit.gff #(Annotation file for read counting)
 Rscript_exec  =  Rscript
+
+
+############################################################################################################################################
+#featureCount
+############################################################################################################################################
+featureCount_exec     =   /restricted/projectnb/montilab-p/personal/liye/shared/tools/Subread/subread-1.4.6-Linux-x86_64/bin/featureCounts
+featureCount_gft      =   /restricted/projectnb/montilab-p/projects/superfund/project4/killifish.genome/gene.models/kfish2rae5g.main.pub_edit.gff #(Annotation file for read counting)
+featureCount_s        = 0      #stranded? (0 (unstranded), 1 (stranded) and 2 (reversely stranded)); 0 by default
+featureCount_t        = exon   #Feature level over which read summarization will be performed. 'exon' by default
+featureCount_id       = gene_id #Attribute type used to group features into meta-features (e.g. genes), when GTF file is provided. 'gene_id' by default (usually 'gene_id' for most annotation files)
+featureCount_by_meta  = TRUE   #Set this to true if you want to assemble feature counts to their meta-feature specified using the 'featureCount_id' parameter. If FALSE, will generate counts per feature specified using the featureCount_t parameter
+Rscript_exec          = Rscript
