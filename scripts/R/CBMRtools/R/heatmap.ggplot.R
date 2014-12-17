@@ -31,25 +31,25 @@
 #' data(eSet2)
 #' 
 #' #Most basic plot
-#' p1<-heatmap.ggplot2(eSet2, col.clust = F, row.clust = F)
+#' p1<-heatmap.ggplot2(eSet2, col.clust=FALSE, row.clust=FALSE)
 #' 
 #' #More advanced plot
-#' p2<-heatmap.ggplot2(eSet=eSet2, col.clust = TRUE, row.clust = TRUE, 
-#' col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "", 
-#' heatmap.y.text = FALSE, heatmap.x.text = FALSE,
-#' heatmap.colorlegend.name = "RNASeq_expression",
-#' title.text = "TCGA BRCA log2 RNA-seq expression, z-score row normalized",
-#' col.legend.name = c("HER2_status", "ER_status", "PR_status", "TN_status"), 
-#' row.legend.name = "", 
-#' row.scaling = "z-score.capped", 
-#' z.norm = FALSE, 
-#' cuttree.col = 4, cuttree.row = 6,
-#' verbose = FALSE, show = FALSE)
+#' p2<-heatmap.ggplot2(eSet=eSet2, col.clust=TRUE, row.clust=TRUE, 
+#' col.lab=c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab="", 
+#' heatmap.y.text=FALSE, heatmap.x.text=FALSE,
+#' heatmap.colorlegend.name="RNASeq_expression",
+#' title.text="TCGA BRCA log2 RNA-seq expression, z-score row normalized",
+#' col.legend.name=c("HER2_status", "ER_status", "PR_status", "TN_status"), 
+#' row.legend.name="", 
+#' row.scaling="z-score.capped", 
+#' z.norm=FALSE, 
+#' cuttree.col=4, cuttree.row=6,
+#' verbose=FALSE, show=FALSE)
 #' 
 #' #Display and saving options
 #' print(p2) #to display in viewer if working in RStudio
-#' ggsave(p2, file = "example_plot.pdf")
-#' ggsave(p2, file = "example_plot.jpg")
+#' ggsave(p2, file="example_plot.pdf")
+#' ggsave(p2, file="example_plot.jpg")
 #' 
 #' @export 
 
@@ -66,29 +66,29 @@
 #####
 
 heatmap.ggplot2<-function(eSet, 
-	col.clust = TRUE, #column clustering
-	row.clust = TRUE, #row clustering
-	col.lab = "", #column side labels, character vector of pData colnames subset to include in label
-	row.lab = "", #row side labels, character vector of fData colnames subset to include in label
-	heatmap.y.text = FALSE, #text labels for heatmap rows: rownames of heatmap matrix
-	heatmap.x.text = FALSE, #text labels for heatmap columns: colnames of heatmap matrix
-	heatmap.y.text.size = 7, #text labels size for heatmap rows
-	heatmap.x.text.size = 6, #text labels size for heatmap columns
-	heatmap.colorlegend.name = "val", #name for heatmap color legend
-	title.text = "",
-	col.legend.name = "", #character vector for colname to plot as col.lab legend
-	row.legend.name = "", #character vector for colname to plot as row.lab legend
-	row.scaling = "none", #one of c("none", "quantile", "z-score.all", "z-score.capped") 
-	z.norm = FALSE, #heatmap colors reflect z-scores rather than original values
-					#only can be TRUE if row.scaling == "none" 
-	cuttree.col = 0, #TO BE IMPLEMENTED: shows cluster assignment color label for columns
+	col.clust=TRUE, #column clustering
+	row.clust=TRUE, #row clustering
+	col.lab="", #column side labels, character vector of pData colnames subset to include in label
+	row.lab="", #row side labels, character vector of fData colnames subset to include in label
+	heatmap.y.text=FALSE, #text labels for heatmap rows: rownames of heatmap matrix
+	heatmap.x.text=FALSE, #text labels for heatmap columns: colnames of heatmap matrix
+	heatmap.y.text.size=7, #text labels size for heatmap rows
+	heatmap.x.text.size=6, #text labels size for heatmap columns
+	heatmap.colorlegend.name="val", #name for heatmap color legend
+	title.text="",
+	col.legend.name="", #character vector for colname to plot as col.lab legend
+	row.legend.name="", #character vector for colname to plot as row.lab legend
+	row.scaling="none", #one of c("none", "quantile", "z-score.all", "z-score.capped") 
+	z.norm=FALSE, #heatmap colors reflect z-scores rather than original values
+					#only can be TRUE if row.scaling=="none" 
+	cuttree.col=0, #TO BE IMPLEMENTED: shows cluster assignment color label for columns
 					#number of clusters for columns, default 0: do not show cluster assignment
-	cuttree.row = 0, #TO BE IMPLEMENTED: shows cluster assignment color label for rows
+	cuttree.row=0, #TO BE IMPLEMENTED: shows cluster assignment color label for rows
 					#number of clusters for rows, default 0: do not show cluster assignment
-	verbose = FALSE,  #return addition information as well as heatmap
-	grid.heights =NA, #numeric vector of length 7 representing heights of subpanels, leave NA for default
-	grid.widths = NA, #numeric vector of length 4 represeting weights of subpanels, leave NA for default
-	show = FALSE #prints the heatmap within execution of the function
+	verbose=FALSE,  #return addition information as well as heatmap
+	grid.heights=NA, #numeric vector of length 7 representing heights of subpanels, leave NA for default
+	grid.widths=NA, #numeric vector of length 4 represeting weights of subpanels, leave NA for default
+	show=FALSE #prints the heatmap within execution of the function
 	){
   
   
@@ -105,25 +105,25 @@ heatmap.ggplot2<-function(eSet,
 
   #make blank ggplot2 theme
 	theme_none <- theme(
-	  panel.grid = element_blank(),
-	  panel.grid.major = element_blank(),
-	  panel.grid.minor = element_blank(),
-	  panel.background = element_blank(),
-	  axis.title.x = element_text(colour=NA),
-	  axis.title.y = element_blank(),
-	  axis.text.x = element_blank(),
-	  axis.text.y = element_blank(),
-	  axis.line = element_blank(), 
-	  axis.ticks.x = element_blank(),
-	  axis.ticks.y = element_blank(),
-	  axis.ticks.margin = unit(0, "cm"),
-	  plot.margin = unit(c(0.1,0.1,-1.2,-0.6), "lines"), # top,right, bottom, left
-	  legend.margin =unit(0,"cm"),
-	  strip.background = element_blank(), 
-	  panel.margin = unit(0, "cm"),
-	  panel.border = element_blank(),
-	  plot.background = element_blank(),
-	  strip.background = element_blank()
+	  panel.grid=element_blank(),
+	  panel.grid.major=element_blank(),
+	  panel.grid.minor=element_blank(),
+	  panel.background=element_blank(),
+	  axis.title.x=element_text(colour=NA),
+	  axis.title.y=element_blank(),
+	  axis.text.x=element_blank(),
+	  axis.text.y=element_blank(),
+	  axis.line=element_blank(), 
+	  axis.ticks.x=element_blank(),
+	  axis.ticks.y=element_blank(),
+	  axis.ticks.margin=unit(0, "cm"),
+	  plot.margin=unit(c(0.1,0.1,-1.2,-0.6), "lines"), # top,right, bottom, left
+	  legend.margin=unit(0,"cm"),
+	  strip.background=element_blank(), 
+	  panel.margin=unit(0, "cm"),
+	  panel.border=element_blank(),
+	  plot.background=element_blank(),
+	  strip.background=element_blank()
 	)
 	
 	meta.c<-NA
@@ -132,7 +132,7 @@ heatmap.ggplot2<-function(eSet,
 	row.meta<-NA
 
 	#--blank panel for paddings in grid layout--
-	p<-grid.rect(gp=gpar(col="white"), draw = F)
+	p<-grid.rect(gp=gpar(col="white"), draw=FALSE)
 
 	#--main title--
 	main.title<-textGrob(label=title.text,just=c("center","center"))
@@ -151,16 +151,16 @@ heatmap.ggplot2<-function(eSet,
 
   	#--column dendrogram--
   	HC<-p
-  	if (col.clust == TRUE){ 
+  	if (col.clust==TRUE){ 
   		#column distance: euclidean, clustering method: ward
   		hc01.col <- hcopt(stats::dist(t(x)),method="ward.D") 
       dd.col<-as.dendrogram(hc01.col)
       col.ord<-order.dendrogram(dd.col)
-	  	data_col <- dendro_data(dd.col, draw = F)
+	  	data_col <- dendro_data(dd.col, draw=FALSE)
 	  	HC <- ggplot(segment(data_col)) + 
 	  	geom_segment(aes(x=x, y=y, xend=xend, yend=yend)) +
-	  	scale_x_continuous( expand = c(0,0)) + 
-	  	scale_y_continuous(expand = c(0.01,0.01))+
+	  	scale_x_continuous( expand=c(0,0)) + 
+	  	scale_y_continuous(expand=c(0.01,0.01))+
 	  	theme_none 
 
 	  	if (cuttree.col > 1){
@@ -170,7 +170,7 @@ heatmap.ggplot2<-function(eSet,
 
   	#--row dendrogram--
   	HR<-p
-  	if (row.clust ==TRUE){
+  	if (row.clust==TRUE){
   		#row distance: pearson's correlation, clustering method: ward
   		hc01.row <- hcopt(stats::as.dist(1-cor(t(x))),method="ward.D")
   		dd.row<-as.dendrogram(hc01.row)
@@ -178,8 +178,8 @@ heatmap.ggplot2<-function(eSet,
 	  	data_row <- dendro_data(dd.row)
 	  	HR <- ggplot(segment(data_row)) + 
 	  	geom_segment(aes(x=x, y=y, xend=xend, yend=yend))+
-	    scale_x_continuous( expand = c(0,0)) + 
-	    scale_y_continuous( expand = c(0.01, 0.01)) +
+	    scale_x_continuous( expand=c(0,0)) + 
+	    scale_y_continuous( expand=c(0.01, 0.01)) +
 	    theme_none+
 	    coord_flip()
 
@@ -192,17 +192,17 @@ heatmap.ggplot2<-function(eSet,
   	
   	x.ordered <- x[row.ord, col.ord]
 
-  	if (row.scaling == "quantile"){
+  	if (row.scaling=="quantile"){
 		  x.ordered.scaled<-t(apply(x.ordered, 1, function(z) 
 			cut(z, 
-          breaks = quantile(z, (0:11)/11 ), 
-          dig.lab =10, 
-          include.lowest=T, 
-          labels =F))) - 6
+          breaks=quantile(z, (0:11)/11 ), 
+          dig.lab=10, 
+          include.lowest=TRUE, 
+          labels=FALSE))) - 6
 		  rownames(x.ordered.scaled)<-rownames(x.ordered)
 		  colnames(x.ordered.scaled)<-colnames(x.ordered)
 		  x.ordered<-x.ordered.scaled
-	  } else if (row.scaling == "z-score.all" || row.scaling == "z-score.capped"){
+	  } else if (row.scaling=="z-score.all" || row.scaling=="z-score.capped"){
 		  x.ordered.scaled<-t(apply(x.ordered, 1, function(z) 
 			scale(z))) 
 		  rownames(x.ordered.scaled)<-rownames(x.ordered)
@@ -214,17 +214,17 @@ heatmap.ggplot2<-function(eSet,
 	df$gene<-rownames(x.ordered)
 	df$gene<-factor(df$gene, levels=unique(df$gene))
   
-	dfm <- melt(df, id.vars = "gene")
+	dfm <- melt(df, id.vars="gene")
 	colnames(dfm) <- c("gene", "sample", heatmap.colorlegend.name)
 
-	if (row.scaling =="none" & z.norm == TRUE){
+	if (row.scaling=="none" & z.norm==TRUE){
     dfm[,heatmap.colorlegend.name]<-scale(dfm[,heatmap.colorlegend.name])
   }
 
-	heatmap_color_scale<-scale_fill_gradientn(colours = rev(brewer.pal(11,"RdBu")))
+	heatmap_color_scale<-scale_fill_gradientn(colours=rev(brewer.pal(11,"RdBu")))
 
-	if (row.scaling == "z-score.capped"){
-		heatmap_color_scale<-scale_fill_gradientn(colours = rev(brewer.pal(11,"RdBu")), limits = c(-3,3), oob=squish)
+	if (row.scaling=="z-score.capped"){
+		heatmap_color_scale<-scale_fill_gradientn(colours=rev(brewer.pal(11,"RdBu")), limits=c(-3,3), oob=squish)
 	}
 
 	M <- ggplot(dfm, aes(x=gene, y=sample)) + 
@@ -233,40 +233,40 @@ heatmap.ggplot2<-function(eSet,
   	theme_none +
   	theme(legend.position="bottom") +
   	coord_flip() + 
-  	theme(axis.text.x = element_text(angle = 90, hjust = 1, size = heatmap.x.text.size), 
-	  			axis.text.y=element_text(hjust = 1, size =heatmap.y.text.size) ) 
+  	theme(axis.text.x=element_text(angle=90, hjust=1, size=heatmap.x.text.size), 
+	  			axis.text.y=element_text(hjust=1, size=heatmap.y.text.size) ) 
 
   	#--color legend for heatmap--
   	ML <- gtable_filter(ggplot_gtable(ggplot_build(M)), "guide-box")
 
   	#--heatmap y axis label text
-  	if(heatmap.y.text == TRUE){
+  	if(heatmap.y.text==TRUE){
   		MCT <- gtable_filter(ggplot_gtable(ggplot_build(M)), "axis.l") 
   	}
   	else{
   		MCT <- p
   	}
 
-  	 if(heatmap.x.text == TRUE){
+  	 if(heatmap.x.text==TRUE){
   		MRT <- gtable_filter(ggplot_gtable(ggplot_build(M)), "axis.b") 
   	}
   	else{
   		MRT <- p
   	}
 
-  	M <- M + theme_none + theme(legend.position = "none" )
+  	M <- M + theme_none + theme(legend.position="none" )
 
   	#--column side label--
   	if (cuttree.col>1){
   		pData(eSet)$cluster.col<- clusMember.col
-  		if(col.lab[1] == ""){
+  		if(col.lab[1]==""){
   			col.lab <-"cluster.col"
   		} else {
   			col.lab <-c("cluster.col", col.lab)
   		}
   	}
 
-  	if (col.lab[1] == ""){
+  	if (col.lab[1]==""){
   		#no specificied column side label
   		LC <- p
   		LCT <- p
@@ -277,12 +277,12 @@ heatmap.ggplot2<-function(eSet,
 
 	  	col.meta<-pData(eSet)[col.ord, ]
 
-	 	meta.c<-data.frame(type = vector(), id = vector(), num = vector() )
+	 	meta.c<-data.frame(type=vector(), id=vector(), num=vector() )
 		for (x in col.lab){
 			meta.c<-rbind(meta.c, 
-				data.frame(cbind(type = x, 
-							id = as.character(col.meta[,x]), 
-							num =  1:length(col.meta[,x]))) )
+				data.frame(cbind(type=x, 
+							id=as.character(col.meta[,x]), 
+							num= 1:length(col.meta[,x]))) )
 		}
 		meta.c$num <- factor(meta.c$num, levels=unique(meta.c$num))
 
@@ -292,24 +292,24 @@ heatmap.ggplot2<-function(eSet,
 		#generate number of colored seed for all unique factor levels
 		palette.all<-getPalette(numColors) 
 		set.seed(57)
-		palette.all.permute<-sample(palette.all, replace = FALSE, size = length(palette.all))
+		palette.all.permute<-sample(palette.all, replace=FALSE, size=length(palette.all))
 
-		LC<-ggplot(meta.c, aes(x=num, y = type, fill = factor(id))) + 
+		LC<-ggplot(meta.c, aes(x=num, y=type, fill=factor(id))) + 
 			geom_tile() + 
-			scale_y_discrete(expand =c(0,0)) + 
+			scale_y_discrete(expand=c(0,0)) + 
 			scale_x_discrete(expand=c(0,0)) + 
-	  		theme(legend.position="bottom", axis.ticks.y = element_blank(),
-	  			legend.key.size = unit(0.15,"cm"),
-	  			legend.text.align = 0, legend.title.align = 0, 
-	  			axis.text.y=element_text(hjust = 1, size =7, vjust = 0)) 
+	  		theme(legend.position="bottom", axis.ticks.y=element_blank(),
+	  			legend.key.size=unit(0.15,"cm"),
+	  			legend.text.align=0, legend.title.align=0, 
+	  			axis.text.y=element_text(hjust=1, size=7, vjust=0)) 
 	  	if (col.legend.name[1] != ""){
 	  		SLC <-list()
 	  		for (ind in rev(col.legend.name)){
-	  			LC.temp<-LC + scale_fill_manual(name = ind, 
+	  			LC.temp<-LC + scale_fill_manual(name=ind, 
 	  					breaks=levels(factor(pData(eSet)[,ind])),
-	                    values = palette.all.permute, 
-	                    guide = guide_legend(direction = "horizontal", 
-                                           title.position = "top", 
+	                    values=palette.all.permute, 
+	                    guide=guide_legend(direction="horizontal", 
+                                           title.position="top", 
                                            label.position="bottom")
 	                    )
 	            SLC[[ind]]<- gtable_filter(ggplot_gtable(ggplot_build(LC.temp)), "guide-box")
@@ -318,7 +318,7 @@ heatmap.ggplot2<-function(eSet,
 	  		LC<-LC.temp
 	  		
 	  	} else {
-	  		LC<-LC + scale_fill_manual(values = palette.all.permute)
+	  		LC<-LC + scale_fill_manual(values=palette.all.permute)
 	  		SLC <-list(p)
 	  		names(SLC)<-"blank"
 	  	}
@@ -326,19 +326,19 @@ heatmap.ggplot2<-function(eSet,
 	  	#--column side label names--
 	    LCT <- gtable_filter(ggplot_gtable(ggplot_build(LC)), "axis.l") 
 
-	    LC <-LC + theme_none + theme(legend.position = "none" )
+	    LC <-LC + theme_none + theme(legend.position="none" )
 	}
 
 	if (cuttree.row>1){
   		fData(eSet)$cluster.row<- clusMember.row
-  		if(row.lab[1] == ""){
+  		if(row.lab[1]==""){
   			row.lab <-"cluster.row"
   		} else{
   			row.lab <-c("cluster.row", row.lab)
   		}
   }
 
-	if (row.lab[1] == ""){
+	if (row.lab[1]==""){
   		#no specificied column side label
   		LR <- p
   		LRT <- p
@@ -348,12 +348,12 @@ heatmap.ggplot2<-function(eSet,
   	} else {
 
 	  	row.meta<-fData(eSet)[row.ord,]
-	 	meta.r<-data.frame(type = vector(), id = vector(), num = vector() )
+	 	meta.r<-data.frame(type=vector(), id=vector(), num=vector() )
 		for (x in row.lab){
 			meta.r<-rbind(meta.r, 
-				data.frame(cbind(type = x, 
-							id = row.meta[,x], 
-							num =  1:length(row.meta[,x]))) )
+				data.frame(cbind(type=x, 
+							id=row.meta[,x], 
+							num= 1:length(row.meta[,x]))) )
 		}
 
 		meta.r$num <- factor(meta.r$num, levels=unique(meta.r$num))
@@ -364,28 +364,28 @@ heatmap.ggplot2<-function(eSet,
 		#generate number of colored need for all unique factor levels
 		palette.all<-getPalette(numColors) 
 		set.seed(57)
-		palette.all.permute<-sample(palette.all, replace = FALSE, size = length(palette.all))
+		palette.all.permute<-sample(palette.all, replace=FALSE, size=length(palette.all))
 
-		LR<-ggplot(meta.r, aes(x=factor(num), y = type, fill = factor(id))) + 
+		LR<-ggplot(meta.r, aes(x=factor(num), y=type, fill=factor(id))) + 
 			geom_tile() + 
-			scale_y_discrete(expand =c(0,0)) + 
+			scale_y_discrete(expand=c(0,0)) + 
 			scale_x_discrete(expand=c(0,0)) + 
 	  	theme(legend.position="bottom", 
-        axis.ticks.x = element_blank(),
-	  		legend.key.size = unit(0.15,"cm"),
-	 			legend.text.align = 0, 
-        legend.title.align = 0,
-        axis.text.x = element_text(angle = -90, hjust = 0, size =7, vjust =0)) + 
+        axis.ticks.x=element_blank(),
+	  		legend.key.size=unit(0.15,"cm"),
+	 			legend.text.align=0, 
+        legend.title.align=0,
+        axis.text.x=element_text(angle=-90, hjust=0, size=7, vjust=0)) + 
         coord_flip()
 
 	  	if (row.legend.name[1] != ""){
 	  		SLR <-list()
 	  		for (ind in rev(row.legend.name)){
-	  			LR.temp<-LR + scale_fill_manual(name = ind, 
+	  			LR.temp<-LR + scale_fill_manual(name=ind, 
 	  					breaks=levels(factor(fData(eSet)[,ind])),
-	                    values = palette.all.permute, 
-	                    guide = guide_legend(direction = "horizontal", 
-                                           title.position = "top", 
+	                    values=palette.all.permute, 
+	                    guide=guide_legend(direction="horizontal", 
+                                           title.position="top", 
                                            label.position="bottom")
 	                    )
 	            SLR[[ind]]<- gtable_filter(ggplot_gtable(ggplot_build(LR.temp)), "guide-box")
@@ -393,14 +393,14 @@ heatmap.ggplot2<-function(eSet,
 	  		LR<-LR.temp
 
 	  	} else {
-	  		LR<-LR + scale_fill_manual(values = palette.all.permute)
+	  		LR<-LR + scale_fill_manual(values=palette.all.permute)
 	  		SLR<-list(p)
 	  		names(SLR)<-"blank"
 	  	}
 	  	#--row side label names--
 	    LRT <- gtable_filter(ggplot_gtable(ggplot_build(LR)), "axis.b") 
 
-	    LR <-LR + theme_none + theme(legend.position = "none" )
+	    LR <-LR + theme_none + theme(legend.position="none" )
 	}
   	#make heatmap with layout
 	dx1<-1/12
@@ -409,21 +409,21 @@ heatmap.ggplot2<-function(eSet,
 	}
 
 	dx2<-1.5/12
-	if (col.clust ==FALSE){
+	if (col.clust==FALSE){
 		dx2<-0
 	}
 	dy4<-1.5/12
-	if (row.clust == FALSE){
+	if (row.clust==FALSE){
 		dy4<-0
 	}
 
 	dx3<-(0.3 * length(col.lab))/12
-	if (col.lab[1] == ""){
+	if (col.lab[1]==""){
 		dx3<-0
 	}
 
 	dy3 <-(0.3 * length(row.lab))/12 
-	if (row.lab[1] == ""){
+	if (row.lab[1]==""){
 		dy3<-0
 	}
 
@@ -439,33 +439,33 @@ heatmap.ggplot2<-function(eSet,
 		dy<-grid.widths
 	}
 
-	p1<-arrangeGrob(p, HC, p, p, widths = dy, ncol = 4)
-	p2<-arrangeGrob(LCT, LC, p, p, widths = dy, ncol = 4)
-	p3<-arrangeGrob(MCT, M, LR, HR, widths = dy, ncol = 4)
+	p1<-arrangeGrob(p, HC, p, p, widths=dy, ncol=4)
+	p2<-arrangeGrob(LCT, LC, p, p, widths=dy, ncol=4)
+	p3<-arrangeGrob(MCT, M, LR, HR, widths=dy, ncol=4)
 
-	if (heatmap.x.text == FALSE){
-		p4<-arrangeGrob(p, ML, LRT, p, widths = dy, ncol = 4)
+	if (heatmap.x.text==FALSE){
+		p4<-arrangeGrob(p, ML, LRT, p, widths=dy, ncol=4)
 		p6<-p
 	} else{
-		p4<-arrangeGrob(p, MRT, LRT, p, widths = dy, ncol = 4)
+		p4<-arrangeGrob(p, MRT, LRT, p, widths=dy, ncol=4)
 		p6<-ML
 	}
 
 	p5.args<-c(SLC, SLR ,list(heights=rep(1/2, length(SLR) +length(SLC)), nrow=1))
 	p5<-do.call(arrangeGrob, p5.args)
 
-	g.main<-arrangeGrob(p1,p2,p3,p4, p5, p6,heights = dx[2:7], nrow = 6)
+	g.main<-arrangeGrob(p1,p2,p3,p4, p5, p6,heights=dx[2:7], nrow=6)
  	g<-arrangeGrob(main.title, g.main, heights= c(dx[1], 1-dx[1]), nrow=2)
 
- 	if (show == TRUE){
+ 	if (show==TRUE){
  		print(g)
  	}
- 	if (verbose == FALSE){
+ 	if (verbose==FALSE){
   		return(g)
   }
   else {
-    res<-list(heatmap = g, meta.c = meta.c, meta.r = meta.r, col.meta = col.meta, row.meta = row.meta)
-    return(res)
+  		res<-list(heatmap=g, meta.c=meta.c, meta.r=meta.r, col.meta=col.meta, row.meta=row.meta)
+  		return(res)
   }
-        
+  
 }

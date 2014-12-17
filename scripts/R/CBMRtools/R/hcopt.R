@@ -3,7 +3,7 @@
 ######
 
 hcopt <- function(d, HC=NULL, method = "ward.D", members = NULL){
-  require("cba")
+#  require("cba")
   if ( is.null(HC) ) {
     HC <- hclust(d,method=method,members=members)
   }
