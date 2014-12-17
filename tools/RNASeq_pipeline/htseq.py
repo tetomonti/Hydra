@@ -1,37 +1,3 @@
-#  Copyright (c) 2014, Boston University. All rights reserved.
-#  
-#  Redistribution and use in source and binary forms, with or without
-#  modification, are permitted provided that the following conditions are met: 
-#  
-#  1. Redistributions of source code must retain the above copyright notice, this
-#     list of conditions and the following disclaimer. 
-#  2. Redistributions in binary form must reproduce the above copyright notice,
-#     this list of conditions and the following disclaimer in the documentation
-#     and/or other materials provided with the distribution. 
-#  
-#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-#  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-#  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-#  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-#  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-#  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-#  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-#  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-#  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-#  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-#  
-#  The views and conclusions contained in the software and documentation are those
-#  of the authors and should not be interpreted as representing official policies, 
-#  either expressed or implied, of Boston University.
-#  
-#  Authors:
-#    Daniel Gusenleitner [1,2], Vinay Kartha [1,2], Francesca Mulas [2], 
-#    Yuxiang Tan [1,2], Liye Zhang [2], Stefano Monti [1,2]
-#
-#  [1] Bioinformatics Program, Boston University
-#  [2] Center for Computational Biomedicine, Boston University  
-#  
-
 import module_helper, helper, subprocess, os
 
 def init(param):
@@ -154,15 +120,40 @@ def finalize(param,input_files='count_files'):
 if __name__ == "__main__":
     import subprocess, sys, os
     param=module_helper.initialize_module()
+    
+    #added code
+    #First we need to sort the bam file by name using samtools sort before we can run htseq-count on it
+#    out_prefix = param['stub'][param['file_index']]+'_nsorted'
+#    sorted_bam = param['module_dir']+out_prefix+'.bam'
+#    sort_call = [param['sam_exec'],'sort','-n','-o',param['working_file'],out_prefix,'>',sorted_bam]    
+
+    #print out_prefix
+    #print sorted_bam
+    #print sort_call
 
     #build htseq-count call:
-    call1 = [param['sam_exec'],'view',param['working_file']]
+#    call1 = [param['sam_exec'],'view',param['working_file']]
+    #edited code
+    call1 = [param['sam_exec'],'view','working_file']
     call2 = [param['HTSeq_exec'],'-s',param['HTSeq_s'],'-t',param['HTSeq_t'],'-i',param['HTSeq_id'],'-m',param['HTSeq_m'],'-',param['HTSeq_gft']]
   
+    #print call1
+    #print call2
+
     #function calls
+#    param['file_handle'].write('Sort CALL: '+' '.join(sort_call)+'\n')
     param['file_handle'].write('Pipe CALL 1: '+' '.join(call1)+'\n')
     param['file_handle'].write('Pipe CALL 2: '+' '.join(call2)+'\n')
     
+    #p = subprocess.Popen(sort_call, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    #p.stdout.close()
+    #output,error = p.communicate()
+    #print "Test"
+    #error handling
+    #if output=='':
+    #    param['file_handle'].write(error+'\n')
+    #    sys.exit(0)
+
     p1 = subprocess.Popen(call1, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(call2, stdin=p1.stdout, stdout=subprocess.PIPE)
     p1.stdout.close()
@@ -180,7 +171,4 @@ if __name__ == "__main__":
     handle.close()
     
     #wrap up and return the current workingfile
-    module_helper.wrapup_module(param,[outfile]) 
-     
-
-
+    module_helper.wrapup_module(param,[outfile])

@@ -170,7 +170,7 @@ def plotNumberOfReads(param,input_files):
 #        print samples_2
 #        print param['stub'] 
         for idx in range(param['num_samples']):
-            #print idx
+#            print idx
             index1=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_1[idx]][0]
             index2=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_2[idx]][0]           
             param['num_total_reads'][idx]=num_total_reads[index1]+num_total_reads[index2]
