@@ -27,10 +27,13 @@ variation.filter(dat, score = c("mad", "sd", "cv"), dir = c("top",
 \code{variation.filter} subset an expression dataset by extracting genes based on their level of variation
 }
 \examples{
-# select the top 5000 genes by median absolute deviation (mad) and also generate plot
+# select the top 100 genes by median absolute deviation (mad) and also generate plot
+
+#Use example data #2, for data set information: ?eSet2
+data(eSet2)
 
 png('mydata.filtered.png')
-variation.filter(mydata,score='mad',ngenes=5000,do.plot=TRUE)
+variation.filter(eset2,score='mad',ngenes=100,do.plot=TRUE)
 dev.off()
 ...
 }
