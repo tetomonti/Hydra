@@ -27,14 +27,14 @@
 #' 
 #' @examples
 #' 
-#' #Use example data #2, for data set information: ?eSet2
-#' data(eSet2)
+#' #Use example data, for data set information: ?eSet.brca.100
+#' data(eSet.brca.100)
 #' 
 #' #Most basic plot
-#' p1<-heatmap.ggplot2(eSet2, col.clust=FALSE, row.clust=FALSE)
+#' p1<-heatmap.ggplot2(eSet.brca.100, col.clust=FALSE, row.clust=FALSE)
 #' 
 #' #More advanced plot
-#' p2<-heatmap.ggplot2(eSet=eSet2, col.clust=TRUE, row.clust=TRUE, 
+#' p2<-heatmap.ggplot2(eSet=eSet.brca.100, col.clust=TRUE, row.clust=TRUE, 
 #' col.lab=c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab="", 
 #' heatmap.y.text=FALSE, heatmap.x.text=FALSE,
 #' heatmap.colorlegend.name="RNASeq_expression",
