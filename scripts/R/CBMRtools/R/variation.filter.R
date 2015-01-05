@@ -49,11 +49,11 @@
 #'
 #' # select the top 100 genes by median absolute deviation (mad) and also generate plot
 #'
-#' # Use example data #2, for data set information: ?eSet2
-#' data(eSet2)
+#' # Use example data, for data set information: ?eSet.brca.100
+#' data(eSet.brca.100)
 #'
 #' png('mydata.filtered.png')
-#' variation.filter(eSet2,score='mad',ngenes=100,do.plot=TRUE)
+#' variation.filter(eSet.brca.100,score='mad',ngenes=50,do.plot=TRUE)
 #' dev.off()
 #' 
 #' @export 
