@@ -1,5 +1,4 @@
-##  THIS NEEDS TO BE INITIALIZED WITH THE SCRIPT TEMPLATE USED FOR EVERY R SCRIPT
-##
+#####################################################################################
 ##  Copyright (c) 2013, 2014, Boston University. All rights reserved.
 ##  
 ##  Redistribution and use in source and binary forms, with or without
@@ -31,7 +30,9 @@
 ##  
 ##  [1] Bioinformatics Program, Boston University
 ##  [2] Section of Computational Biomedicine, Boston University  
+#####################################################################################
 
+#####################################################################################
 ## BEGIN documentation support (what follows are keyworded entries from which documentation pages will be extracted automatically)
 
 #' <FUNCTION NAME>
@@ -47,6 +48,7 @@
 #' # comment
 #' <CODE SNIPPET>
 #' ...
-#' @export 
+#' @export
 
 ## END documentation support
+#####################################################################################

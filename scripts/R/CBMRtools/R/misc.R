@@ -488,6 +488,13 @@ list2table <- function( obj, fill=NA )
   }
   mx
 }
+table2list <- function( tab, header=TRUE, fill=NA )
+{
+  LS <- vector('list',ncol(tab))
+  if ( header ) names(LS) <- colnames(tab)
+  for ( i in 1:ncol(tab) ) LS[[i]] <- tab[tab[,i]!=fill,i]
+  LS
+}
 ## write.table wrapper that adds a column header to row names column, if specified
 ##
 my.write.table <- function(x, file="", append=F, sep="\t", row.names=T, col.names=T, names=NULL, dec=".", 
