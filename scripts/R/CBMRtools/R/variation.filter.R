@@ -52,9 +52,7 @@
 #' # Use example data, for data set information: ?eSet.brca.100
 #' data(eSet.brca.100)
 #'
-#' png('mydata.filtered.png')
 #' variation.filter(eSet.brca.100,score='mad',ngenes=50,do.plot=TRUE)
-#' dev.off()
 #' 
 #' @export 
 
