@@ -1,8 +1,7 @@
 Package: CBMRtools
 Title: Miscellanea scripts for the analysis of genomics data
 Version: 0.1
-Authors@R: "Li, Amy <ajli@bu.edu> [aut, cre]; Monti, Stefano <smonti@bu.edu>
-    [aut,cre]"
+Authors@R: c(person("Li", "Amy", email = "ajli@bu.edu", role =  c("aut", "cre")),c(person("Monti", "Stefano", email = "smonti@bu.edu", role = c("aut", "cre"))))
 Description: Miscellanea scripts developed by CBM/montilab members
 Depends:
     R (>= 3.1.0),
