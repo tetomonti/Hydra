@@ -48,8 +48,8 @@
 #' 
 #' #Display and saving options
 #' print(p2) #to display in viewer if working in RStudio
-#' ggsave(p2, file="example_plot.pdf")
-#' ggsave(p2, file="example_plot.jpg")
+#' #ggsave(p2, file="example_plot.pdf") #not ran
+#' #ggsave(p2, file="example_plot.jpg") #not ran
 #' 
 #' @export 
 
