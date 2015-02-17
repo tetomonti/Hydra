@@ -88,6 +88,10 @@ strip.path <- function( filen, path=F )
   else
     rev(splits)[1]
 }
+make.dir <- function( dname )
+{
+  if ( is.na(file.info(dname)$isdir) ) system(paste('mkdir',dname))
+}
 file.ext <- function( filen, w.sep=F )
 {
   ext <- rev(unlist(strsplit( filen, "\\.")))[1]
@@ -543,9 +547,9 @@ genName <- function( stub=NULL )
 ## map any type of vector (e.g., vector of strings) to a vector of
 ## consecutive numbers (starting at base)
 ##
-genIndex <- function( X, base=0, add.levels=TRUE )
+genIndex <- function( X, base=0, add.levels=TRUE, do.sort=FALSE )
 {
-  idx <- match( X, unique(X) ) + (base-1)
+  idx <- match( X, if (do.sort) sort(unique(X)) else unique(X) ) + (base-1)
   if ( add.levels )
     levels(idx) <- if (is.null(levels(X))) unique(idx) else levels(X)
   idx
