@@ -141,6 +141,7 @@ ks.genescore <- function
  cls.lev=c(0,1),    # class labels to display
  absolute=F,        # takes max - min score rather than the maximum deviation from null
  plot.labels=FALSE, # hits' labels
+ exact=NULL,
  ...                # additional plot arguments
  )
 {
@@ -223,22 +224,9 @@ ks.genescore <- function
 
   # ELSE, compute asymptotic p-value
   #
-  STATISTIC <- abs( score )
-  names(score) <- switch(alternative, two.sided = "D", 
-                         greater = "D^+", less = "D^-")
-  pkstwo <- function(x, tol = 1e-06) {
-      if (is.numeric(x)) 
-          x <- as.double(x)
-      else stop("argument 'x' must be numeric")
-      p <- rep(0, length(x))
-      p[is.na(x)] <- NA
-      IND <- which(!is.na(x) & (x > 0))
-      if (length(IND)) 
-          p[IND] <- .Call(C_pKS2, p = x[IND], tol)
-      p
-  }
-  PVAL <- ifelse(alternative == "two.sided", 1 - pkstwo(sqrt(n) * 
-                   STATISTIC), exp(-2 * n * STATISTIC^2))
+  names(score) <- switch(alternative, two.sided="D", greater="D^+", less="D^-")
+  PVAL <- ks.test(1:n.x,y=y,alternative=alternative,exact=exact)$p.value
+  
   if ( bare ) {
     return( c(score=score, p.value=PVAL) )
   }
