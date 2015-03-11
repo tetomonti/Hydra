@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>heatmap.ggplot2. CBMRtools 0.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">CBMRtools 0.1</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>heatmap.ggplot2</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>heatmap.ggplot2(eSet, col.clust&nbsp;=&nbsp;TRUE, row.clust&nbsp;=&nbsp;TRUE, col.lab&nbsp;=&nbsp;"", row.lab&nbsp;=&nbsp;"", heatmap.y.text&nbsp;=&nbsp;FALSE, heatmap.x.text&nbsp;=&nbsp;FALSE, heatmap.y.text.size&nbsp;=&nbsp;7, heatmap.x.text.size&nbsp;=&nbsp;6, heatmap.colorlegend.name&nbsp;=&nbsp;"val", title.text&nbsp;=&nbsp;"", col.legend.name&nbsp;=&nbsp;"", row.legend.name&nbsp;=&nbsp;"", row.scaling&nbsp;=&nbsp;"none", z.norm&nbsp;=&nbsp;FALSE, cuttree.col&nbsp;=&nbsp;0, cuttree.row&nbsp;=&nbsp;0, verbose&nbsp;=&nbsp;FALSE, grid.heights&nbsp;=&nbsp;NA, grid.widths&nbsp;=&nbsp;NA, show&nbsp;=&nbsp;FALSE)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>eSet</dt>
+      <dd>expression set object to plot</dd>
+      <dt>col.clust</dt>
+      <dd>perform column-wise hierarchical clustering (TRUE or FALSE)</dd>
+      <dt>row.clust</dt>
+      <dd>perform row-wise hierarchical clustering (TRUE or FALSE)</dd>
+      <dt>col.lab</dt>
+      <dd>column labels to include: subset of pData colnames character vector</dd>
+      <dt>row.lab</dt>
+      <dd>row labels to include: subset of fData colnames character vector</dd>
+      <dt>heatmap.y.text</dt>
+      <dd>include y axis labels for heatmap, uses rownames(eSet) (TRUE or FALSE)</dd>
+      <dt>heatmap.x.text</dt>
+      <dd>include x axis labels for heatmap, uses colnames(eSet)) (TRUE or FALSE)</dd>
+      <dt>heatmap.y.text.size</dt>
+      <dd>text size for y axis labels</dd>
+      <dt>heatmap.x.text.size</dt>
+      <dd>text size for x axis labels</dd>
+      <dt>heatmap.colorlegend.name</dt>
+      <dd>name for heatmap color legend</dd>
+      <dt>title.text</dt>
+      <dd>main title for the plot</dd>
+      <dt>col.legend.name</dt>
+      <dd>character vector for subset of col.lab to include in color legend</dd>
+      <dt>row.legend.name</dt>
+      <dd>character vector for subset of row.lab to include in color legend</dd>
+      <dt>row.scaling</dt>
+      <dd>how should rows be scaled ("none", "quantile", "z-score.all", or "z-score.capped")</dd>
+      <dt>z.norm</dt>
+      <dd>heatmap colors reflect z-scores rather than original values, can be TRUE if row.scaling is "none"</dd>
+      <dt>cuttree.col</dt>
+      <dd>number of clusters for columns, default 0: do not show cluster assignment</dd>
+      <dt>cuttree.row</dt>
+      <dd>number of clusters for rows, default 0: do not show cluster assignment</dd>
+      <dt>verbose</dt>
+      <dd>return additional clustred annotation information as well as heatmap</dd>
+      <dt>grid.heights</dt>
+      <dd>numeric vector of length 7 representing heights of subpanels, leave NA for default</dd>
+      <dt>grid.widths</dt>
+      <dd>numeric vector of length 4 represeting weights of subpanels, leave NA for default</dd>
+      <dt>show</dt>
+      <dd>prints the heatmap within execution of the function (TRUE or FALSE)</dd>
+    </dl>
+    
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p><code>heatmap.ggplot2</code> is the main function to draw and/or save the heatmap from an
+expression set object</p>
+  
+    </div>
+    
+    <h2 id="examples">Examples</h2>
+    <pre class="examples"><div class='input'>#Use example data, for data set information: ?eSet.brca.100
+data(eSet.brca.100)
+
+#Most basic plot
+p1&lt;-heatmap.ggplot2(eSet.brca.100, col.clust=FALSE, row.clust=FALSE)
+
+#More advanced plot
+p2&lt;-heatmap.ggplot2(eSet=eSet.brca.100, col.clust=TRUE, row.clust=TRUE,
+col.lab=c(&quot;HER2_status&quot;, &quot;ER_status&quot;, &quot;PR_status&quot;, &quot;TN_status&quot;), row.lab=&quot;&quot;,
+heatmap.y.text=FALSE, heatmap.x.text=FALSE,
+heatmap.colorlegend.name=&quot;RNASeq_expression&quot;,
+title.text=&quot;TCGA BRCA log2 RNA-seq expression, z-score row normalized&quot;,
+col.legend.name=c(&quot;HER2_status&quot;, &quot;ER_status&quot;, &quot;PR_status&quot;, &quot;TN_status&quot;),
+row.legend.name=&quot;&quot;,
+row.scaling=&quot;z-score.capped&quot;,
+z.norm=FALSE,
+cuttree.col=4, cuttree.row=6,
+verbose=FALSE, show=FALSE)
+
+#Display and saving options
+print(p2) #to display in viewer if working in RStudio
+</div>
+<p><img src='heatmap.ggplot2-2.png' alt='' width='540' height='400' /></p>
+<div class='input'>#ggsave(p2, file=&quot;example_plot.pdf&quot;) #not ran
+#ggsave(p2, file=&quot;example_plot.jpg&quot;) #not ran
+</div></pre>
+  </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>heatmap.ggplot2</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="http://twitter.github.com/bootstrap">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

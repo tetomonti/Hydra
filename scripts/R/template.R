@@ -1,6 +1,5 @@
-##  THIS NEEDS TO BE INITIALIZED WITH THE SCRIPT TEMPLATE USED FOR EVERY R SCRIPT
-##
-##  Copyright (c) 2013, 2014, Boston University. All rights reserved.
+#####################################################################################
+##  Copyright (c) 2013-2015, Boston University. All rights reserved.
 ##  
 ##  Redistribution and use in source and binary forms, with or without
 ##  modification, are permitted provided that the following conditions are met: 
@@ -27,21 +26,29 @@
 ##  either expressed or implied, of Boston University.
 ##  
 ##  Authors:
-##    name1 [1], name2 [1], name3 [2],
-##    Stefano Monti [1,2]
+##    name1 [1], name2 [1], name3 [2], ...
 ##  
 ##  [1] Bioinformatics Program, Boston University
-##  [2] Center for Computational Biomedicine, Boston University  
+##  [2] Section of Computational Biomedicine, Boston University  
+#####################################################################################
 
-if ( !exists("CBMDEV") ) {
-  CBMDEV <- Sys.getenv('CBMDEV')
-  if (CBMDEV=="") stop( "Use 'setenv CBMDEV ..' to set CBMrepository's base directory" )
-}
-if ( !exists("CBMMLAB") ) {
-  CBMMLAB <- Sys.getenv('CBMMLAB')
-  if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
-}
-source( paste(CBMMLAB, "R/misc.R", sep="/") )
-#source( paste(RHOME, "", sep="/") )
-#require(Biobase)
+#####################################################################################
+## BEGIN documentation support (what follows are keyworded entries from which documentation pages will be extracted automatically)
 
+#' <FUNCTION NAME>
+#' 
+#' \code{<FUNCTION NAME>} ... description ...
+#'
+#' @param <PARAM_1> parameter description
+#' @param <PARAM_2> parameter description
+#' ...
+#'
+#' @examples
+#'
+#' # comment
+#' <CODE SNIPPET>
+#' ...
+#' @export
+
+## END documentation support
+#####################################################################################

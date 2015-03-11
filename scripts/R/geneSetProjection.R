@@ -1,0 +1,498 @@
+#####################################################################################
+##  Copyright (c) 2012-2015, Boston University. All rights reserved.
+##  
+##  Redistribution and use in source and binary forms, with or without
+##  modification, are permitted provided that the following conditions are met: 
+##  
+##  1. Redistributions of source code must retain the above copyright notice, this
+##     list of conditions and the following disclaimer. 
+##  2. Redistributions in binary form must reproduce the above copyright notice,
+##     this list of conditions and the following disclaimer in the documentation
+##     and/or other materials provided with the distribution. 
+##  
+##  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+##  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+##  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+##  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+##  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+##  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+##  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+##  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+##  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+##  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+##  
+##  The views and conclusions contained in the software and documentation are those
+##  of the authors and should not be interpreted as representing official policies, 
+##  either expressed or implied, of Boston University.
+##  
+##  Authors:
+##    Stefano Monti [1,2]
+##  
+##  [1] Bioinformatics Program, Boston University
+##  [2] Section of Computational Biomedicine, Boston University  
+#####################################################################################
+
+#####################################################################################
+## BEGIN documentation support (what follows are keyworded entries
+## from which documentation pages will be extracted automatically)
+
+#' geneSetProjection
+#' 
+#' \code{geneSetProjection} map a gene-level dataset to a
+#' geneset-level dataset based on control-treatment pairing (i.e., the
+#' ks score is done with respect to the 'control vs. treatment'
+#' phenotype).  This function is ideal for 'time-series' data of
+#' response to treatment, where for each time point there are several
+#' replicates for both the control and the treated.
+#'
+#' @param dat ExpressionSet data object ( require(biobase) )
+#' @param pairing list with pairing between treatment and control (see format below)
+#' @param gsets GeneSet data object (see GeneSet.R)
+#' @param method one of {"ks","logistic","median","mean"} (only ks implemented so far)
+#' @param collapse collapse multiple replicates into a single output vector (TRUE)
+#' @param weighted gsea-like weighting of KS score (TRUE)
+#' @param absolute use absolute values when calculating the KS score ignoring up and down (FALSE)
+#' @param verbose verbosity on/off (TRUE)
+#'
+#' @examples
+#'
+#' # comment
+#' 
+#' # the very basic steps are:
+#' 
+#' # 1) load the data (expression and genesets)
+#' # 2) rename the dataset by replacing probesetIDs by gene symbols ==> DB
+#' # 3) create the list of lists pairing ==> PAIRS
+#' # 4) run geneSetProjection(dat=DB,pairing=PAIRS,gset.db=GSET, ...)
+#'
+#' # 1) load the data (expression and genesets)
+#' 
+#' DAT <- readRDS("data/gsp.eSet.rds")
+#' GST <- GeneSet("data/gsp.GeneSet.gmt")
+#'
+#' # 2) RENAME the dataset rows (w/ gene symbols)
+#' 
+#' DAT1 <- DAT[pData(featureData(DAT))[,"symbol"]!="",]
+#' featureNames(DAT1) <- toupper(pData(featureData(DAT1))[,"symbol"])
+#'
+#' # 3) CREATE the list of lists pairing
+#' 
+#' PAIRS <- list(OSCC=list(control=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]=="AN"],
+#'                         treatment=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]!="AN"]))
+#'
+#' GSPdir <- geneSetProjection(dat=DAT1,pairing=PAIRS,GS=GST,collapse=FALSE,weighted=FALSE,absolute=FALSE)
+#' 
+#' @export
+
+## END documentation support
+#####################################################################################
+## GENESET PROJECTION
+##
+## function to map a gene-level dataset to a geneset-level dataset
+## based on control-treatment pairing (i.e., the ks score is done
+## with respect to the 'control vs. treatment' phenotype).
+## This function is ideal for 'time-series' data of response to
+## treatment, where for each time point there are several replicates
+## for both the control and the treated.
+## 
+geneSetProjection <- function
+(
+ dat,          # expression data
+ pairing,      # list with pairing between treatment and control (see format below)
+ GS,           # gene set object
+ method=c("ks","logistic","median","mean"), # only ks implemented at the moment
+ collapse=T,   # collapse multiple replicates into a single output vector
+ weighted=T,   # gsea-like weighting of KS score
+ absolute=F,   # use absolute values when calculating the KS score ignoring up and down
+ min.gset=5,   # min genes in a geneset allowed
+ verbose=T
+ )
+{
+  ## FORMAT: pairing is a list of lists, of the form:
+  ##   list(group1=list(control=c(s_111,..,s_11n),treatment=c(s_121,..,s_12n)),
+  ##        group2=list(control=c(s_211,..,s_21n),treatment=c(s_221,..,s_22n)),
+  ##        ...)
+  
+  ## checks on inputs
+  ##
+  method <- match.arg(method)
+  if ( class(dat)!='ExpressionSet' )
+    stop( 'dat expected to be an ExpressionSet object: ', class(dat) )
+  if ( class(GS)!='GeneSet' )
+    stop( 'GS expected to be a GeneSet object: ', class(GS) )
+  if ( class(pairing)!='list' )
+    stop( 'pairing expected to be a list: ', class(pairing) )      
+  if ( method!="ks" )
+    stop( "method not implemented yet: ", method )
+  if ( any(unlist(sapply(pairing,function(z) is.na(match(unlist(z),sampleNames(dat)))))) )
+    stop( "mismatch btw pairing and data" )
+  if ( any(sapply(pairing,function(z) any(names(z)!=c("control","treatment")))) )
+    stop( "pairing groups must be named 'control' and 'treatment'" )
+
+  ## drop the genes that are in the gene sets and not in the dataset
+  GS@geneset <- lapply(geneSet(GS),intersect,toupper(featureNames(dat)))
+  if ( length(GS)<1 ) stop( "no genesets overlap w/ data's genes" )
+
+  VERBOSE(verbose,"Projecting",length(pairing),"groups ..\n")
+  PRJ <- NULL
+  for ( i in 1:length(pairing) )
+  {
+    VERBOSE(verbose,"  > group",names(pairing)[i],".. ")
+    grpI <- pairing[[i]]
+    ctlI <- match(grpI$control,sampleNames(dat))
+    trtI <- match(grpI$treatment,sampleNames(dat))
+    VERBOSE(verbose,"[",length(ctlI),"/",length(trtI),"]")
+    if ( length(ctlI)<2 ) {
+      VERBOSE(verbose,"insufficient control samples: ",length(ctlI),", skipping.\n",sep="")
+      next
+    }
+    if ( length(trtI)<1 ) {
+      VERBOSE(verbose,"insufficient treatment samples: ",length(trtI),", skipping\n",sep="")
+      next
+    }
+    datI <- dat[,c(ctlI,trtI)]
+    clsI <- rep(0:1,times=c(length(ctlI),length(trtI))); levels(clsI) <- paste(c("ctl","trt"),0:1,sep=".")
+    prjI <- ks.projection(exprs(datI),cls=clsI,gsets=geneSet(GS),collapse=collapse,weighted=weighted,absolute=absolute)
+    PRJ <- cbind(PRJ,prjI)
+
+    VERBOSE(verbose," done.\n")
+  }
+  outdat <- NULL
+  if ( collapse ) {
+    outdat <- dat[,as.vector(unlist(sapply(pairing,function(z) z$treatment[1])))]
+    sampleNames(outdat) <- names(pairing)
+    exprs(outdat) <- PRJ
+  }
+  else {
+    outdat <- dat[,as.vector(unlist(sapply(pairing,function(z) z$treatment)))]
+    exprs(outdat) <- PRJ
+  }
+  outdat
+}
+## function: KS PROJECTION
+##
+## project one or more samples from gene space onto geneset ks-score space
+## the function can either:
+## - turn many-cases vs. many-controls into a single ks-score vector (collapse=T, cls!=NULL)
+## - turn many-cases vs. many-controls into many ks-score vectors (collapse=F, cls!=NULL)
+## - turn many-cases into many ks-score vectors (cls==NULL)
+##
+ks.projection <- function
+(
+    dat,              # [genes x samples] data matrix
+    cls=NULL,         # class template (expected coding: 0=control; 1=treatment)
+    gsets,            # list of (named) genesets
+    collapse=FALSE,   # collapse multiple replicates
+    control=!collapse,# include normals (only when collapse==FALSE)
+    weighted=T,
+    do.check=TRUE,
+    min.gset=10,
+    verbose=T,
+    absolute=F
+)
+{
+  ## CHECKS ON INPUTS
+  ##
+  if ( !is.matrix(dat) ) {
+    stop( 'dat must be a matrix: ', class(dat) )
+  }
+  if ( collapse && control )
+     warning( 'inclusion of controls ignored when collapse==TRUE' )
+  if ( !is.null(cls) && length(cls)!=ncol(dat) ) {
+    stop( "length(cls)!=ncol(dat)" )
+  }
+  if ( !is.null(cls) && length(unique(cls))!=2 ) {
+    stop( "cls must be binary" )
+  }
+  if ( do.check && length(cmn <- intersect(unique(unlist(gsets)),toupper(rownames(dat))))<min.gset ) {
+    stop( "genes in common are less then ", min.gset, ": ",length(cmn) )
+  }
+  ## restrict to the geneset genes represented in the data (and to genesets w/ at least min.gset genes)
+  ##
+  if ( do.check ) {
+      VERBOSE( verbose, "\n\tChecking genesets .." )
+      gsets <- lapply(lapply(gsets,unique),intersect,cmn)
+      gsets <- gsets[nz <- sapply(gsets,length)>=min.gset]
+      if ( length(gsets)<1 ) stop( "no genesets w/ min # of genes required" )
+      VERBOSE( verbose, sum(!nz), "genesets removed because of too few genes.\n")
+  }
+  ## map from gene names to gene positions within dataset
+  ## (for max efficiency, this could ideally be brought out of the function)
+  ##
+  gidx <- lapply( gsets, function(Z) sort(match.nona(Z,rownames(dat))) )
+  
+  ks.project <- function( dat, cls, var.equal=FALSE,absolute=FALSE)
+  {
+    ## WARNING: gidx is a 'global' variable (not passed as argument)
+    ##
+    RNK <- rank(SCR <- tscore.4ks(dat,cls,var.equal=var.equal),ties.method="first")
+    KS <- sapply(gidx, function(z)
+        ks.genescore(n.x=nrow(dat),y=RNK[z],do.pval=FALSE,weight=if(weighted) sort(SCR),absolute=absolute))
+    return(KS)
+  }
+  ## return single vector from replicates
+  ##
+  if ( collapse ) {
+    KS <- ks.project(dat,cls,var.equal=FALSE,absolute=absolute)
+    return(KS)
+  }
+  ## return as many vectors as replicates
+  ##
+  else if ( !is.null(cls) ) {
+    ctl.idx <- which(cls==0)
+    trt.idx <- which(cls==1)
+    KSctl <- if (control)
+                 sapply(ctl.idx,function(z) ks.project(dat=dat[,c(ctl.idx,z)],cls=c(cls[ctl.idx],1),
+                                                       var.equal=TRUE,absolute=absolute))
+    KStrt <- sapply(trt.idx,function(z) ks.project(dat=dat[,c(ctl.idx,z)],cls=cls[c(ctl.idx,z)],
+                                                   var.equal=TRUE,absolute=absolute))
+    return( cbind(KSctl,KStrt) )
+  }
+  ## no control group provided
+  ##
+  else {
+    stop( "not implemented yet" )
+  }
+}
+## function: TSCORE 4 KS
+##
+## fast computation of t-score based on matrix multiplications
+## it also takes care of the case when one of the two groups is a singleton
+## return value: positive => up in cls==0; negative => up in cls==1
+##
+tscore.4ks <- function( x, cls, var.equal=FALSE, robust=FALSE )
+{
+  lev <- sort(unique(cls))
+  if (length(lev)!=2) stop( "cls must be binary" )
+  CLS <- cbind( as.numeric(cls==lev[1]), as.numeric(cls==lev[2]) )
+  nc <- apply(CLS,2,sum)
+
+  ## both groups have multiple observations
+  ##
+  if ( all(nc>1) ) # use mean and stdev
+  {
+    s <- s2 <- NULL
+    if ( !robust || all(nc<3) )
+    {
+      s  <- x %*% CLS
+      s2 <- x^2 %*% CLS
+      
+      s2[,1] <- (s2[,1] - (s[,1]^2)/nc[1]) / (nc[1]-1)
+      s2[,2] <- (s2[,2] - (s[,2]^2)/nc[2]) / (nc[2]-1)
+      s[,1] <- s[,1]/nc[1]
+      s[,2] <- s[,2]/nc[2]
+    }     
+    else           # use median and mad instead
+    { 
+      s <- sapply(lev,function(z) apply(x[,cls==z],1,median))
+      s2 <- sapply(lev,function(z) apply(x[,cls==z],1,mad))^2
+    }
+    stderr <- if (var.equal)
+      sqrt( (((nc[1]-1)*s2[,1] + (nc[2]-1)*s2[,2])/(nc[1]+nc[2]-2)) * (1/nc[1]+1/nc[2]) )
+    else
+      sqrt( s2[,1]/nc[1] + s2[,2]/nc[2] )
+    
+    (s[,1]-s[,2]) / stderr
+  }
+  ## one of the two groups has a single observation
+  ##
+  else if ( any(nc>1) )
+  {
+    ## determine the group w/ multiple observations
+    iN <- which(nc>1)
+    ncN <- nc[iN]
+    clsN <- CLS[,iN,drop=FALSE]
+    sgn <- if (iN==1) 1 else -1 # needed to keep consistent sign
+
+    ## compute mean and standard deviation for that group
+    s <- s2 <- NULL
+    if ( !robust || ncN<3 )
+    {
+      s  <- drop(x %*% clsN)
+      s2 <- drop(x^2 %*% clsN)
+      s2 <- (s2 - (s^2)/ncN) / (ncN-1)
+      s <- s/ncN
+    }
+    else {
+      s <- apply(x[,cls==lev[iN]],1,median)
+      s2 <- apply(x[,cls==lev[iN]],1,mad)^2     
+    }
+    ## I found a case where s2 was negative for a single value it was
+    ## a very small value e-14 so I assume it was a rounding error,
+    ## but sqrt of a negative number doesn't work so this is a rather
+    ## crude way to fix this:
+    s2<-abs(s2)
+    
+    ## compute score
+    sgn * ( s - x[,cls!=lev[iN]] ) / sqrt(s2)
+  }
+  ## both groups have a single observation (just compute the difference)
+  ##
+  else {
+    x[,cls==lev[1]] - x[,cls==lev[2]]
+  }
+}
+## CONTROL STANDARDIZE
+##
+control.based.standardize <- function
+(
+ dat,            # ExpressionSet object
+ pairing,        # list with pairing between treatment and control (see format below)
+ robust=FALSE,   # use median/mad instead of mean/sd
+ collapse=FALSE, # not implemented yet (but would collapse multiple treatment replicates into one)
+ min.sd=.01,     # can be a scalar or a vector of length nrow(dat)
+ verbose=TRUE
+ )
+{
+  ## FORMAT: pairing is a list of lists, of the form:
+  ##   list(group1=list(control=c(s_111,..,s_11n),treatment=c(s_121,..,s_12n)),
+  ##        group2=list(control=c(s_211,..,s_21n),treatment=c(s_221,..,s_22n)),
+  ##        ...)
+
+  ## CHECKS on inputs
+  ##
+  if ( length(min.sd)==1 )
+    min.sd <- rep(min.sd,nrow(dat))
+  if ( length(min.sd)!=nrow(dat) )
+    stop( "length(min.sd)!=nrow(dat)" )
+  if ( collapse )
+    stop( "collapse not implemented yet, ignored" )
+  
+  VERBOSE(verbose,"Control-standardizing",length(pairing),"groups ..\n")
+  NRM <- NULL
+  nrm.names <- NULL
+  for ( i in 1:length(pairing) )
+  {
+    VERBOSE(verbose,"  > group",names(pairing)[i],".. ")
+    grpI <- pairing[[i]]
+    if ( any(is.na(ctlI <- match(grpI$control,sampleNames(dat)))) ) stop( "control samples missing from dat" )
+    if ( any(is.na(trtI <- match(grpI$treatment,sampleNames(dat)))) ) stop( "treatment samples missing from dat" )
+    VERBOSE(verbose,"[",length(trtI),"/",length(ctlI),"]")
+    if ( length(ctlI)<2 ) {
+      VERBOSE(verbose,"insufficient control samples: ",length(ctlI),", skipping.\n",sep="")
+      next
+    }
+    if ( length(trtI)<1 ) {
+      VERBOSE(verbose,"insufficient treatment samples: ",length(trtI),", skipping\n",sep="")
+      next
+    }
+    mnI <- if (robust) apply(exprs(dat)[,ctlI],1,median) else drop(fast.mean(exprs(dat)[,ctlI]))
+    sdI <- if (robust) apply(exprs(dat)[,ctlI],1,mad) else drop(fast.sd(exprs(dat)[,ctlI]))
+    VERBOSE(verbose, " (thresholding ",round(100*sum(sdI<min.sd)/length(sdI),2),"% SDs)",sep="")
+    sdI[sdI<min.sd] <- min.sd[sdI<min.sd]
+
+    nrmI <- (dat@signal[,trtI] - mnI) / sdI
+    NRM <- cbind(NRM,nrmI)
+    nrm.names <- c(nrm.names,grpI$treatment)
+
+    VERBOSE(verbose," done.\n")
+  }
+  if ( ncol(NRM)!=length(nrm.names) ) stop( "ncol(NRM)!=length(nrm.names):",ncol(NRM),length(nrm.names) )
+  colnames(NRM) <- if ( collapse ) names(pairing) else nrm.names
+  outdat <- dat[,match.nona(colnames(NRM),sampleNames(dat))]
+  exprs(outdat) <- NRM
+  return( outdat )
+}
+if ( FALSE )
+{
+  CBMMLAB <- Sys.getenv('CBMMLAB')
+  if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
+
+  ## CREATION OF 'TOY' DATA
+  ##
+  DAT <- readRDS('~/Research/Projects/oralcancer/tcga/firehose_2014_12_06/TCGA_OSCC_mRNA.annotated.rds')
+  DAT1 <- DAT[pData(featureData(DAT))[,'symbol']!='',]
+  DAT1 <- DAT1[match(unique(pData(featureData(DAT1))[,'symbol']),pData(featureData(DAT1))[,'symbol']),]
+  featureNames(DAT1) <- pData(featureData(DAT1))[,'symbol']
+
+  GS <- GeneSet(paste(CBMMLAB,'/annot/c2.cp.v4.0.symbols.gmt',sep=''))
+  GS1 <- GS
+  GS1@geneset <- GS1@geneset[unlist(sapply(c('catenin','emt'),grep,names(geneSet(GS1)),ignore.case=TRUE))]
+  sapply( lapply(lapply(geneSet(GS1),toupper),intersect,toupper(featureNames(DAT1))), length)
+  geneSetName(GS1) <- '4pathways'
+
+  gsp.eSet <- DAT1[intersect(unique(unlist(geneSet(GS1))),featureNames(DAT1)),]
+  gsp.GeneSet <- GS1
+  
+  saveRDS(gsp.eSet,file=paste(CBMGIT, "scripts/R/CBMRtools/data/gsp.eSet.rds",sep="/"))
+  saveRDS(gsp.GeneSet,file=paste(CBMGIT, "scripts/R/CBMRtools/data/gsp.GeneSet.rds",sep="/"))
+
+  INP <- paste(CBMMLAB,"/annot/c2.cp.v4.0.symbols.gmt",sep="")
+  OUT <- paste(CBMGIT, "/scripts/R/CBMRtools/data/gsp.GeneSet.gmt",sep="")
+  system( paste("grep CATENIN", INP, ">", OUT) )
+  system( paste("grep _EMT_", INP, ">>", OUT) )
+  
+  
+  ## EXAMPLE OF USE
+  ##
+  ## the very basic steps are:
+  ##
+  ## 1) load the data (expression and genesets)
+  ## 2) rename the dataset by replacing probesetIDs by gene symbols ==> DB
+  ## 3) create the list of lists pairing ==> PAIRS
+  ## 4) run geneSetProjection(dat=DB,pairing=PAIRS,gset.db=GSET, ...)
+  ##
+  CBMGIT <- Sys.getenv('CBMGIT')
+  if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
+  source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/misc.math.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/broad.file.formats.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/GeneSet.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/ks.score.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/geneSetProjection.R", sep="/") )
+  require(Biobase)
+
+  CBMMLAB <- Sys.getenv('CBMMLAB')
+  if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
+  source( paste(CBMMLAB, "R/heatmap.R", sep="/") )
+  
+  setwd( paste(CBMGIT, "/scripts/R/CBMRtools/", sep="") )
+
+  ## 1) LOAD the data
+  ##
+  DAT <- readRDS("data/gsp.eSet.rds")
+  GST <- GeneSet("data/gsp.GeneSet.gmt")
+
+  ## 2) RENAME the dataset rows (w/ gene symbols)
+  ##
+  DAT1 <- DAT[pData(featureData(DAT))[,"symbol"]!="",]
+  featureNames(DAT1) <- toupper(pData(featureData(DAT1))[,"symbol"])
+
+  ## 3) CREATE the list of lists pairing
+  ##
+  PAIRS <- list(OSCC=list(control=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]=="AN"],
+                          treatment=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]!="AN"]))
+
+  ## 4) RUN geneSetProjection ..
+  ##
+  GSPdir <- geneSetProjection(dat=DAT1,
+                              pairing=PAIRS,
+                              GS=GST,
+                              collapse=FALSE,
+                              weighted=FALSE,
+                              absolute=FALSE, # keep the directionality of the enrichment scores
+                              min.gset=5,
+                              verbose=TRUE)
+
+
+  typeID <-  'tissue_type'
+  siteID <-  'patient.anatomic_neoplasm_subdivision'
+  gradeID <- 'my_grade'
+  stageID <- 'my_stage'
+  valid.grade <- c('g0','g1','g2','g3','g4')
+  valid.stage <- c('stage 0','stage i','stage ii','stage iii','stage iva','stage ivb')
+  grade.col <- col.gradient(c('white','dark green'),length(valid.grade));names(grade.col) <- valid.grade
+  stage.col <- col.gradient(c('white','dark green'),length(valid.stage));names(stage.col) <- valid.stage
+  site.col <- col.gradient(c('blue','white','red'),nlevels(pData(DAT1)[,siteID]))
+  names(site.col) <- levels(pData(DAT1)[,siteID])
+
+  require(cba)
+  hc.col <- hcopt(dist(t(exprs(GSPdir)),method='euclidean'),method='ward.D')
+  hc.row <- hcopt(as.dist(1-cor(t(exprs(GSPdir)))),method='ward.D')
+  grade <- pData(DAT1)[,gradeID]; grade[!(grade %in% valid.grade)] <- 'zzz'
+  stage <- pData(DAT1)[,stageID]; stage[!(stage %in% valid.stage)] <- 'zzz'
+  CSC <- cbind(grade=c(grade.col,"yellow")[match(grade,c(names(grade.col),'zzz'))],
+               stage=c(stage.col,"yellow")[match(stage,c(names(stage.col),'zzz'))])
+
+  my.heatmap(exprs(GSPdir),scale='n',Rowv=as.dendrogram(hc.row),Colv=as.dendrogram(hc.col),labCol=NA,ColSideColors=CSC,margins=c(4,10),cexRow=.5)
+}
