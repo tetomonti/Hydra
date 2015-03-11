@@ -44,9 +44,11 @@ def initialize_module():
         if opt[0]=='-i': file_index=opt[1]
         if opt[0]=='-n': num_processors=opt[1]
         if opt[0]=='-d': working_dir=opt[1]
+    print '\n'
     print '###########################'
     print sys.argv
     print working_dir
+
 
     #Read and initialize parameters
     with open(working_dir+'results/parameters.json') as f:

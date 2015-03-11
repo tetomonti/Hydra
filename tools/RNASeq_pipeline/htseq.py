@@ -79,7 +79,7 @@ def finalize(param,input_files='count_files'):
         csv_file.close()
     
         #get all the expression values
-        header='ENS_ID'
+        header='ID'
         for idx in range(param['num_samples']):
             if param[input_files]!='':            
                 header=header+'\t'+param['stub'][idx]
@@ -120,40 +120,15 @@ def finalize(param,input_files='count_files'):
 if __name__ == "__main__":
     import subprocess, sys, os
     param=module_helper.initialize_module()
-    
-    #added code
-    #First we need to sort the bam file by name using samtools sort before we can run htseq-count on it
-#    out_prefix = param['stub'][param['file_index']]+'_nsorted'
-#    sorted_bam = param['module_dir']+out_prefix+'.bam'
-#    sort_call = [param['sam_exec'],'sort','-n','-o',param['working_file'],out_prefix,'>',sorted_bam]    
-
-    #print out_prefix
-    #print sorted_bam
-    #print sort_call
 
     #build htseq-count call:
-#    call1 = [param['sam_exec'],'view',param['working_file']]
-    #edited code
-    call1 = [param['sam_exec'],'view','working_file']
+    call1 = [param['sam_exec'],'view',param['working_file']]
     call2 = [param['HTSeq_exec'],'-s',param['HTSeq_s'],'-t',param['HTSeq_t'],'-i',param['HTSeq_id'],'-m',param['HTSeq_m'],'-',param['HTSeq_gft']]
   
-    #print call1
-    #print call2
-
     #function calls
-#    param['file_handle'].write('Sort CALL: '+' '.join(sort_call)+'\n')
     param['file_handle'].write('Pipe CALL 1: '+' '.join(call1)+'\n')
     param['file_handle'].write('Pipe CALL 2: '+' '.join(call2)+'\n')
     
-    #p = subprocess.Popen(sort_call, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-    #p.stdout.close()
-    #output,error = p.communicate()
-    #print "Test"
-    #error handling
-    #if output=='':
-    #    param['file_handle'].write(error+'\n')
-    #    sys.exit(0)
-
     p1 = subprocess.Popen(call1, stdout=subprocess.PIPE)
     p2 = subprocess.Popen(call2, stdin=p1.stdout, stdout=subprocess.PIPE)
     p1.stdout.close()
@@ -171,4 +146,7 @@ if __name__ == "__main__":
     handle.close()
     
     #wrap up and return the current workingfile
-    module_helper.wrapup_module(param,[outfile])
+    module_helper.wrapup_module(param,[outfile]) 
+     
+
+

@@ -43,6 +43,10 @@ def wait_for_qsub(param, job_id):
             for current_line in output.split('\n'):
                 if user in current_line and job_id in current_line:
                     qjobs+=1  
+    #change writing permissions in qsub directory so that group has access to the qlog files. Otherwise other people cannot rerun the pipeline
+    for file in os.listdir(param['qsub_dir']):
+        os.chmod(param['qsub_dir']+file, 0770)    
+    
                     
         
 def submit_jobs(index, param, py_file, job_id, cores, environment):

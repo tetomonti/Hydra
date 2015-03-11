@@ -100,7 +100,7 @@ def plotAlignmentOverview(param):
 
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8
@@ -129,7 +129,7 @@ def plotSplicedReads(param):
 
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8
@@ -155,7 +155,7 @@ def plotInsertReads(param):
         
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8
@@ -180,7 +180,7 @@ def plotDeleteReads(param):
         
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8
@@ -208,7 +208,7 @@ def plotPairedSingleton(param):
     
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8
@@ -245,7 +245,7 @@ def plotMismatches(param):
 
     #create plot 
     fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['bamqc_stub'])*0.4,8)
+    fig.set_size_inches(5+len(param['bamqc_stub'])*0.4,8)
     index = np.arange(len(param['bamqc_stub']))
     
     bar_width = 0.8

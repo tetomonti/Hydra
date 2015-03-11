@@ -118,11 +118,47 @@ def finalize(param,input_files='count_files'):
         #create an eSet:
         createESet(out_file,param['pheno_file'],param)
         
-        #write summary stats        # We don't need this because featureCount does this on its own
-        #out_handle=open(param['working_dir']+'results/featureCount/featureCount_stats.txt','w')
-        #out_handle.write(header+'\n')
-        #for i in range(len(counts),len(counts)): out_handle.write(counts[i]+'\n')
-        #out_handle.close()
+        #write summary stats        # featureCount does this on its own so we can just fetch each summary file
+        #check which of these files are actually available
+        working_files = [iFile+'.summary' for iFile in param[input_files] if iFile !='']
+      
+        if len(working_files)>0:
+        #get Status column from summary file using the first column in the first file in the list of working files
+         csv_file = open(working_files[0])
+         csv_reader = csv.reader(csv_file, delimiter='\t')
+        #Here, we want to skip the first line, as it simply points to the alignment file used when running featureCount
+         next(csv_reader,None)
+    
+        #Now start by taking the list of identifier, which is the first column in the file
+         entry = [row[0] for row in csv_reader]
+         csv_file.close()
+
+        #get all the summary stats for each sample
+         header='Status'
+      
+         for idx in range(param['num_samples']):
+            if param[input_files]!='':
+              header=header+'\t'+param['stub'][idx]
+             #Fetch the corresponding sample's summary file
+              csv_file = open(param[input_files][idx]+'.summary')
+              csv_reader = csv.reader(csv_file,delimiter='\t')
+             #Again, we want to skip the first line, as it simply points to the alignment file used when running featureCount
+              next(csv_reader,None)
+
+             #Now start getting the stats (row[1]) and add in the Status (counts[i]) before it
+              i=0
+              for row in csv_reader:
+                entry[i] = entry[i]+'\t'+row[1]
+                i+=1
+              csv_file.close()
+
+
+        #output the file
+         out_handle=open(param['working_dir']+'results/featureCount/featureCount_stats.txt','w')
+         out_handle.write(header+'\n')
+       
+         for i in range(len(entry)): out_handle.write(entry[i]+'\n')
+         out_handle.close()
         
     else:
         print('featureCount was not run successfully on any of the files..\n')
@@ -160,7 +196,7 @@ if __name__ == "__main__":
     param['file_handle'].write(output)
         
     #error handling
-    if not os.path.exists(out_file):
+    if not os.path.exists(outfile):
         param['file_handle'].write('featureCount run failed \n') 
         sys.exit(0)
     
