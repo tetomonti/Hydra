@@ -12,7 +12,7 @@ def init(param):
 def run_cutadapt(param,infile,outfile,adapter):
     #run the clipper
 
-    call = param['cutadapt_python_version']+' '+param['cutadapt_exec']+' -m '+param['cutadapt_m']+' -a '+adapter+' -o "'+outfile+'" "'+param[infile]+'"'
+    call = param['cutadapt_exec']+' -m '+param['cutadapt_m']+' -a '+adapter+' -o "'+outfile+'" "'+param[infile]+'"'
     print '\n'
     print call
     print '\n'
