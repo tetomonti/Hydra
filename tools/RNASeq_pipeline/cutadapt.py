@@ -1,7 +1,7 @@
 import module_helper, os
 
 def init(param):
-   module_helper.checkParameter(param,key='cutadapt_exec',dType=str, checkFile=True)
+   module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
    module_helper.checkParameter(param,key='cutadapt_python_version',dType=str)
    module_helper.checkParameter(param,key='cutadapt_first_adapter',dType=str)
    if param['paired']:
