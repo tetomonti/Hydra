@@ -1,0 +1,8 @@
+
+
+# compiled files
+*.pyc
+
+# temp files
+\#*\#
+*~
