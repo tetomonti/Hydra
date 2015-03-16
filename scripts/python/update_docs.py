@@ -72,14 +72,16 @@ def main():
         tuple_args = zip(pnames, list_args[1::2])
         file_param = filter(lambda x: x[0]== '-f', tuple_args)
         filen = file_param[0][1]
+        file_param_2 = filter(lambda x: x[0]== '-d', tuple_args)
+        docn = file_param_2[0][1]
         scripts = os.listdir('source')
         if '%s.rst' %filen in scripts:
            print ".rst file already present in source dir"
         else:
-             print "updating documentation"   
+             print "updating rst files"   
              add_rst(filen)
              update_index(filen)
-        os.system("python sphinx_mod/sphinx-build.py source docs")
+        os.system("python sphinx_mod/sphinx-build.py source %s" %docn)
             
         
 if __name__ == '__main__':
