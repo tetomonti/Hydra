@@ -12,6 +12,7 @@ Contents:
    :maxdepth: 2
    
    utils
+   xls_write_sheets
 
 
 Indices and tables
