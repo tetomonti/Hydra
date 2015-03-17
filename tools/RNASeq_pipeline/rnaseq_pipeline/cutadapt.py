@@ -4,7 +4,6 @@ import os
 
 def init(param):
    module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
-   module_helper.checkParameter(param,key='cutadapt_python_version',dType=str)
    module_helper.checkParameter(param,key='cutadapt_first_adapter',dType=str)
    if param['paired']:
        module_helper.checkParameter(param,key='cutadapt_second_adapter',dType=str)
