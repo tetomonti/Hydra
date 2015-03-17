@@ -1,4 +1,5 @@
-import module_helper, helper, subprocess, os
+from rnaseq_pipeline import module_helper, helper
+import subprocess, os
 
 def init(param):
    module_helper.checkParameter(param,key='HTSeq_exec',dType=str)

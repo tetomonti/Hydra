@@ -1,4 +1,5 @@
-import module_helper, helper, os, subprocess
+from rnaseq_pipeline import module_helper, helper
+import os, subprocess
 
 def init(param):
    module_helper.checkParameter(param,key='cufflinks_exec',dType=str)

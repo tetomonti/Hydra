@@ -1,4 +1,6 @@
-import os, sys,  time, shlex, subprocess, module_helper, helper, random
+import os, sys,  time, shlex, subprocess
+from rnaseq_pipeline import module_helper, helper
+import random
 
 def initialize_qsub(param):
     #split module list and add module load to the list

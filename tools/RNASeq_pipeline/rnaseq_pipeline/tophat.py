@@ -1,4 +1,4 @@
-import module_helper
+from rnaseq_pipeline import module_helper
 
 def init(param):
    module_helper.checkParameter(param,key='tophat_exec',dType=str)

@@ -1,4 +1,5 @@
-import module_helper, os
+from rnaseq_pipeline import module_helper
+import os
 
 def init(param):
    module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
