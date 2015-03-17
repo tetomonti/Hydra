@@ -1,14 +1,14 @@
-import module_helper
-import helper
-import fastqc
-import trimmer
-import tophat
-import bamqc
-import cufflinks 
-import matched_pairs
-import cutadapt
-import htseq
-import featureCount
+from rnaseq_pipeline import module_helper
+from rnaseq_pipeline import helper
+from rnaseq_pipeline import fastqc
+from rnaseq_pipeline import trimmer
+from rnaseq_pipeline import tophat
+from rnaseq_pipeline import bamqc
+from rnaseq_pipeline import cufflinks 
+from rnaseq_pipeline import matched_pairs
+from rnaseq_pipeline import cutadapt
+from rnaseq_pipeline import htseq
+from rnaseq_pipeline import featureCount
 import sys
 
     
