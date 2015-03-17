@@ -1,10 +1,9 @@
 import os, sys,  time, shlex, subprocess
-import rnaseq_pipeline.helper
-helper = rnaseq_pipeline.helper
+from rnaseq_pipeline import module_helper
 
 def initialize_single_cpu(param):
     #split module list and add module load to the list
-    helper.checkParameter(param,key='modules',dType=str)
+    module_helper.checkParameter(param,key='modules',dType=str)
     param['modules']=[]
 
         
