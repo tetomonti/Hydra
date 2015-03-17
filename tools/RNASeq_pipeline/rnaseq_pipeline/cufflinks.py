@@ -1,4 +1,5 @@
 from rnaseq_pipeline import module_helper, helper
+from rnaseq_pipeline.r_scripts import get_script_path
 import os, subprocess
 
 def init(param):
@@ -26,7 +27,7 @@ def report(param):
         
     #run R script that creates a PCA
     counts=param['working_dir']+'deliverables/cufflinks_counts_fpkm.txt'
-    cmd=[param['Rscript_exec'],'cufflinks_pca.R','-c',counts,'-a',param['pheno_file'],'-o',param['working_dir']]
+    cmd=[param['Rscript_exec'], get_script_path('cufflinks_pca.R'),'-c',counts,'-a',param['pheno_file'],'-o',param['working_dir']]
     output,error = subprocess.Popen(cmd ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
     param['report'].write('<a href="cufflinks/pca.html">PCA</a>')
         

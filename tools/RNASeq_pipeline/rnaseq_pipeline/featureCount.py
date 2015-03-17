@@ -1,4 +1,5 @@
 from rnaseq_pipeline import module_helper, helper
+from rnaseq_pipeline.r_scripts import get_script_path
 import subprocess, os
 
 def init(param):
@@ -14,7 +15,7 @@ def init(param):
    
 def createESet(count_file,pheno_file,param):
     #create a Bioconductor ExpresionSet
-    cmd=[param['Rscript_exec'],'createRawCountESet.R','-c',count_file,'-a',pheno_file,'-o',param['working_dir']]
+    cmd=[param['Rscript_exec'],get_script_path('createRawCountESet.R'),'-c',count_file,'-a',pheno_file,'-o',param['working_dir']]
     output,error = subprocess.Popen(cmd ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
     helper.writeLog('Creating ESet ... \n',param)
     
