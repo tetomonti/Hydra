@@ -13,7 +13,7 @@ if __name__ == "__main__":
     import sys, getopt
     import rnaseq_pipeline.pipeline
     pipeline = rnaseq_pipeline.pipeline
-    import rnaseq_pipeline,helper
+    import rnaseq_pipeline.helper
     helper = rnaseq_pipeline.helper
     import subprocess
     
