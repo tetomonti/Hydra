@@ -1,5 +1,5 @@
 import os, subprocess, csv
-from rnaseq_pipeline import module_helper
+import rnaseq_pipeline.module_helper as module_helper
 import numpy as np
 import matplotlib.pyplot as plt
 import math, pylab

@@ -1,5 +1,6 @@
 import os, sys,  time, shlex, subprocess
-from rnaseq_pipeline import module_helper, helper
+import rnaseq_pipeline.module_helper as module_helper
+import rnaseq_pipeline.helper as helper
 import random
 
 def initialize_qsub(param):
