@@ -1,7 +1,10 @@
 import os, sys, shutil, json, time, shlex, subprocess, random 
-import rnaseq_pipeline.qsub_module as qsub_module
-import rnaseq_pipeline.single_cpu_module as single_cpu_module
-import rnaseq_pipeline.module_helper as module_helper
+import rnaseq_pipeline.qsub_module
+qsub_module = rnaseq_pipeline.qsub_module
+import rnaseq_pipeline.single_cpu_module
+single_cpu_module = rnaseq_pipeline.single_cpu_module
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
   
 ################################################################################################################################################################################
 ################################################################################################################################################################################

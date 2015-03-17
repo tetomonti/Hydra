@@ -11,8 +11,10 @@ if __name__ == "__main__":
     import matplotlib
     matplotlib.use('Agg')
     import sys, getopt
-    import rnaseq_pipeline.pipeline as pipeline
-    improt rnaseq_pipeline,helper as helper
+    import rnaseq_pipeline.pipeline
+    pipeline = rnaseq_pipeline.pipeline
+    import rnaseq_pipeline,helper
+    helper = rnaseq_pipeline.helper
     import subprocess
     
     list_args = sys.argv[1:]

@@ -1,5 +1,7 @@
-import rnaseq_pipeline.module_helper as module_helper
-import rnaseq_pipeline.helper as helper
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import rnaseq_pipeline.helper
+helper = rnaseq_pipeline.helper
 from rnaseq_pipeline.r_scripts import get_script_path
 import subprocess, os
 

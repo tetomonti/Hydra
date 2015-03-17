@@ -1,4 +1,5 @@
-import rnaseq_pipeline.module_helper as module_helper
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
 import os
 
 def init(param):

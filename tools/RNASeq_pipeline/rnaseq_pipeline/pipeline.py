@@ -1,14 +1,25 @@
-import rnaseq_pipeline.module_helper as module_helper
-import rnaseq_pipeline.helper as helper
-import rnaseq_pipeline.fastqc as fastqc
-import rnaseq_pipeline.trimmer as trimmer
-import rnaseq_pipeline.tophat as tophat
-import rnaseq_pipeline.bamqc as bamqc
-import rnaseq_pipeline.cufflinks as cufflinks
-import rnaseq_pipeline.matched_pairs as matched_pairs
-import rnaseq_pipeline.cutadapt as cutadapt
-import rnaseq_pipeline.htseq as htseq
-import rnaseq_pipeline.featureCount as featureCount
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import rnaseq_pipeline.helper
+helper = rnaseq_pipeline.helper
+import rnaseq_pipeline.fastqc
+fastqc = rnaseq_pipeline.fastqc
+import rnaseq_pipeline.trimmer
+trimmer = rnaseq_pipeline.trimmer
+import rnaseq_pipeline.tophat
+tophat = rnaseq_pipeline.tophat
+import rnaseq_pipeline.bamqc
+bamqc = rnaseq_pipeline.bamqc
+import rnaseq_pipeline.cufflinks
+cufflinks = rnaseq_pipeline.cufflinks
+import rnaseq_pipeline.matched_pairs
+matched_pairs = rnaseq_pipeline.matched_pairs
+import rnaseq_pipeline.cutadapt
+cutadapt = rnaseq_pipeline.cutadapt
+import rnaseq_pipeline.htseq
+htseq = rnaseq_pipeline.htseq
+import rnaseq_pipeline.featureCount
+featureCount = rnaseq_pipeline.featureCount
 import sys
 
     
