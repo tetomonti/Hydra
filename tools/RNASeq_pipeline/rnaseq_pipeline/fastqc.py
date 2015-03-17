@@ -285,7 +285,7 @@ def report(param,input_files='fastq_files',header='FastQC results'):
 
 
 def init(param):
-   module_helper.checkParameter(param,key='fastqc_exec',dType=str,checkFile=True)
+   module_helper.checkParameter(param,key='fastqc_exec',dType=str)
 
 def run_fastqc(filename,param):
     out_dir = param['module_dir']+'/'+param['stub'][param['file_index']]
