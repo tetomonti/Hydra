@@ -1,6 +1,7 @@
 import rnaseq_pipeline.module_helper
 module_helper = rnaseq_pipeline.module_helper
 import os
+import subprocess
 
 def init(param):
    module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
