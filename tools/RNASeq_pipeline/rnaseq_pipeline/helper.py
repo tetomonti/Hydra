@@ -1,4 +1,5 @@
-import os, sys, shutil, json, time, shlex, subprocess, random 
+import os, sys, shutil, json, time, shlex, subprocess, random
+from rnaseq_pipeline.logs import writeLog
 import rnaseq_pipeline.qsub_module
 qsub_module = rnaseq_pipeline.qsub_module
 import rnaseq_pipeline.single_cpu_module
@@ -287,12 +288,6 @@ def submit_job(param,py_file,input_files,output_files='',cores='1-8',environment
         check_if_queue_finished_sucessful(param)         
         
         writeLog('++++++++++++++++++++++++++++\n\n',param)
-
-def writeLog(string,param):
-    if param['verbose']: print string
-    handle=open(param['log_handle'],'a')
-    handle.write(string)
-    handle.close()
 
 
 ################################################################################################################################################################################
