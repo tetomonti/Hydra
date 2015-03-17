@@ -34,7 +34,7 @@ def run_trimmer(param,infile,outfile):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

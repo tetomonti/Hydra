@@ -68,7 +68,7 @@ def finalize(param,input_files='count_files'):
         print('Cufflinks was not run successfully on any of the files..\n')
     
     
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

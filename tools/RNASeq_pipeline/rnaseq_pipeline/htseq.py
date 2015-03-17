@@ -118,7 +118,7 @@ def finalize(param,input_files='count_files'):
         
         
         
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

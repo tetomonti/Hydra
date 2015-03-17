@@ -291,7 +291,7 @@ def init(param):
     module_helper.checkParameter(param,key='bamqc_script',dType=str)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

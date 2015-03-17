@@ -23,7 +23,7 @@ def run_match_pairs(param,infile,infile2,outfile,outfile2):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

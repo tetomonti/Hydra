@@ -299,7 +299,7 @@ def run_fastqc(filename,param):
        sys.exit()
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys
     param=module_helper.initialize_module()
 

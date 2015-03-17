@@ -12,7 +12,7 @@ def init(param):
    
    
      
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 
