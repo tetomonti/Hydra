@@ -32,44 +32,44 @@ def run_all(param):
        param['bam_files']=param['raw_files'][:]
     else:
         #preprocessing fastq file
-        helper.submit_job(param, 'fastqc.py',input_files='raw_files',environment='modules_python2.7')  
+        helper.submit_job(param, 'run_fastqc',input_files='raw_files',environment='modules_python2.7')  
         if param['do_trimming']:
-            helper.submit_job(param,'trimmer.py',input_files='raw_files',output_files='fastq_files',environment='modules_python2.7') 
+            helper.submit_job(param,'run_trimmer',input_files='raw_files',output_files='fastq_files',environment='modules_python2.7') 
         else:
            param['fastq_files']=param['raw_files'][:]
            if param['paired']:
                param['fastq_files2']=param['raw_files2'][:]
-        helper.submit_job(param, 'cutadapt.py',    input_files='raw_files',output_files='fastq_files',environment='modules_python2.7.5')
+        helper.submit_job(param, 'run_cutadapt',    input_files='raw_files',output_files='fastq_files',environment='modules_python2.7.5')
 #Added code
         if param['paired']:
-               helper.submit_job(param, 'matched_pairs.py', input_files='fastq_files',output_files='fastq_files',environment='modules_python2.7') 
-        helper.submit_job(param, 'fastqc.py',    input_files='fastq_files',environment='modules_python2.7') 
+               helper.submit_job(param, 'run_matched_pairs', input_files='fastq_files',output_files='fastq_files',environment='modules_python2.7') 
+        helper.submit_job(param, 'run_fastqc',    input_files='fastq_files',environment='modules_python2.7') 
         
         #do alignment if it's not just a fastqc run
         if not param['QC_and_trim_only']:
             if param['aligner']=='tophat':
                 #running the aligner
-                helper.submit_job(param, 'tophat.py',    input_files='fastq_files', output_files='bam_files', cores=param['qsub_num_processors'],environment='modules_python2.7')  
+                helper.submit_job(param, 'run_tophat',    input_files='fastq_files', output_files='bam_files', cores=param['qsub_num_processors'],environment='modules_python2.7')  
             else:
                 helper.writeLog('The selected aligner does not exist.',param)
                 sys.exit(0)
             
     if not param['QC_and_trim_only']:
         #Bamqc
-        helper.submit_job(param, 'bamqc.py',     input_files='bam_files',   environment='modules_python2.7.5') 
+        helper.submit_job(param, 'run_bamqc',     input_files='bam_files',   environment='modules_python2.7.5') 
         
         #Getting the counts:
         #Added code (conditional statements to accomodate multiple read quantifiers)
         if param['run_cufflinks']:
-          helper.submit_job(param, 'cufflinks.py', input_files='bam_files',   output_files='count_files',environment='modules_python2.7')  
+          helper.submit_job(param, 'run_cufflinks', input_files='bam_files',   output_files='count_files',environment='modules_python2.7')  
           cufflinks.finalize(param,input_files='count_files')
         
         if param['run_htseq']:
-	  helper.submit_job(param, 'htseq.py', input_files='bam_files',   output_files='count_files', environment='modules_python2.7')  
+	  helper.submit_job(param, 'run_htseq', input_files='bam_files',   output_files='count_files', environment='modules_python2.7')  
           htseq.finalize(param,input_files='count_files')
 
         if param['run_featureCount']:		  
-          helper.submit_job(param,'featureCount.py',input_files='bam_files', output_files='count_files',environment='modules_python2.7')
+          helper.submit_job(param,'run_featureCount',input_files='bam_files', output_files='count_files',environment='modules_python2.7')
 	  featureCount.finalize(param,input_files='count_files')
 
 def report_all(param):

@@ -287,7 +287,6 @@ def report(param):
 
 
 def init(param):
-    module_helper.checkParameter(param,key='bamqc_exec',dType=str)
     module_helper.checkParameter(param,key='bamqc_script',dType=str)
 
 
@@ -301,7 +300,7 @@ def main():
         os.makedirs(outdir)
 
 
-    call = param['bamqc_exec']+' '+param['scripts_dir']+param['bamqc_script']+' -i '+param['working_file']+' -o '+outdir
+    call = param['bamqc_script']+' -i '+param['working_file']+' -o '+outdir
     
     param['file_handle'].write('CALL: '+call+'\n')
     output,error = subprocess.Popen(call.split() ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()

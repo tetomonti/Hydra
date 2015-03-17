@@ -5,12 +5,12 @@ import random
 def initialize_qsub(param):
     #split module list and add module load to the list
     helper.checkParameter(param,key='modules_python2.6',dType=str)
-    param['modules_python2.6']=[('module load '+mod.strip()) for mod in param['modules_python2.6'].split(",")]
+    param['modules_python2.6']=[] 
     helper.checkParameter(param,key='modules_python2.7',dType=str)
-    param['modules_python2.7']=[('module load '+mod.strip()) for mod in param['modules_python2.7'].split(",")]
+    param['modules_python2.7']=[]
     #Added code for htseq-count to work (only requires python 2.7.5 and samtools to be loaded)
     helper.checkParameter(param,key='modules_python2.7.5',dType=str)
-    param['modules_python2.7.5']=[('module load '+mod.strip()) for mod in param['modules_python2.7.5'].split(",")]
+    param['modules_python2.7.5']=[]
     #####
     helper.checkParameter(param,key='qsub_email',dType=str)
     helper.checkParameter(param,key='qsub_send_email',dType=bool)
@@ -70,7 +70,7 @@ def submit_jobs(index, param, py_file, job_id, cores, environment):
         command_list[:0] = ['module unload python2.7/Python-2.7.3_gnu446']
         cmd='python '
     
-    cmd=cmd+param['scripts_dir']+ py_file +' -i ' + str(index) + ' -n $NSLOTS' + ' -d ' +  param['working_dir']
+    cmd=py_file +' -i ' + str(index) + ' -n $NSLOTS' + ' -d ' +  param['working_dir']
     command_list.append(cmd)
 
 
