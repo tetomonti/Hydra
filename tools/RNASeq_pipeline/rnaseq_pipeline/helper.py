@@ -230,7 +230,9 @@ def submit_job(param,py_file,input_files,output_files='',cores='1-8',environment
     addInputOutputFiles(param,input_files,output_files)
 
     #get the current flag for the log file
-    param['current_dir']  = py_file.split('.')[0]
+    # this is a terrible hard coded solution assuming that py_file has a value
+    # 'run_currennt_dir' and we want to drop the 'run_' to get 'current_dir'
+    param['current_dir']  = py_file[4:]
     param['current_flag'] = param['current_dir'] + '_' + input_files
         
     if is_module_finished(param):
