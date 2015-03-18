@@ -56,14 +56,14 @@ setup(
              'scripts/run_bamqc.py'],
     entry_points={
         'console_scripts': [
-            'run_bamqc=rnaseq_pipeline.bamqc:main',
-            'run_cufflinks=rnaseq_pipeline.cufflinks:main',
-            'run_cutadapt=rnaseq_pipeline.cutadapt:main',
-            'run_fastqc=rnaseq_pipeline.fastqc:main',
-            'run_featureCount=rnaseq_pipeline.featureCount:main',
-            'run_htseq=rnaseq_pipeline.htseq:main',
-            'run_matched_pairs=rnaseq_pipeline.matched_pairs:main',
-            'run_tophat=rnaseq_pipeline.tophat:main',
-            'run_trimmer=rnaseq_pipeline.trimmer:main']
+            'bamqc.py=rnaseq_pipeline.bamqc:main',
+            'cufflinks.py=rnaseq_pipeline.cufflinks:main',
+            'cutadapt.py=rnaseq_pipeline.cutadapt:main',
+            'fastqc.py=rnaseq_pipeline.fastqc:main',
+            'featureCount.py=rnaseq_pipeline.featureCount:main',
+            'htseq.py=rnaseq_pipeline.htseq:main',
+            'matched_pairs.py=rnaseq_pipeline.matched_pairs:main',
+            'tophat.py=rnaseq_pipeline.tophat:main',
+            'trimmer.py=rnaseq_pipeline.trimmer:main']
     }
 )
