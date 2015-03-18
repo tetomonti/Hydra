@@ -13,14 +13,14 @@ def init(param):
 def run_trimmer(param,infile,outfile):
 
     #unzip the fastq file
-    temp_file = param['module_dir']+param['stub'][param['file_index']]+'.fastq'
+    temp_file = "'"+param['module_dir']+param['stub'][param['file_index']]+".fastq'"
     call = 'gunzip -c ' + param[infile] + ' >'+temp_file
     retvalue = os.system(call)
 
     #run the trimmer
     param['file_handle'].write('CALL: '+call+'\n')
     call = param['trimming_exec']+' '+ param['trimming_mode'] + ' ' + param['trimming_value'] + ' ' + param['trimming_quality_value'] +' -z -i '+ temp_file +' -o '+param[outfile]
-    output,error = subprocess.Popen(call.split() ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+    output,error = subprocess.Popen(call ,shell=True, stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
     
     #remove temporary file
     os.remove(temp_file)

@@ -4,16 +4,21 @@
 \alias{heatmap.ggplot2}
 \title{heatmap.ggplot2}
 \usage{
-heatmap.ggplot2(eSet, col.clust = TRUE, row.clust = TRUE, col.lab = "",
-  row.lab = "", heatmap.y.text = FALSE, heatmap.x.text = FALSE,
-  heatmap.y.text.size = 7, heatmap.x.text.size = 6,
-  heatmap.colorlegend.name = "val", title.text = "", col.legend.name = "",
-  row.legend.name = "", row.scaling = "none", z.norm = FALSE,
-  cuttree.col = 0, cuttree.row = 0, verbose = FALSE, grid.heights = NA,
-  grid.widths = NA, show = FALSE)
+heatmap.ggplot2(eSet, brewer.pal.name = "RdBu", brewer.pal.rev = TRUE,
+  col.clust = TRUE, row.clust = TRUE, col.lab = "", row.lab = "",
+  heatmap.y.text = FALSE, heatmap.x.text = FALSE, heatmap.y.text.size = 7,
+  heatmap.x.text.size = 6, heatmap.colorlegend.name = "val",
+  title.text = "", col.legend.name = "", row.legend.name = "",
+  row.scaling = "none", z.norm = FALSE, cuttree.col = 0,
+  cuttree.row = 0, verbose = FALSE, grid.heights = NA, grid.widths = NA,
+  show = FALSE)
 }
 \arguments{
 \item{eSet}{expression set object to plot}
+
+\item{brewer.pal.name}{name of colorbrewer, see options at RColorBrewer::display.brewer.all()}
+
+\item{brewer.pal.rev}{reverse colorbrewer (TRUE or FALSE)}
 
 \item{col.clust}{perform column-wise hierarchical clustering (TRUE or FALSE)}
 

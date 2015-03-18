@@ -45,9 +45,10 @@ QC_and_trim_only   =   FALSE
 ############################################################################################################################################
 run_single_cpu = FALSE         #in case you have nothing to do for the next 2 month or so give this option a try!!
 
-modules_python2.6 = FASTX-Toolkit/0.0.13.2, boost/boost_1_51_0_gnu446, samtools/samtools-0.1.19_gnu446, bowtie2, tophat, cufflinks/2.2.0
-modules_python2.7 = python2.7/Python-2.7.3_gnu446, samtools/samtools-0.1.19_gnu446, htseq/0.6.1p1
+modules_python2.6 = FASTX-Toolkit/0.0.13.2
+modules_python2.7 = python2.7/Python-2.7.3_gnu446, samtools/samtools-0.1.19_gnu446, htseq/0.6.1p1, boost/boost_1_51_0_gnu446, bowtie2/2.2.2, tophat/2.0.13, cufflinks/2.2.0, FASTX-Toolkit/0.0.13.2
 modules_python2.7.5 = python/2.7.5, samtools/samtools-0.1.19_gnu446, pysam/0.7.7
+
 
 ###########################################
 #MAKE SURE YOU CHANGE THIS to avoid e-mails to default user
