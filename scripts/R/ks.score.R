@@ -36,7 +36,6 @@ load.gset <- function( gset.filename, do.save=F, verbose=T )
   }
   gset
 }
-
 # FUNCTION: KS SCORE
 #
 ks.score <- function( x, y, alternative=c("two.sided","greater","less"),

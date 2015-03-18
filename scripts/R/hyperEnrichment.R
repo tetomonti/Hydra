@@ -36,9 +36,9 @@
 ## BEGIN documentation support (what follows are keyworded entries
 ## from which documentation pages will be extracted automatically)
 
-#' hyper.enrichment
+#' hyperEnrichment
 #' 
-#' \code{hyper.enrichment} carry out set enrichment test based on hyper-geometric distribution
+#' \code{hyperEnrichment} carry out set enrichment test based on hyper-geometric distribution
 #'
 #' @param drawn One or more sets of 'drawn' items (e.g., genes). Basically, a list of signatures.
 #' @param categories list of gene sets (e.g., MSigDB c2)
@@ -54,8 +54,8 @@
 #' # and run hyper-enrichment test
 #'
 #' data(hyper)
-#' print(hyper)
-#' hyperE<-hyper.enrichment(drawn=hyperSig,categories=geneSet(hyperGsets),ntotal=10000) 
+#' print(hyper) # contains objects hyperSig and hyperGsets
+#' hyperE <- hyperEnrichment(drawn=hyperSig,categories=geneSet(hyperGsets),ntotal=10000) 
 #' 
 #' @export 
 
@@ -64,7 +64,7 @@
 
 ## function: HYPER ENRICHMENT
 ##
-hyper.enrichment <- function
+hyperEnrichment <- function
 (
    drawn,          # one or more sets of 'drawn' items (e.g., genes). Basically, a list of signatures.
    categories,     # gene sets (list of gene sets)
@@ -111,7 +111,7 @@ hyper.enrichment <- function
      {
        VERBOSE(verbose,"*** Testing", names(drawn)[i], ".. " )
        dset <- drawn[[i]]
-       tmp <- hyper.enrichment(dset,categories,ntotal=ntotal,verbose=verbose)
+       tmp <- hyperEnrichment(dset,categories,ntotal=ntotal,verbose=verbose)
        if (is.null(tmp)) {
          VERBOSE(verbose,"not enough items drawn\n")
          next
@@ -193,17 +193,18 @@ if ( FALSE )
 {
   CBMMLAB <- Sys.getenv('CBMMLAB')
   CBMRtools <- Sys.getenv('CBMRtools')
+  CBMGIT <- Sys.getenv('CBMGIT')
   source(paste(CBMRtools,'R/misc.R',sep='/'))
-  source(paste(CBMRtools,'R/GeneSet.R',sep='/'))
-  source(paste(CBMRtools,'R/hyper.enrichment.R',sep='/'))
-  source(paste(CBMRtools,'R/broad.file.formats.R',sep='/'))
+  source(paste(CBMGIT,'scripts/R/GeneSet.R',sep='/'))
+  source(paste(CBMGIT,'scripts/R/hyperEnrichment.R',sep='/'))
+  source(paste(CBMGIT,'scripts/R/broad.file.formats.R',sep='/'))
 
   GS <- GeneSet(paste(CBMMLAB,'/annot/c2.cp.v4.0.symbols.gmt',sep=''))
-  SIG <- readRDS('~/Research/Projects/oralcancer/taz_yap_dpagt1/results/SIG.RDS')
+
   SIG <- read.tab.delim('~/Research/Projects/oralcancer/taz_yap_dpagt1/results/SIGtab.xls')
   hyperSig <- table2list(SIG,fill="")
 
-  HYP <- hyper.enrichment(drawn=hyperSig,categories=GS@geneset,ntotal=10000)
+  HYP <- hyperEnrichment(drawn=hyperSig,categories=GS@geneset,ntotal=10000)
 
   hyperGsets <- GS
   hyperGsets@source.file <- GS@name
