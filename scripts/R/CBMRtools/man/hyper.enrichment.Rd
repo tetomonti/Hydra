@@ -9,7 +9,7 @@ hyper.enrichment(drawn, categories,
   mht = TRUE, verbose = TRUE)
 }
 \arguments{
-\item{drawn}{one or more sets of 'drawn' items (e.g., genes). Basically, a list of signatures.}
+\item{drawn}{One or more sets of 'drawn' items (e.g., genes). Basically, a list of signatures.}
 
 \item{categories}{list of gene sets (e.g., MSigDB c2)}
 

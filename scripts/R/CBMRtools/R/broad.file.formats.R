@@ -143,7 +143,7 @@ write.res <- function( x, file=NULL, binext=".RData", verbose=T, do.save=T )
   cat(dim(x)[1], "\n", sep="", file=file, append=T )
 
   my.write.table(cbind(x@description, rownames(x@signal), res ),
-                 sep="\t", col.names=FALSE, file=file, append=TRUE )
+                 sep="\t", justify="none", col.names=FALSE, file=file, append=TRUE )
   if ( do.save ) {
     VERBOSE(verbose," (saving binary object ..")
     binfile <- gsub("\\.res",binext,file)
@@ -315,7 +315,7 @@ write.gct <- function( x, file, binext=".RData", do.save=T, verbose=F )
   cat( paste( c("Name\tDescription",exptnames(x)),collapse="\t"), sep="", "\n",
        file=file, append=T )
   my.write.table(cbind(genenames(x),x@description,x@signal), row.names=F, col.names=F,
-                 sep="\t", file=file, append=T )
+                 justify="none", sep="\t", file=file, append=T )
 
   if ( do.save ) {
     VERBOSE(verbose," (saving binary object ..")
@@ -768,63 +768,4 @@ factor2cls <- function(FCT)
   cls <- match(FCT,levels(FCT))-1
   levels(cls) <- levels(FCT)
   cls
-}
-## READ GMT
-##
-## Read gmt file into a named list
-##
-read.gmt <- function( gmtfile, verbose=T )
-{
-  gsets <- lapply(scan(gmtfile,what="character",sep="\n",quiet=T),
-                  function(z) unlist(strsplit(z,"\t"))[-2])
-  names(gsets) <- sapply(gsets,function(z) z[1])
-  
-  ## *** IMPORTANT: all gene names are 'upper-cased' and replicates are removed ***
-  gsets <- lapply(gsets,function(z) {z <- z[-1]; unique(toupper(z[z!=""]))}) # <== upper-case + removal
-  gsets
-}
-## GMT 2 TABLE
-##
-## create a 0-1 table of genesets from a GSEA '.gmt' file. The output is in
-## the format appropriate for hyper.enrichment (the 'categories' argument)
-##
-gmt2table <- function
-(
- gmtfile,
- verbose=T,
- do.save=F,   # save binary format of 0-1 table
- force.read=F # force to read 'gmt' table even if binary already available
-)
-{
-  binfile <- gsub(".gmt",".RData",gmtfile)
-  if ( !force.read && file.access(binfile)==0 ) {
-    VERBOSE(verbose, "binary object found, loading...\n")
-    return( load.var(binfile) )
-  }
-  # creating a list of genesets
-  # *** IMPORTANT: all gene names are 'upper-cased' and replicates are removed ***
-  #
-  gsets <- read.gmt(gmtfile,verbose=verbose)
-  items <- sort(unique(unlist(gsets)))
-  pathways <- matrix(0,length(items),length(gsets),
-                     dimnames=list(items,names(gsets)))
-  percent <- 0.1
-  for ( i in 1:length(gsets) )
-  {
-    gidx <- match(gsets[[i]],rownames(pathways))
-    if ( any(is.na(gidx)) )
-      stop("something wrong")
-    pathways[gidx,i] <- 1
-    if (verbose && i>=round(percent*length(gsets)) ) {
-      VERBOSE(verbose,round(percent*100),"% ",sep="")
-      percent <- percent+0.1
-    }
-  }
-  VERBOSE(verbose,"done, [",paste(dim(pathways),collapse="x"),"] table created.\n",sep="")
-  if ( do.save ) {
-    VERBOSE(verbose,"Saving binary object .. ")
-    save(pathways,file=binfile)
-    VERBOSE(verbose,"done.\n")
-  }
-  return(pathways)
 }
