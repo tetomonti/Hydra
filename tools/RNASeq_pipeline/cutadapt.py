@@ -1,7 +1,7 @@
 import module_helper, os
 
 def init(param):
-   module_helper.checkParameter(param,key='cutadapt_exec',dType=str, checkFile=True)
+   module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
    module_helper.checkParameter(param,key='cutadapt_python_version',dType=str)
    module_helper.checkParameter(param,key='cutadapt_first_adapter',dType=str)
    if param['paired']:
@@ -12,9 +12,15 @@ def init(param):
 def run_cutadapt(param,infile,outfile,adapter):
     #run the clipper
 
-    call = [param['cutadapt_python_version'],param['cutadapt_exec'],'-m',param['cutadapt_m'],'-a',adapter,'-o',outfile,param[infile]]
-    output,error = subprocess.Popen(call ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
-   
+    call = param['cutadapt_exec']+' -m '+param['cutadapt_m']+' -a '+adapter+' -o "'+outfile+'" "'+param[infile]+'"'
+    print '\n'
+    print call
+    print '\n'
+
+    output,error = subprocess.Popen(call ,stdout = subprocess.PIPE, shell=True, stderr= subprocess.PIPE).communicate()
+    print output
+    print error   
+
     param['file_handle'].write(error)
     param['file_handle'].write(output)
 

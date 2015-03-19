@@ -38,15 +38,15 @@ setClass("l1000data",
 read.res <- function
 (
  file,
- nrow=T,
+ nrow=TRUE,
  sep="\t",
- ignore.scale=F,
+ ignore.scale=FALSE,
  description="Description",
  accession="Accession",
- force.read=F,
- do.save=T,
+ force.read=FALSE,
+ do.save=TRUE,
  binext=".RData",
- verbose=T
+ verbose=TRUE
  )
 {
   # see if a binary object was cached
@@ -68,7 +68,7 @@ read.res <- function
   
   # Reading header line
   #
-  chip.names <- sapply(read.delim(file,nrows=1,sep=sep,header=F,colClasses="character",fill=T),as.character)
+  chip.names <- sapply(read.delim(file,nrows=1,sep=sep,header=FALSE,colClasses="character",fill=TRUE),as.character)
 
   if (chip.names[length(chip.names)]=="") chip.names <- chip.names[-length(chip.names)]
   if (chip.names[1]!=description)
@@ -78,7 +78,7 @@ read.res <- function
   
   # Reading data (signal + calls)
   #
-  dat <- read.delim(file,skip=3,sep=sep,header=F,quote="",check.names=F,row.names=2)
+  dat <- read.delim(file,skip=3,sep=sep,header=FALSE,quote="",check.names=FALSE,row.names=2)
   if ( length(chip.names)!=ncol(dat) )
     stop("header and dat have different length: ", length(chip.names), "!=", ncol(dat),sep="")
 
@@ -92,14 +92,14 @@ read.res <- function
   #
   if ( !ignore.scale )
   {
-    scale <- drop(as.matrix(read.delim(file,nrows=1,sep=sep,skip=1,header=F)))[seq(3,ncol(dat),2)]
+    scale <- drop(as.matrix(read.delim(file,nrows=1,sep=sep,skip=1,header=FALSE)))[seq(3,ncol(dat),2)]
     names(scale) <- chip.names
     if ( any(na.idx <- is.na(scale)))
       stop( "Scale factors are missing: ", paste(which(na.idx),collapse=","))
   }
   # Reading number of genes
   #
-  ngene <- read.delim(file,nrows=1,sep=sep,skip=2,header=F)[1]
+  ngene <- read.delim(file,nrows=1,sep=sep,skip=2,header=FALSE)[1]
   if ( ngene!=nrow(dat) )
     stop("Number of rows different from expected: ", nrow(dat), " (",ngene,") expected", sep="")
 
@@ -124,7 +124,7 @@ read.res <- function
   }
   dat
 }
-write.res <- function( x, file=NULL, binext=".RData", verbose=T, do.save=T )
+write.res <- function( x, file=NULL, binext=".RData", verbose=TRUE, do.save=TRUE )
 {
   if ( class(x)!="resdata" )
     stop( "object does not belong to resdata class" )
@@ -139,8 +139,8 @@ write.res <- function( x, file=NULL, binext=".RData", verbose=T, do.save=T )
       "\t\n", sep="", file=file )
   cat("\t\t",
       paste( x@scale, collapse="\t\t", sep="" ),
-      "\t\n", sep="", file=file, append=T )
-  cat(dim(x)[1], "\n", sep="", file=file, append=T )
+      "\t\n", sep="", file=file, append=TRUE )
+  cat(dim(x)[1], "\n", sep="", file=file, append=TRUE )
 
   my.write.table(cbind(x@description, rownames(x@signal), res ),
                  sep="\t", col.names=FALSE, file=file, append=TRUE )
@@ -213,7 +213,7 @@ set.descriptors <- function( x, dnames )
   x@description <- dnames
   x
 }
-subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
+subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)!="resdata") stop( "'resdata' object expected" )
   if ( is.null(exptnames) && is.null(genenames) )
@@ -247,8 +247,8 @@ subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
       stop( "empty subset to select" )
   }
   return( new("resdata",
-              signal=x@signal[g.idx,e.idx,drop=F],
-              calls=x@calls[g.idx,e.idx,drop=F],
+              signal=x@signal[g.idx,e.idx,drop=FALSE],
+              calls=x@calls[g.idx,e.idx,drop=FALSE],
               description=x@description[g.idx],
               scale=if (length(x@scale)>1) x@scale[e.idx] else "") )
 }
@@ -267,7 +267,7 @@ merge.resdata <- function( X, Y )
       description=X@description,
       scale=c(X@scale,Y@scale) )  
 }
-read.gct <- function( file, force.read=F, do.save=T, binext=".RData",verbose=T )
+read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RData",verbose=TRUE )
 {
   # see if a binary object was cached
   #
@@ -280,7 +280,7 @@ read.gct <- function( file, force.read=F, do.save=T, binext=".RData",verbose=T )
     return(dat)
   }
   VERBOSE( verbose, "\tReading signal .. " )
-  x <- read.delim(file,sep="\t",fill=T,skip=2, header=T,check.names=F,comment.char="")
+  x <- read.delim(file,sep="\t",fill=TRUE,skip=2, header=TRUE,check.names=FALSE,comment.char="")
   rownames(x) <- x[,1]
   desc <- as.character(x[,2])
   x <- as.matrix(x[,-c(1,2)])
@@ -300,7 +300,7 @@ dim.gctdata <- function( x )
     stop( "object does not belong to gctdata class" )
   dim(x@signal)
 }
-write.gct <- function( x, file, binext=".RData", do.save=T, verbose=F )
+write.gct <- function( x, file, binext=".RData", do.save=TRUE, verbose=FALSE )
 {
   if ( is.matrix(x) ) {
     x <- new("gctdata",
@@ -311,11 +311,11 @@ write.gct <- function( x, file, binext=".RData", do.save=T, verbose=F )
     stop( "object does not belong to gctdata class" )
   
   cat( "#1.2\n", file=file )
-  cat( paste(dim(x),collapse="\t"), sep="" , "\n", file=file, append=T )
+  cat( paste(dim(x),collapse="\t"), sep="" , "\n", file=file, append=TRUE )
   cat( paste( c("Name\tDescription",exptnames(x)),collapse="\t"), sep="", "\n",
-       file=file, append=T )
-  my.write.table(cbind(genenames(x),x@description,x@signal), row.names=F, col.names=F,
-                 sep="\t", file=file, append=T )
+       file=file, append=TRUE )
+  my.write.table(cbind(genenames(x),x@description,x@signal), row.names=FALSE, col.names=FALSE,
+                 sep="\t", file=file, append=TRUE )
 
   if ( do.save ) {
     VERBOSE(verbose," (saving binary object ..")
@@ -329,7 +329,7 @@ write.gct <- function( x, file, binext=".RData", do.save=T, verbose=F )
     VERBOSE(verbose, " done)")
   }
 }
-subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
+subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)!="gctdata") stop( "'gctdata' object expected" )
   if ( is.null(exptnames) && is.null(genenames) )
@@ -363,10 +363,10 @@ subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
       stop( "empty subset to select" )
   }
   return( new("gctdata",
-              signal=x@signal[g.idx,e.idx,drop=F],
+              signal=x@signal[g.idx,e.idx,drop=FALSE],
               description=x@description[g.idx]) )
 }
-read.l1000 <- function( fname, force.read=F, do.save=T, binext=".RData",verbose=T )
+read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RData",verbose=TRUE )
 {
   gene.headings <- c("pr_gene_symbol","pr_gene_title")
   
@@ -380,10 +380,10 @@ read.l1000 <- function( fname, force.read=F, do.save=T, binext=".RData",verbose=
     }
     return(dat)
   }
-  heading <- as.vector(as.matrix(read.tab.delim(fname,header=F,skip=1,nrows=1)))
+  heading <- as.vector(as.matrix(read.tab.delim(fname,header=FALSE,skip=1,nrows=1)))
 
   VERBOSE( verbose, "\tReading signal .. " )
-  x <- read.delim(fname,sep="\t",fill=T,skip=2, row.names=1,header=T,check.names=F,comment.char="",stringsAsFactors=F)
+  x <- read.delim(fname,sep="\t",fill=TRUE,skip=2, row.names=1,header=TRUE,check.names=FALSE,comment.char="",stringsAsFactors=FALSE)
   if ( nrow(x)!=heading[1]+heading[4] )
     stop( "unexpected # of rows:", heading[1]+heading[4], "expected" )
   if ( ncol(x)!=heading[2]+heading[3] )
@@ -414,7 +414,7 @@ dim.l1000data <- function( x )
     stop( "object does not belong to l1000data class" )
   dim(x@signal)
 }
-subset.l1000data <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
+subset.l1000data <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)!="l1000data") stop( "'l1000data' object expected" )
   if ( is.null(exptnames) && is.null(genenames) )
@@ -448,8 +448,8 @@ subset.l1000data <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
       stop( "empty subset to select" )
   }
   return( new("l1000data",
-              signal=x@signal[g.idx,e.idx,drop=F],
-              meta=x@meta[,e.idx,drop=F],
+              signal=x@signal[g.idx,e.idx,drop=FALSE],
+              meta=x@meta[,e.idx,drop=FALSE],
               description=x@description[g.idx]) )
 }
 l1000.from.gctx <- function( GCTX, cnames=c("cell_id","pert_time","pert_id") )
@@ -555,7 +555,7 @@ rename.data <- function( x, expt.names=NULL, gene.names=NULL, descriptors=NULL, 
     stop( "either expt.names or gene.names or descriptors must be non-null")
   x
 }
-subset.data <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
+subset.data <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)=="gctdata") {
     return( subset.gctdata(x, exptnames=exptnames, genenames=genenames, ignore=ignore) )
@@ -568,7 +568,7 @@ subset.data <- function( x, exptnames=NULL, genenames=NULL, ignore=F )
   }
   else stop( "unrecognized data format" )
 }
-read.data.gp <- function( data.filename, verbose=T, ... )
+read.data.gp <- function( data.filename, verbose=TRUE, ... )
 {
   #file.test( data.filename )
   ext <- file.ext( data.filename )
@@ -581,7 +581,7 @@ read.data.gp <- function( data.filename, verbose=T, ... )
                  odf=stop( "odf reader not implemented yet" ),
                  stop("unrecognized file extension: ", ext) )
 }
-write.data.gp <- function( data, filename, do.save=F, verbose=T )
+write.data.gp <- function( data, filename, do.save=FALSE, verbose=TRUE )
 {
   #file.test( filename, mode=2 )
   ext <- file.ext(filename)
@@ -600,7 +600,7 @@ write.data.gp <- function( data, filename, do.save=F, verbose=T )
   }
   VERBOSE(verbose, "done.\n" )
 }
-read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=F, verbose=T )
+read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=FALSE, verbose=TRUE )
 {
   # INPUT:
   #   - file     filename
@@ -609,10 +609,10 @@ read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=F, verbose=T
   #   - gc.lbl   type of mapping from class names to class labels (default is first ..
   #              ..class name associated to lowest class label, etc.)
   #
-  stats <- as.vector(as.matrix(read.table(file,nrows=1,header=F)))
+  stats <- as.vector(as.matrix(read.table(file,nrows=1,header=FALSE)))
   if ( length(stats)!=3 )
     stop( "1st row of '.cls' file must have three (3) entries" )
-  cls <- as.vector(as.matrix(read.table(file, skip=rowskip, header=F)))
+  cls <- as.vector(as.matrix(read.table(file, skip=rowskip, header=FALSE)))
   if ( length(cls)!=stats[1] )
     stop( paste("Wrong number of labels: ", length(cls), " (", stats[1], " expected)", sep="") )
   if ( my.nlevels(cls)!=stats[2] )
@@ -638,12 +638,12 @@ read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=F, verbose=T
 write.cls <- function( cls, filen )
 {
   cat( length(cls), length(levels(cls)), "1\n", file=filen )
-  cat( "#", paste( levels(cls) ), sep=" ", file=filen, append=T )
-  cat( "\n", file=filen, append=T )
-  cat( paste( cls ), sep=" ", file=filen, append=T )
-  cat( "\n", file=filen, append=T )
+  cat( "#", paste( levels(cls) ), sep=" ", file=filen, append=TRUE )
+  cat( "\n", file=filen, append=TRUE )
+  cat( paste( cls ), sep=" ", file=filen, append=TRUE )
+  cat( "\n", file=filen, append=TRUE )
 }
-subset.cls <- function( cls, sub, do.renum=F )
+subset.cls <- function( cls, sub, do.renum=FALSE )
 {
   levs <- if (is.null(levels(cls))) sort(unique(cls)) else levels(cls)
   cls1 <- cls[sub]
@@ -652,7 +652,7 @@ subset.cls <- function( cls, sub, do.renum=F )
   levels(cls1) <- cls1.lev
   cls1
 }
-tab2cls <- function(tab,col.name=NULL,cnames=NULL,levs=NULL,na.rm=T)
+tab2cls <- function(tab,col.name=NULL,cnames=NULL,levs=NULL,na.rm=TRUE)
 {
   if ( is.null(col.name) && !is.null(dim(tab)) )
     stop( "must provide col.name with 2D tab" )
@@ -687,7 +687,7 @@ many2one.cls <- function( cls )
   levels(cls.new) <- levs
   cls.new
 }
-create.cls <- function( X, levs=NULL, nms=NULL, do.sort=T )
+create.cls <- function( X, levs=NULL, nms=NULL, do.sort=TRUE )
 {
   if ( !is.null(nms) && !is.null(names(X)) )
     stop( "names(X) is non-null, can't assign new names" )
@@ -704,7 +704,7 @@ create.cls <- function( X, levs=NULL, nms=NULL, do.sort=T )
   levels(X) <- if (is.null(levs)) unique(sort(X)) else levs
   X
 }
-subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=F )
+subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=FALSE )
 {
   if ( is.null(subset) && is.null(subfile) )
     stop( "subset or subfile must be specified" )
@@ -712,7 +712,7 @@ subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=F )
   VERBOSE( verbose, "Extracting sample subset " )
   if ( !is.null(subfile) ) {
     VERBOSE( verbose, "from '", subfile, "' .. ", sep="" )
-    subset <- read.table( subfile, sep="\t", header=F )[,1]
+    subset <- read.table( subfile, sep="\t", header=FALSE )[,1]
   }
   s.idx <- match( subset, exptnames(dat) )
   if ( any(is.na(s.idx)) ) stop( "subset contains unmatched samples" )
@@ -721,7 +721,7 @@ subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=F )
   VERBOSE( verbose, "done, [", paste(dim(dat),collapse=" x "), "] data entries.\n", sep="" )
   list( data=dat, cls=cls )
 }
-change.description <- function( dat, gene2desc, ignore=F )
+change.description <- function( dat, gene2desc, ignore=FALSE )
 {
   idx <- match(genenames(dat),gene2desc[,1])
   
@@ -750,7 +750,7 @@ change.description <- function( dat, gene2desc, ignore=F )
   
   newdat
 }
-xcel2cls <- function( X, levs=NULL, do.sort=F )
+xcel2cls <- function( X, levs=NULL, do.sort=FALSE )
 {
   if (is.null(levs))
     levs <- unique(X)
@@ -773,9 +773,9 @@ factor2cls <- function(FCT)
 ##
 ## Read gmt file into a named list
 ##
-read.gmt <- function( gmtfile, verbose=T )
+read.gmt <- function( gmtfile, verbose=TRUE )
 {
-  gsets <- lapply(scan(gmtfile,what="character",sep="\n",quiet=T),
+  gsets <- lapply(scan(gmtfile,what="character",sep="\n",quiet=TRUE),
                   function(z) unlist(strsplit(z,"\t"))[-2])
   names(gsets) <- sapply(gsets,function(z) z[1])
   
@@ -791,9 +791,9 @@ read.gmt <- function( gmtfile, verbose=T )
 gmt2table <- function
 (
  gmtfile,
- verbose=T,
- do.save=F,   # save binary format of 0-1 table
- force.read=F # force to read 'gmt' table even if binary already available
+ verbose=TRUE,
+ do.save=FALSE,   # save binary format of 0-1 table
+ force.read=FALSE # force to read 'gmt' table even if binary already available
 )
 {
   binfile <- gsub(".gmt",".RData",gmtfile)

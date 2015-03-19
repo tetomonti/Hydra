@@ -32,9 +32,9 @@ def run_all(param):
        param['bam_files']=param['raw_files'][:]
     else:
         #preprocessing fastq file
-        helper.submit_job(param, 'fastqc.py',input_files='raw_files')  
+        helper.submit_job(param, 'fastqc.py',input_files='raw_files',environment='modules_python2.7')  
         if param['do_trimming']:
-            helper.submit_job(param,'trimmer.py',input_files='raw_files',output_files='fastq_files') 
+            helper.submit_job(param,'trimmer.py',input_files='raw_files',output_files='fastq_files',environment='modules_python2.7') 
         else:
            param['fastq_files']=param['raw_files'][:]
            if param['paired']:
@@ -43,13 +43,13 @@ def run_all(param):
 #Added code
         if param['paired']:
                helper.submit_job(param, 'matched_pairs.py', input_files='fastq_files',output_files='fastq_files',environment='modules_python2.7') 
-        helper.submit_job(param, 'fastqc.py',    input_files='fastq_files') 
+        helper.submit_job(param, 'fastqc.py',    input_files='fastq_files',environment='modules_python2.7') 
         
         #do alignment if it's not just a fastqc run
         if not param['QC_and_trim_only']:
             if param['aligner']=='tophat':
                 #running the aligner
-                helper.submit_job(param, 'tophat.py',    input_files='fastq_files', output_files='bam_files', cores=param['qsub_num_processors'])  
+                helper.submit_job(param, 'tophat.py',    input_files='fastq_files', output_files='bam_files', cores=param['qsub_num_processors'],environment='modules_python2.7')  
             else:
                 helper.writeLog('The selected aligner does not exist.',param)
                 sys.exit(0)
@@ -61,7 +61,7 @@ def run_all(param):
         #Getting the counts:
         #Added code (conditional statements to accomodate multiple read quantifiers)
         if param['run_cufflinks']:
-          helper.submit_job(param, 'cufflinks.py', input_files='bam_files',   output_files='count_files')  
+          helper.submit_job(param, 'cufflinks.py', input_files='bam_files',   output_files='count_files',environment='modules_python2.7')  
           cufflinks.finalize(param,input_files='count_files')
         
         if param['run_htseq']:

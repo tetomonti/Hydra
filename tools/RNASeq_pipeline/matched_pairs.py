@@ -8,8 +8,8 @@ def init(param):
 def run_match_pairs(param,infile,infile2,outfile,outfile2):
     #run the script that matches pairs
 
-    call = [param['match_pairs_python_version'],param['match_pairs_exec'],param[infile],param[infile2],outfile,outfile2]
-    output,error = subprocess.Popen(call ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+    call = param['match_pairs_python_version']+' '+param['match_pairs_exec']+' "'+param[infile]+'" "'+param[infile2]+'" '+outfile+' '+outfile2
+    output,error = subprocess.Popen(call, shell=True ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
 
     param['file_handle'].write(error)
     param['file_handle'].write(output)

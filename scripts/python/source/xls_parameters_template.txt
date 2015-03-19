@@ -1,0 +1,27 @@
+#########################################################################################################
+# PARAMETERS
+#########################################################################################################
+font = Calibri
+#
+
+##### INPUT
+
+# Set the input type (1 or 2):
+# 1: json of python dictionary with pairs: names of the Excel sheet, list of rows to be printed
+## e.g: {'sheet1': [header1, row11, row12]: 'sheet2': [header2, row21, row22]}. Headers and rows are lists with strings or numbers.
+# 2: tab delimited txt files to be converted in a single Excel with multiple sheets
+
+# in both cases the first line contains the header, that can be printed in a different format (e.g. bold)
+
+input_type = 2 
+folder = results_pathways # path where the files are
+filelist = all  #names of the input files separated by comma with no spaces, or all if entire folder
+output_file = for_xls_python  #name of the resulting xls file
+output_folder = res_xls  #name of the results folder
+
+##### SELECTED rows, highlighted with a different foreground color
+sel_column = 2 # 0 if none should be selected 
+sel_operator = < # can be > or <
+sel_threshold = 0.05
+sel_color = yellow
+

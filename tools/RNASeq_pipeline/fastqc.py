@@ -6,8 +6,10 @@ import module_helper
 def copyFiles(param, input_files):
     #if there is no fastqc directory in the report make one
     param['fastqc_dir']=param['working_dir']+'report/fastqc/'
-    if not os.path.exists(param['fastqc_dir']+'/'+param['stub'][0]):
-        os.makedirs(param['fastqc_dir']+'/'+param['stub'][0])
+    #Create a report fastqc subdirectory for each sample
+    for s in param['stub']:
+     if not os.path.exists(param['fastqc_dir']+'/'+s):
+        os.makedirs(param['fastqc_dir']+'/'+s)
     
     #reconstruct file names
     param['fastqc_stub']=[stb+'/'+fn.split('/')[-1] for stb,fn in zip(param['stub'],param[input_files])]
@@ -28,8 +30,8 @@ def copyFiles(param, input_files):
     #print param['fastqc_stub']
     #copy the unpacked directories   
     for fastqc_file in param['fastqc_stub']:
-        call='cp -R '+ fqc_dir +fastqc_file+'/ '+param['fastqc_dir']+'/'+param['stub'][0]
-        #print call
+        call='cp -R '+ fqc_dir +fastqc_file+'/ '+param['fastqc_dir']+fastqc_file.split('/')[0]
+#        print call
         output,error = subprocess.Popen(call.split(),stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
 
     #cut off the suffix
@@ -93,8 +95,8 @@ def readRawfastqc(param,input_files):
     
     summary_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc'+'/summary.txt' for idx in range(len(param['fastqc_stub']))]
     
-#    print "Summary files .."
-#    print summary_files
+    print "Summary files .."
+    print summary_files
 
     fastqc=dict()
     #add entries into fastqc dictionary
@@ -149,7 +151,7 @@ def plotNumberOfReads(param,input_files):
     num_total_reads=[open(sum_file).readlines()[6].split('\t')[1].strip().rstrip() for sum_file in summary_files]
     num_total_reads=[int(num) for num in num_total_reads]
     
-    #if we deal with unpaired data the total number of reads used downstream is equivalent to the fastqc reads, but for paired it is the sum of the two paried files
+    #if we deal with unpaired data the total number of reads used downstream is equivalent to the fastqc reads, but for paired it is the sum of the two paired files
     #print range(param['num_samples'])
     #print num_total_reads
     #for idx in range(param['num_samples']):
@@ -166,14 +168,18 @@ def plotNumberOfReads(param,input_files):
         samples_1=[param['fastqc_stub'][0]]
         samples_2=[param['fastqc_stub'][1]]
         
-#        print samples_1
-#        print samples_2
-#        print param['stub'] 
+        #print samples_1
+        #print samples_2
+        #print param['stub']
+#        print param['fastqc_stub'] 
+#        print param['num_samples']
+        #print num_total_reads 
         for idx in range(param['num_samples']):
-#            print idx
-            index1=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_1[idx]][0]
-            index2=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_2[idx]][0]           
-            param['num_total_reads'][idx]=num_total_reads[index1]+num_total_reads[index2]
+        #    print idx
+        #    index1=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_1[idx]][0]
+        #    index2=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_2[idx]][0]           
+            param['num_total_reads'][idx]=num_total_reads[idx]+num_total_reads[idx+param['num_samples']]
+    #    print param['num_total_reads']
         
     #create plot 
     fig, ax = plt.subplots()
@@ -284,9 +290,9 @@ def run_fastqc(filename,param):
     out_dir = param['module_dir']+'/'+param['stub'][param['file_index']]
     if not os.path.exists(out_dir):
        os.makedirs(out_dir)
-    call = param['fastqc_exec']+' '+param[filename]+' -o '+out_dir+' --extract'
+    call = param['fastqc_exec']+" '"+param[filename]+"' -o "+out_dir+' --extract'
     param['file_handle'].write('CALL: '+call+'\n')
-    output,error = subprocess.Popen(call.split() ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+    output,error = subprocess.Popen(call ,stdout = subprocess.PIPE,shell=True, stderr= subprocess.PIPE).communicate()
     param['file_handle'].write(error)
     param['file_handle'].write(output)
     if ('Analysis complete for' not in output):
