@@ -1,4 +1,4 @@
 
 import os.path
 
-RNASEQ_PIPELINE_DIR = os.path.dirname(__FILE__)
+RNASEQ_PIPELINE_DIR = os.path.dirname(__file__)
