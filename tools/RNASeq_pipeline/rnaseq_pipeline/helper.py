@@ -1,11 +1,9 @@
 import os, sys, shutil, json, time, shlex, subprocess, random
 from rnaseq_pipeline.logs import writeLog
-import rnaseq_pipeline.qsub_module
-qsub_module = rnaseq_pipeline.qsub_module
-import rnaseq_pipeline.single_cpu_module
-single_cpu_module = rnaseq_pipeline.single_cpu_module
-import rnaseq_pipeline.module_helper
-module_helper = rnaseq_pipeline.module_helper
+from rnaseq_pipeline import qsub_module
+from rnaseq_pipeline import single_cpu_module
+from rnaseq_pipeline import module_helper
+from rnaseq_pipeline import RNASEQ_PIPELINE_DIR
   
 ################################################################################################################################################################################
 ################################################################################################################################################################################
@@ -343,7 +341,7 @@ def report_start(param):
     copyFileAndLinkIt(param,'raw_filenames','Raw files')
     
     #copy the pass/fail icons into the directory
-    call='cp -R '+ param['scripts_dir']+'Icons '+param['working_dir']+'report/'
+    call='cp -R '+ os.path.join(RNASEQ_PIPELINE_DIR,'Icons') + ' ' +param['working_dir']+'report/'
     output,error = subprocess.Popen(call.split(),stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
  
     #report the run log in a table and show which samples passed/failed 

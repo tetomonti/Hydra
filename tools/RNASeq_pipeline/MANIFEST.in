@@ -9,3 +9,4 @@ recursive-exclude * *.py[co]
 recursive-include docs *.rst conf.py Makefile make.bat
 
 include rnaseq_pipeline/r_scripts/*.R
+include rnaseq_pipeline/Icons/*.png
