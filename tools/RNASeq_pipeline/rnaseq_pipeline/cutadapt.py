@@ -1,8 +1,10 @@
-import module_helper, os
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import os
+import subprocess
 
 def init(param):
    module_helper.checkParameter(param,key='cutadapt_exec',dType=str)
-   module_helper.checkParameter(param,key='cutadapt_python_version',dType=str)
    module_helper.checkParameter(param,key='cutadapt_first_adapter',dType=str)
    if param['paired']:
        module_helper.checkParameter(param,key='cutadapt_second_adapter',dType=str)
@@ -32,7 +34,7 @@ def run_cutadapt(param,infile,outfile,adapter):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

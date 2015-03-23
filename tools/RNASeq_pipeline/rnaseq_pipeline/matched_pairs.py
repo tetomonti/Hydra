@@ -1,8 +1,9 @@
-import module_helper, os
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import os
 
 def init(param):
-   module_helper.checkParameter(param,key='match_pairs_exec',dType=str, checkFile=True)
-   module_helper.checkParameter(param,key='match_pairs_python_version',dType=str)
+   module_helper.checkParameter(param,key='match_pairs_exec',dType=str)
 
 
 def run_match_pairs(param,infile,infile2,outfile,outfile2):
@@ -22,7 +23,7 @@ def run_match_pairs(param,infile,infile2,outfile,outfile2):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

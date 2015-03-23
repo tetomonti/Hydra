@@ -1,24 +1,28 @@
-import os, sys,  time, shlex, subprocess, module_helper, helper, random
+import os, sys,  time, shlex, subprocess
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+from rnaseq_pipeline.logs import writeLog
+import random
 
 def initialize_qsub(param):
     #split module list and add module load to the list
-    helper.checkParameter(param,key='modules_python2.6',dType=str)
-    param['modules_python2.6']=[('module load '+mod.strip()) for mod in param['modules_python2.6'].split(",")]
-    helper.checkParameter(param,key='modules_python2.7',dType=str)
-    param['modules_python2.7']=[('module load '+mod.strip()) for mod in param['modules_python2.7'].split(",")]
+    module_helper.checkParameter(param,key='modules_python2.6',dType=str)
+    param['modules_python2.6']=[] 
+    module_helper.checkParameter(param,key='modules_python2.7',dType=str)
+    param['modules_python2.7']=[]
     #Added code for htseq-count to work (only requires python 2.7.5 and samtools to be loaded)
-    helper.checkParameter(param,key='modules_python2.7.5',dType=str)
-    param['modules_python2.7.5']=[('module load '+mod.strip()) for mod in param['modules_python2.7.5'].split(",")]
+    module_helper.checkParameter(param,key='modules_python2.7.5',dType=str)
+    param['modules_python2.7.5']=[]
     #####
-    helper.checkParameter(param,key='qsub_email',dType=str)
-    helper.checkParameter(param,key='qsub_send_email',dType=bool)
-    helper.checkParameter(param,key='qsub_memory',dType=str)
-    helper.checkParameter(param,key='qsub_suffix',dType=str)
-    helper.checkParameter(param,key='qsub_PROJECT',dType=str)
-    helper.checkParameter(param,key='qsub_MACHINE',dType=str)
-    helper.checkParameter(param,key='qsub_RUNTIME_LIMIT',dType=str)
-    helper.checkParameter(param,key='qsub_wait_time',dType=int)
-    helper.checkParameter(param,key='qsub_num_processors',dType=str)
+    module_helper.checkParameter(param,key='qsub_email',dType=str)
+    module_helper.checkParameter(param,key='qsub_send_email',dType=bool)
+    module_helper.checkParameter(param,key='qsub_memory',dType=str)
+    module_helper.checkParameter(param,key='qsub_suffix',dType=str)
+    module_helper.checkParameter(param,key='qsub_PROJECT',dType=str)
+    module_helper.checkParameter(param,key='qsub_MACHINE',dType=str)
+    module_helper.checkParameter(param,key='qsub_RUNTIME_LIMIT',dType=str)
+    module_helper.checkParameter(param,key='qsub_wait_time',dType=int)
+    module_helper.checkParameter(param,key='qsub_num_processors',dType=str)
 
 
 def wait_for_qsub(param, job_id):
@@ -27,7 +31,7 @@ def wait_for_qsub(param, job_id):
 
     #wait until there are no jobs with the current job name in the queue anymore
     qjobs = param['num_samples']
-    helper.writeLog('Waiting for single '+param['current_flag']+' jobs to finish.... \n',param)
+    writeLog('Waiting for single '+param['current_flag']+' jobs to finish.... \n',param)
     while qjobs > 0 :
         qjobs = 0
         time.sleep(param['qsub_wait_time'])
@@ -68,7 +72,7 @@ def submit_jobs(index, param, py_file, job_id, cores, environment):
         command_list[:0] = ['module unload python2.7/Python-2.7.3_gnu446']
         cmd='python '
     
-    cmd=cmd+param['scripts_dir']+ py_file +' -i ' + str(index) + ' -n $NSLOTS' + ' -d ' +  param['working_dir']
+    cmd=py_file +' -i ' + str(index) + ' -n $NSLOTS' + ' -d ' +  param['working_dir']
     command_list.append(cmd)
 
 

@@ -1,4 +1,9 @@
-import module_helper, helper, os, subprocess
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import rnaseq_pipeline.helper
+helper = rnaseq_pipeline.helper
+from rnaseq_pipeline.r_scripts import get_script_path
+import os, subprocess
 
 def init(param):
    module_helper.checkParameter(param,key='cufflinks_exec',dType=str)
@@ -25,7 +30,7 @@ def report(param):
         
     #run R script that creates a PCA
     counts=param['working_dir']+'deliverables/cufflinks_counts_fpkm.txt'
-    cmd=[param['Rscript_exec'],'cufflinks_pca.R','-c',counts,'-a',param['pheno_file'],'-o',param['working_dir']]
+    cmd=[param['Rscript_exec'], get_script_path('cufflinks_pca.R'),'-c',counts,'-a',param['pheno_file'],'-o',param['working_dir']]
     output,error = subprocess.Popen(cmd ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
     param['report'].write('<a href="cufflinks/pca.html">PCA</a>')
         
@@ -67,7 +72,7 @@ def finalize(param,input_files='count_files'):
         print('Cufflinks was not run successfully on any of the files..\n')
     
     
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

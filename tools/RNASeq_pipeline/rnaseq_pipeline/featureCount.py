@@ -1,4 +1,9 @@
-import module_helper, helper, subprocess, os
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import rnaseq_pipeline.helper
+helper = rnaseq_pipeline.helper
+from rnaseq_pipeline.r_scripts import get_script_path
+import subprocess, os
 
 def init(param):
    module_helper.checkParameter(param,key='featureCount_exec',dType=str)
@@ -13,7 +18,7 @@ def init(param):
    
 def createESet(count_file,pheno_file,param):
     #create a Bioconductor ExpresionSet
-    cmd=[param['Rscript_exec'],'createRawCountESet.R','-c',count_file,'-a',pheno_file,'-o',param['working_dir']]
+    cmd=[param['Rscript_exec'],get_script_path('createRawCountESet.R'),'-c',count_file,'-a',pheno_file,'-o',param['working_dir']]
     output,error = subprocess.Popen(cmd ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
     helper.writeLog('Creating ESet ... \n',param)
     
@@ -165,7 +170,7 @@ def finalize(param,input_files='count_files'):
         
         
         
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

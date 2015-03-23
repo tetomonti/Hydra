@@ -1,5 +1,9 @@
-import os, sys, shutil, json, time, shlex, subprocess, random 
-import qsub_module, single_cpu_module, module_helper
+import os, sys, shutil, json, time, shlex, subprocess, random
+from rnaseq_pipeline.logs import writeLog
+from rnaseq_pipeline import qsub_module
+from rnaseq_pipeline import single_cpu_module
+from rnaseq_pipeline import module_helper
+from rnaseq_pipeline import RNASEQ_PIPELINE_DIR
   
 ################################################################################################################################################################################
 ################################################################################################################################################################################
@@ -224,7 +228,9 @@ def submit_job(param,py_file,input_files,output_files='',cores='1-8',environment
     addInputOutputFiles(param,input_files,output_files)
 
     #get the current flag for the log file
-    param['current_dir']  = py_file.split('.')[0]
+    # this is a terrible hard coded solution assuming that py_file has a value
+    # 'run_currennt_dir' and we want to drop the 'run_' to get 'current_dir'
+    param['current_dir']  = py_file[4:]
     param['current_flag'] = param['current_dir'] + '_' + input_files
         
     if is_module_finished(param):
@@ -283,12 +289,6 @@ def submit_job(param,py_file,input_files,output_files='',cores='1-8',environment
         
         writeLog('++++++++++++++++++++++++++++\n\n',param)
 
-def writeLog(string,param):
-    if param['verbose']: print string
-    handle=open(param['log_handle'],'a')
-    handle.write(string)
-    handle.close()
-
 
 ################################################################################################################################################################################
 ################################################################################################################################################################################
@@ -341,7 +341,7 @@ def report_start(param):
     copyFileAndLinkIt(param,'raw_filenames','Raw files')
     
     #copy the pass/fail icons into the directory
-    call='cp -R '+ param['scripts_dir']+'Icons '+param['working_dir']+'report/'
+    call='cp -R '+ os.path.join(RNASEQ_PIPELINE_DIR,'Icons') + ' ' +param['working_dir']+'report/'
     output,error = subprocess.Popen(call.split(),stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
  
     #report the run log in a table and show which samples passed/failed 

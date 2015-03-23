@@ -1,5 +1,6 @@
 import os, subprocess, csv
-import module_helper
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
 import numpy as np
 import matplotlib.pyplot as plt
 import math, pylab
@@ -287,11 +288,10 @@ def report(param):
 
 
 def init(param):
-    module_helper.checkParameter(param,key='bamqc_exec',dType=str)
     module_helper.checkParameter(param,key='bamqc_script',dType=str)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 
@@ -301,7 +301,7 @@ if __name__ == "__main__":
         os.makedirs(outdir)
 
 
-    call = param['bamqc_exec']+' '+param['scripts_dir']+param['bamqc_script']+' -i '+param['working_file']+' -o '+outdir
+    call = param['bamqc_script']+' -i '+param['working_file']+' -o '+outdir
     
     param['file_handle'].write('CALL: '+call+'\n')
     output,error = subprocess.Popen(call.split() ,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()

@@ -1,4 +1,6 @@
-import module_helper, os
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
+import os
 
 def init(param):
    module_helper.checkParameter(param,key='trimming_exec',dType=str)
@@ -33,7 +35,7 @@ def run_trimmer(param,infile,outfile):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 

@@ -1,4 +1,5 @@
-import module_helper
+import rnaseq_pipeline.module_helper
+module_helper = rnaseq_pipeline.module_helper
 
 def init(param):
    module_helper.checkParameter(param,key='tophat_exec',dType=str)
@@ -12,7 +13,7 @@ def init(param):
    
    
      
-if __name__ == "__main__":
+def main():
     import subprocess, sys, os
     param=module_helper.initialize_module()
 
