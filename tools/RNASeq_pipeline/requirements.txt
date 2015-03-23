@@ -1,0 +1,5 @@
+numpy
+matplotlib
+pysam
+# do we need this for paired_ends_intersect.py?
+#biopython
