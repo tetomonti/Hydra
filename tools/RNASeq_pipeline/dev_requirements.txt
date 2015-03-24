@@ -1,0 +1,4 @@
+sphinx
+nose
+coverage
+flake8
