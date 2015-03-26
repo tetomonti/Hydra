@@ -10,8 +10,22 @@ setClass("resdata",
          representation(signal="matrix",
                         calls="matrix",
                         description="character",
-                        scale="character"))
-         
+                        scale="character"),
+         validity = function(object) {
+           if ( ncol(object@signal)!=ncol(object@calls) )
+             stop( "ncol(signal)!=ncol(calls)" )
+           if ( nrow(object@signal)!=nrow(object@calls) )
+               stop( "nrow(signal)!=nrow(calls)" )
+           if ( any(colnames(object@signal)!=colnames(object@calls)) )
+             stop( "colnames(signal)!=colnames(alls)" )
+           if ( any(rownames(object@signal)!=rownames(object@calls)) )
+             stop( "rownames(signal)!=rownames(alls)" )
+           if ( !is.null(object@description) && (length(object@description)!=nrow(object@signal)) )
+             stop("length(description)!=nrow(signal))")
+           if ( !is.null(object@scale) && (length(object@scale)!=ncol(object@signal)) )
+             stop( "length(scale)!=ncol(signal)" )
+         })
+
 setClass("gctdata",
          representation(signal="matrix",
                         description="character"))

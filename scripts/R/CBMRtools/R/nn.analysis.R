@@ -31,10 +31,12 @@
 ##  [2] Section of Computational Biomedicine, Boston University
 
 ## BEGIN documentation support (what follows are keyworded entries from which documentation pages will be extracted automatically)
-
+##
 #' nn.analysis
 #'
-#' \code{nn.analysis} rank rows (genes) by their 'similarity' to a prototype profile
+#' \code{nn.analysis} rank rows (genes) by their 'similarity' to a
+#' prototype profile and carries out permutation-based p-value
+#' calculation
 #'
 #' @param dat NxM genes-by-sample matrix ('ExpressionSet' or 'resdata' or 'gctdata' object)
 #' @param y M-tuple vector to use as the prototype profile
@@ -48,34 +50,29 @@
 #'
 #' @return list object with attributes 'pval' and 'nperm' corresponding to nn analysis permutation results
 #' @examples
-#'   rm(list=ls())
-#'  CBMDEV <- Sys.getenv('CBMDEV')
-#'  source(paste(CBMDEV,'R/source.nn.analysis.R',sep='/'))
-#'  require(Biobase)
-
-#'  DAT <- readRDS(paste(CBMDEV,'data/TCGA_OSCC_mRNA.rds',sep='/'))
-#'  DAT1 <- DAT[order(apply(exprs(DAT),1,mad),decreasing=TRUE)[1:1000],]
-
+#'
+#'  data(eSet.brca.100)
+#'
 #'  ## passing the actual vector as argument
-#'  ##
-#'  NNout1 <- nn.analysis(dat=DAT1,y=exprs(DAT1)[1,],score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
+#'  ##                        eSet.brca.100         eSet.brca.100
+#'  NNout1 <- nn.analysis(dat=eSet.brca.100,y=exprs(eSet.brca.100)[1,],score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
 #'  head(NNout1$pval)
-
+#'
 #'  ## passing the index (within the matrix) as argument
 #'  ##
-#'  NNout2 <- nn.analysis(dat=DAT1,y.i=1,score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
+#'  NNout2 <- nn.analysis(dat=eSet.brca.100,y.i=1,score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
 #'  head(NNout2$pval)
 #'  all.equal(NNout1$pval,NNout2$pval) # TRUE
-
+#' 
 #'  ## controlling for a confounder (only discrete)
 #'  ##
-#'  CTL <- pData(DAT1)[,'treatment']
-#'  NNout3 <- nn.analysis(dat=DAT1,y.i=1,score='pearson',nperm=1000,seed=123,control=CTL,verbose=TRUE,smooth=1)
+#'  CTL <- pData(eSet.brca.100)[,'ER_status']
+#'  NNout3 <- nn.analysis(dat=eSet.brca.100,y.i=1,score='pearson',nperm=1000,seed=123,control=CTL,verbose=TRUE,smooth=1)
 #'  head(NNout3$pval)
+#'
 #' @export
 
 ## END documentation support
-
 
 ########################################################################
 #                              MAIN                                    #
@@ -102,10 +99,10 @@ nn.analysis <- function
   if ( class(dat)=='ExpressionSet' )
   {
     dsc <- { # attempting to identify the description column
-      if ( length(idx <- grep('symbol',colnames(pData(featureData(dat))),ignore.case=TRUE))==1 )
-        pData(featureData(dat))[,idx]
+      if ( length(idx <- grep('symbol',colnames(fData(dat)),ignore.case=TRUE))==1 )
+        fData(dat)[,idx]
       else if ( ncol(featureData(dat))>0 )
-        pData(featureData(dat))[,1]
+        fData(dat)[,1]
       else
         featureNames(dat)
     }      
@@ -196,4 +193,41 @@ nn.analysis.4gp <- function( gp.filename, gene.name, out.filename,
   VERBOSE( verbose, "output saved to file '", out.filename, "'.\n", sep="" )
   out.filename
 }
+## EXAMPLE OF USE (not assuming existence of CBMRtools package)
+##
+if ( FALSE )
+{
+  rm(list=ls())
+  CBMGIT <- Sys.getenv('CBMGIT')
+  if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
 
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/misc.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/misc.math.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/broad.file.formats.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/permute.array.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/perm.1side.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/perm.2side.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/diffanal.scores.R",sep="/"))
+  source(paste(CBMGIT,"scripts/R/CBMRtools/R/nn.analysis.R",sep="/"))
+  
+  require(Biobase)
+  
+  eSet.brca.100 <- load.var(paste(CBMGIT,"scripts/R/CBMRtools/data/eSet.brca.100.rda",sep='/'))
+
+  ## passing the actual vector as argument
+  ##
+  NNout1 <- nn.analysis(dat=eSet.brca.100,y=exprs(eSet.brca.100)[1,],score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
+  head(NNout1$pval)
+
+  ## passing the index (within the matrix) as argument
+  ##
+  NNout2 <- nn.analysis(dat=eSet.brca.100,y.i=1,score='pearson',nperm=1000,seed=123,verbose=TRUE,smooth=1)
+  head(NNout2$pval)
+  all.equal(NNout1$pval,NNout2$pval) # should be TRUE
+
+  ## controlling for a confounder (only discrete)
+  ##
+  CTL <- pData(eSet.brca.100)[,'gender']
+  NNout3 <- nn.analysis(dat=eSet.brca.100,y.i=1,score='pearson',nperm=1000,seed=123,control=CTL,verbose=TRUE,smooth=1)
+  head(NNout3$pval)
+}
