@@ -12,7 +12,7 @@ readme = open('README.rst').read()
 history = open('HISTORY.rst').read().replace('.. :changelog:', '')
 
 with open('requirements.txt') as fin:
-    requirements = map(line.strip() for line in fin.readlines())
+    requirements = [line.strip() for line in fin.readlines()]
 
 test_requirements = [
     # TODO: put package test requirements here
