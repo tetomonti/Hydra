@@ -59,7 +59,7 @@ read.res <- function
  accession="Accession",
  force.read=FALSE,
  do.save=TRUE,
- binext=".RData",
+ binext=".RDS",
  verbose=TRUE
  )
 {
@@ -68,7 +68,7 @@ read.res <- function
   binfile <- gsub("\\.res",binext,file)
   if ( !force.read && file.access(binfile)==0 ) {
     VERBOSE( verbose, "Loadin bin file '", binfile, "' ..", sep="")
-    dat <- load.var(binfile)
+    dat <- readRDS(binfile)
     if (class(dat)!="resdata") {
       stop("a resdat object expected in '", binfile, "'", sep="")
     }
@@ -138,14 +138,14 @@ read.res <- function
   }
   dat
 }
-write.res <- function( x, file=NULL, binext=".RData", verbose=TRUE, do.save=TRUE )
+write.res <- function( x, file=NULL, binext=".RDS", rnd=NULL, verbose=TRUE, do.save=TRUE )
 {
   if ( class(x)!="resdata" )
     stop( "object does not belong to resdata class" )
 
   res <- matrix( NA, nrow(x@signal), ncol(x@signal)*2 )
   idx <- seq( 1, ncol(res)-1, 2 )
-  res[,idx]  <- x@signal
+  res[,idx]  <- if (is.null(rnd)) x@signal else round(x@signal,rnd)
   res[,-idx] <- x@calls
   
   cat( "Description\tAccession\t",
@@ -157,7 +157,7 @@ write.res <- function( x, file=NULL, binext=".RData", verbose=TRUE, do.save=TRUE
   cat(dim(x)[1], "\n", sep="", file=file, append=TRUE )
 
   my.write.table(cbind(x@description, rownames(x@signal), res ),
-                 sep="\t", col.names=FALSE, file=file, append=TRUE )
+                 sep="\t", row.names=FALSE, col.names=FALSE, file=file, append=TRUE )
   if ( do.save ) {
     VERBOSE(verbose," (saving binary object ..")
     binfile <- gsub("\\.res",binext,file)
@@ -165,7 +165,7 @@ write.res <- function( x, file=NULL, binext=".RData", verbose=TRUE, do.save=TRUE
       warning("didn't save binary file (problems creating output name)")
     else {
       dat <- x
-      save(dat,file=binfile)
+      saveRDS(dat,file=binfile)
     }
     VERBOSE(verbose, " done)")
   }
@@ -281,13 +281,13 @@ merge.resdata <- function( X, Y )
       description=X@description,
       scale=c(X@scale,Y@scale) )  
 }
-read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RData",verbose=TRUE )
+read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RDS",verbose=TRUE )
 {
   # see if a binary object was cached
   #
   binfile <- gsub(".gct",binext,file)
   if ( !force.read && file.access(binfile)==0 ) {
-    dat <- load.var(binfile)
+    dat <- readRDS(binfile)
     if (class(dat)!="gctdata") {
       stop("a gctdat object expected in '", binfile, "'", sep="")
     }
@@ -303,7 +303,7 @@ read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RData",verb
   dat <- new( "gctdata", signal=x, description=desc )
   if (do.save) {
     VERBOSE(verbose, "Saving binary object ..")
-    save(dat,file=binfile)
+    saveRDS(dat,file=binfile)
     VERBOSE(verbose, " done.\n" )
   }
   return(dat)
@@ -314,7 +314,7 @@ dim.gctdata <- function( x )
     stop( "object does not belong to gctdata class" )
   dim(x@signal)
 }
-write.gct <- function( x, file, binext=".RData", do.save=TRUE, verbose=FALSE )
+write.gct <- function( x, file, binext=".RDS", do.save=TRUE, verbose=FALSE )
 {
   if ( is.matrix(x) ) {
     x <- new("gctdata",
@@ -338,7 +338,7 @@ write.gct <- function( x, file, binext=".RData", do.save=TRUE, verbose=FALSE )
       warning("didn't save binary file (problems creating output name)")
     else {
       dat <- x
-      save(dat,file=binfile)
+      saveRDS(dat,file=binfile)
     }
     VERBOSE(verbose, " done)")
   }
@@ -380,7 +380,7 @@ subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
               signal=x@signal[g.idx,e.idx,drop=FALSE],
               description=x@description[g.idx]) )
 }
-read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RData",verbose=TRUE )
+read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RDS",verbose=TRUE )
 {
   gene.headings <- c("pr_gene_symbol","pr_gene_title")
   
@@ -388,7 +388,7 @@ read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RData",v
   ##
   binfile <- gsub("\\.gct",binext,fname)
   if ( !force.read && file.access(binfile)==0 ) {
-    dat <- load.var(binfile)
+    dat <- readRDS(binfile)
     if (class(dat)!="l1000data") {
       stop("a l1000data object expected in '", binfile, "'", sep="")
     }
@@ -417,7 +417,7 @@ read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RData",v
 
   if (do.save) {
     VERBOSE(verbose, "Saving binary object ..")
-    save(dat,file=binfile)
+    saveRDS(dat,file=binfile)
     VERBOSE(verbose, " done.\n" )
   }
   return(dat)
