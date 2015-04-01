@@ -7,6 +7,19 @@ assert <- function( expr, msg=NULL )
   if ( !eval(parse(text=expr)) )
     stop( if (is.null(msg)) paste("'",expr,"' failed",sep="") else msg )
 }
+my.nlevels <- function( x )
+{
+  return( length(my.levels(x)) )
+}
+my.levels <- function( x, sort=T )
+{
+  #if ( !is.numeric(x) ) stop( "x must be numeric" )
+  return( if (sort) sort(unique(as.vector(x)),na.last=T) else unique(as.vector(x)) )
+}
+my.tabulate <- function( x,nbins=length(unique(x)) )
+{
+  tabulate(match(x,unique(x)),nbins=nbins)
+}
 rowMax <- function( MX )
 {
   if ( !(class(MX) %in% c('matrix','data.frame')) )
