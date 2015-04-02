@@ -45,7 +45,7 @@ Alternatively, you can just install the dependencies:
     fastqc \
     htseq \
     pysam \
-    r=3.0.0-monti_0 \
+    r=3.0.0 \
     subread \
     tophat \
     matplotlib \
