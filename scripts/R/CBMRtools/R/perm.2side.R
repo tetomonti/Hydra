@@ -120,13 +120,13 @@ perm.2side <- function( x, y, nperm=100, score, ngenes=NULL, seed=NULL,
   if ( !is.null(seed) )
     set.seed(seed)  
   cls.prm <- if ( surv )
-    permute.binarray( y[,2], n=nperm, balanced=balanced, equalized=equalized,
+    permute.binarray( y[,2], nperm=nperm, balanced=balanced, equalized=equalized,
                       exhaustive=exhaustive, control=control, verbose=verbose )
   else if ( !paired.score )
-    permute.binarray( y, n=nperm, balanced=balanced, equalized=equalized,
+    permute.binarray( y, nperm=nperm, balanced=balanced, equalized=equalized,
                       exhaustive=exhaustive, control=control, verbose=verbose )
   else
-    permute.paired(y, n=nperm, exhaustive=exhaustive, balanced=balanced, control=control, verbose=verbose)
+    permute.paired(y, nperm=nperm, exhaustive=exhaustive, balanced=balanced, control=control, verbose=verbose)
 
   if ( nperm!=nrow(cls.prm) )
   {

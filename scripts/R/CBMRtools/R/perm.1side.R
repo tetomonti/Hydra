@@ -81,10 +81,10 @@ perm.1side <- function( x, y, score, nperm=100, ngenes=NULL, seed=NULL, smooth=0
   if ( !is.null(seed) ) set.seed(seed)
   VERBOSE( verbose, "Generating permuted class templates .. " )
   cls.prm <- if ( surv )
-    permute.binarray( y[,2], n=nperm, balanced=F, equalized=F, control=control,
+    permute.binarray( y[,2], nperm=nperm, balanced=F, equalized=F, control=control,
                       exhaustive=exhaustive, verbose=verbose )
   else
-    permute.binarray( y, n=nperm, balanced=F, equalized=F, control=control,
+    permute.binarray( y, nperm=nperm, balanced=F, equalized=F, control=control,
                       exhaustive=exhaustive, verbose=verbose )
 
   if ( nperm!=nrow(cls.prm) )

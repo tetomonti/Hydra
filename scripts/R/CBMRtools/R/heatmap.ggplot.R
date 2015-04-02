@@ -290,9 +290,8 @@ heatmap.ggplot2<-function(eSet,
 	 	meta.c<-data.frame(type=vector(), id=vector(), num=vector() )
 		for (x in col.lab){
 			meta.c<-rbind(meta.c, 
-				data.frame(cbind(type=x, 
-							id=as.character(col.meta[,x]), 
-							num= 1:length(col.meta[,x]))) )
+				data.frame(cbind(type=x,id=as.character(col.meta[,x]), 
+                                                 num= 1:length(col.meta[,x]))) )
 		}
 		meta.c$num <- factor(meta.c$num, levels=unique(meta.c$num))
 

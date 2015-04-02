@@ -547,7 +547,7 @@ col.gradient <- function( cols, length, cmax=255 )
   ##   col.gradient(cols=c('blue','white','red'),length=9)
   ##
   ramp <- colorRamp(cols)
-  rgb( ramp(seq(0,1,length=length)), max=cmax )
+  rgb( ramp(seq(0,1,length=length)), maxColorValue=cmax )
 }
 genName <- function( stub=NULL )
 {
@@ -590,12 +590,12 @@ multi.write.xlsx <- function
 ## reads a multi-sheet excel workbook into a list of data.frames
 ## presumes the names of the sheets are known (snames)
 ##
-multi.read.xlsx <- function( file, snames )
-{
-  OUT <- lapply(snames, function(X) read.xlsx2(file,sheetName=X,check.names=FALSE))
-  names(OUT) <- snames
-  OUT
-}
+#multi.read.xlsx <- function( file, snames )
+#{
+#  OUT <- lapply(snames, function(X) read.xlsx2(file,sheetName=X,check.names=FALSE))
+#  names(OUT) <- snames
+#  OUT
+#}
 ## hierarchical clustering with optimal leaf ordering (needs package 'cba')
 ## require(cba)
 ##

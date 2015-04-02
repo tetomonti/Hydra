@@ -7,6 +7,7 @@ Depends:
     R (>= 3.1.0),
     ggplot2,
     ggdendro,
+    combinat,
     cba,
     grid,
     proxy,
@@ -16,6 +17,7 @@ Depends:
     gridExtra,
     gtable,
     RColorBrewer,
-    scales
+    scales,
+    survival
 License: Boston University
 LazyData: true
