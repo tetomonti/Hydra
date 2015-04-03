@@ -34,8 +34,7 @@ When you use the make target `docs` from the root directory's Makefile,
 you automatically run sphinx's api documentation script, and this creates
 the appropriate \*.rst files in the `docs` directory. This automatically
 makes a list of all modules and functions you write in the pipeline. The
-docstrings are used as part of the documentation (
- `for example <https://pythonhosted.org/an_example_pypi_project/sphinx.html#function-definitions>`_).
+docstrings are used as part of the documentation (`for example <https://pythonhosted.org/an_example_pypi_project/sphinx.html#function-definitions>`_). 
 
 Basially, the unassigned string following a function's signature will be
 used as part of the function's documentation::

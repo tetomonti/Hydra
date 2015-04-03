@@ -18,7 +18,7 @@ Below are all the steps you need to make changes to the pipeline.
 
    .. code:: bash
 
-     module load anaconda
+     module load anaconda/2.2.0
 
 
 2. Create Dev Environment
@@ -29,9 +29,31 @@ Use `conda` to install a basic developement environment::
   conda create \
     -p ./dev_env \
     -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
-    --copy \
     --yes \
     rnaseq_pipeline
+
+Alternatively, you can just install the dependencies:
+
+  conda create \
+    -p ./dev_env \
+    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    --yes \
+    samtools \
+    bowtie2 \
+    cufflinks \
+    cutadapt \
+    fastqc \
+    htseq \
+    pysam \
+    r=3.0.0 \
+    subread \
+    tophat \
+    matplotlib \
+    numpy \
+    python=2.7*
+
+ And then you can install the package from source (see below).
+
 
 What just happend?
 ------------------
@@ -51,21 +73,13 @@ What just happend?
    install. The Monti lab has a custom channel on SCC, which you've
    included in the search path with the above instruction.
 
-3. `--copy` -- copy all installed files.
-
-   By default, `conda` tries to take space-saving measures (by creating
-   hard or softlink to centrally installed copies of the packages) when
-   setting up environments and installing packages. Sometimes this doesn't
-   work, so you can force `conda` to make a unique copy of the installed
-   files with this instruction.
-
-4. `--yes` -- say "yes" to all posed questions.
+3. `--yes` -- say "yes" to all posed questions.
 
    `conda` checks in with you before it actually does anything, and this
    instruction saves a bit of time. You can walk away from the computer,
    and when you get back, everything should just work.
 
-5. `rnqseq_pipeline` -- the package in question.
+4. `rnqseq_pipeline` -- the package in question.
 
    The channel configured above (with `-c` option) has a package called
    `rnaseq_pipeline` that contains the python and R code for the
