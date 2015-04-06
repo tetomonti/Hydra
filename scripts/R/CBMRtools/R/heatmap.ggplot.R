@@ -36,7 +36,8 @@
 #' @examples
 #' 
 #' #Use example data #1, for data set information: ?eSet1
-#' data(eSet1)
+#' data(eSet.brca.100)
+#' eSet1<-eSet.brca.100
 #' eSet1<-eSet1[1:10,1:25]
 #'
 #' p1<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE, 
