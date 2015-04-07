@@ -53,9 +53,9 @@
 #' # load objects hyperSig (a list of signatures) and hyperGsets (a GeneSet object)
 #' # and run hyper-enrichment test
 #'
-#' data(hyper) # contains objects hyperSig and hyperGsets
-#' hyperE <- hyperEnrichment(drawn=hyperSig,categories=geneSet(hyperGsets),ntotal=10000)
-#' head(hyperE)
+#' #data(hyper) # contains objects hyperSig and hyperGsets
+#' #hyperE <- hyperEnrichment(drawn=hyperSig,categories=getGeneSet(hyperGsets),ntotal=10000)
+#' #head(hyperE)
 #' 
 #' @export 
 
@@ -206,7 +206,7 @@ if ( FALSE )
   SIG <- read.tab.delim('~/Research/Projects/oralcancer/taz_yap_dpagt1/results/SIGtab.xls')
   hyperSig <- table2list(SIG,fill="")
 
-  HYP <- hyperEnrichment(drawn=hyperSig,categories=GS@geneset,ntotal=10000)
+  HYP <- hyperEnrichment(drawn=hyperSig,categories=getGeneSet(GS),ntotal=10000)
 
   hyperGsets <- GS
   hyperGsets@source.file <- GS@name
@@ -216,5 +216,5 @@ if ( FALSE )
   ## testing the script outside the package
   ##
   load(file=paste(CBMRtools,'data/hyper.rda',sep='/'))
-  HYP <- hyperEnrichment(drawn=hyperSig,categories=geneSet(hyperGsets),ntotal=10000)
+  HYP <- hyperEnrichment(drawn=hyperSig,categories=getGeneSet(hyperGsets),ntotal=10000)
 }

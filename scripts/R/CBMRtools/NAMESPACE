@@ -2,9 +2,11 @@
 
 export(geneNormalization)
 export(geneSetProjection)
+export(hcopt)
 export(heatmap.ggplot2)
 export(hyperEnrichment)
 export(nnAnalysis)
+export(to.hex)
 export(variation.filter)
 import(Biobase)
 import(RColorBrewer)

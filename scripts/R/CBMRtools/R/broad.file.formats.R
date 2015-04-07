@@ -6,6 +6,8 @@
 ## operators such as rownames, colnames, and indexing ([,]) so as to
 ## make it transparent. 
 
+## use slotNames, getSlots, or getClass to see details about the class
+
 setClass("resdata",
          representation(signal="matrix",
                         calls="matrix",

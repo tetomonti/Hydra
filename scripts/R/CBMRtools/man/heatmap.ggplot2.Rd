@@ -5,13 +5,15 @@
 \title{heatmap.ggplot2}
 \usage{
 heatmap.ggplot2(eSet, brewer.pal.name = "RdBu", brewer.pal.rev = TRUE,
-  col.clust = TRUE, row.clust = TRUE, col.lab = "", row.lab = "",
-  heatmap.y.text = FALSE, heatmap.x.text = FALSE, heatmap.y.text.size = 7,
+  brewer.numColors = 11, col.legend.brewer = "", row.legend.brewer = "",
+  col.clust = TRUE, row.clust = TRUE, col.clust.hc = NA,
+  row.clust.hc = NA, col.lab = "", row.lab = "", heatmap.y.text = FALSE,
+  heatmap.x.text = FALSE, heatmap.y.text.size = 7,
   heatmap.x.text.size = 6, heatmap.colorlegend.name = "val",
   title.text = "", col.legend.name = "", row.legend.name = "",
-  row.scaling = "none", z.norm = FALSE, cuttree.col = 0,
-  cuttree.row = 0, verbose = FALSE, grid.heights = NA, grid.widths = NA,
-  show = FALSE)
+  legend.lab.max.char = 15, row.scaling = "none", z.norm = FALSE,
+  cuttree.col = 0, cuttree.row = 0, verbose = FALSE, grid.heights = NA,
+  grid.widths = NA, show = FALSE)
 }
 \arguments{
 \item{eSet}{expression set object to plot}
@@ -20,9 +22,19 @@ heatmap.ggplot2(eSet, brewer.pal.name = "RdBu", brewer.pal.rev = TRUE,
 
 \item{brewer.pal.rev}{reverse colorbrewer (TRUE or FALSE)}
 
+\item{brewer.numColors}{number of colors for heatmap palette default 11}
+
+\item{col.legend.brewer}{string vector of hexdecimal values for column labels, see example p3 and p4 for how to determine annotation labels and assigning colors}
+
+\item{row.legend.brewer}{string vector of hexdecimal values for row labels}
+
 \item{col.clust}{perform column-wise hierarchical clustering (TRUE or FALSE)}
 
 \item{row.clust}{perform row-wise hierarchical clustering (TRUE or FALSE)}
+
+\item{col.clust.hc}{hc object to be passed to as.dendrogram, available when col.clust = TRUE, default NA: hc.col = hcopt(stats::dist(t(x)), method="ward.D")}
+
+\item{row.clust.hc}{hc object to be passed to as.dendrogram, available when row.clust = TRUE, default NA: hc.row = hcopt(stats::as.dist(1-cor(t(x))),method="ward.D")}
 
 \item{col.lab}{column labels to include: subset of pData colnames character vector}
 
@@ -43,6 +55,8 @@ heatmap.ggplot2(eSet, brewer.pal.name = "RdBu", brewer.pal.rev = TRUE,
 \item{col.legend.name}{character vector for subset of col.lab to include in color legend}
 
 \item{row.legend.name}{character vector for subset of row.lab to include in color legend}
+
+\item{legend.lab.max.char}{number of characters limit for legend labels, default = 15}
 
 \item{row.scaling}{how should rows be scaled ("none", "quantile", "z-score.all", or "z-score.capped")}
 
@@ -65,28 +79,89 @@ heatmap.ggplot2(eSet, brewer.pal.name = "RdBu", brewer.pal.rev = TRUE,
 expression set object
 }
 \examples{
-#Use example data, for data set information: ?eSet.brca.100
+#Use example data #1, for data set information: ?eSet1
 data(eSet.brca.100)
+eSet1<-eSet.brca.100
+eSet1<-eSet1[1:10,1:25]
 
-#Most basic plot
-p1<-heatmap.ggplot2(eSet.brca.100, col.clust=FALSE, row.clust=FALSE)
+p1<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
+col.clust.hc = NA, row.clust.hc = NA,
+col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "",
+heatmap.y.text = TRUE, heatmap.x.text = TRUE,
+heatmap.colorlegend.name = "RNASeq_expression",
+title.text = "TCGA BRCA log2 RNA-seq expression, z-score row normalized",
+col.legend.name = c("HER2_status", "ER_status", "PR_status", "TN_status"),
+row.legend.name = "",
+row.scaling = "z-score.capped",
+z.norm = FALSE,
+cuttree.col = 4, cuttree.row = 3,
+verbose = FALSE, show = FALSE)#'
+p1
 
-#More advanced plot
-p2<-heatmap.ggplot2(eSet=eSet.brca.100, col.clust=TRUE, row.clust=TRUE,
-col.lab=c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab="",
-heatmap.y.text=FALSE, heatmap.x.text=FALSE,
-heatmap.colorlegend.name="RNASeq_expression",
-title.text="TCGA BRCA log2 RNA-seq expression, z-score row normalized",
-col.legend.name=c("HER2_status", "ER_status", "PR_status", "TN_status"),
-row.legend.name="",
-row.scaling="z-score.capped",
-z.norm=FALSE,
-cuttree.col=4, cuttree.row=6,
-verbose=FALSE, show=FALSE)
+x<-exprs(eSet1)
+x<-x[rev(1:nrow(x)),]
+hc.row<-hcopt(stats::as.dist(1-cor(t(x))),method="ward.D")
+hc.col <- hcopt(stats::dist(t(x)), method="ward.D") #'
 
-#Display and saving options
-print(p2) #to display in viewer if working in RStudio
-#ggsave(p2, file="example_plot.pdf") #not ran
-#ggsave(p2, file="example_plot.jpg") #not ran
+#Adding custom hclust object in col.clust.hc and row.clust.hc
+p2<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
+col.clust.hc = hc.col, row.clust.hc = hc.row,
+col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "",
+heatmap.y.text = TRUE, heatmap.x.text = TRUE,
+heatmap.colorlegend.name = "RNASeq_expression",
+title.text = "TCGA BRCA log2 RNA-seq expression, z-score row normalized",
+col.legend.name = c("HER2_status", "ER_status", "PR_status", "TN_status"),
+row.legend.name = "",
+row.scaling = "z-score.capped",
+z.norm = FALSE,
+cuttree.col = 4, cuttree.row = 3,
+verbose = FALSE, show = FALSE)
+p2
+
+#Saving plot in verbose format
+p3<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
+col.clust.hc = hc.col, row.clust.hc = hc.row,
+col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "",
+heatmap.y.text = TRUE, heatmap.x.text = TRUE,
+heatmap.colorlegend.name = "RNASeq_expression",
+title.text = "TCGA BRCA log2 RNA-seq expression, z-score row normalized",
+col.legend.name = c("HER2_status", "ER_status", "PR_status", "TN_status"),
+row.legend.name = "",
+row.scaling = "z-score.capped",
+z.norm = FALSE,
+cuttree.col = 4, cuttree.row = 3,
+verbose = TRUE, show = FALSE)
+p3$heatmap
+
+meta.c.lab<-levels(unique(p3$meta.c$id))
+meta.c.color.string<-c("yellow", "khaki3", "gold", "chocolate", "darkred", "cyan", "white")
+meta.c.color<-as.character(sapply(meta.c.color.string, to.hex))
+
+meta.r.lab<-levels(unique(p3$meta.r$id))
+meta.r.color.string<-c("pink", "azure", "green")
+meta.r.color<-as.character(sapply(meta.r.color.string, to.hex))
+
+#Adding custom colors to column and row annotation labels
+p4<-heatmap.ggplot2(eSet=eSet1,
+col.legend.brewer = meta.c.color,
+row.legend.brewer = meta.r.color,
+col.clust = TRUE, row.clust = TRUE,
+col.clust.hc = hc.col, row.clust.hc = hc.row,
+col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "cluster.row",
+heatmap.y.text = TRUE, heatmap.x.text = TRUE,
+heatmap.colorlegend.name = "RNASeq_expression",
+title.text = "TCGA BRCA log2 RNA-seq expression, z-score row normalized",
+col.legend.name = c("HER2_status", "ER_status", "PR_status", "TN_status", "cluster.col"),
+row.legend.name = "cluster.row",
+row.scaling = "z-score.capped",
+z.norm = FALSE,
+cuttree.col = 4, cuttree.row = 3,
+verbose = FALSE, show = FALSE)
+p4
+
+#ggsave(p1, file = "p1.pdf")
+#ggsave(p2, file = "p2.pdf")
+#ggsave(p3$heatmap, file = "p3.pdf" )
+#ggsave(p4, file = "p4.pdf")
 }
 

@@ -151,7 +151,7 @@ geneSetProjection <- function
     stop( "pairing groups must be named 'control' and 'treatment'" )
 
   ## drop the genes that are in the gene sets and not in the dataset
-  GS@geneset <- lapply(geneSet(GS),intersect,toupper(featureNames(dat)))
+  setGeneSet(GS) <- lapply(getGeneSet(GS),intersect,toupper(featureNames(dat)))
   if ( length(GS)<1 ) stop( "no genesets overlap w/ data's genes" )
 
   VERBOSE(verbose,"Projecting",length(pairing),"groups ..\n")
@@ -173,7 +173,7 @@ geneSetProjection <- function
     }
     datI <- dat[,c(ctlI,trtI)]
     clsI <- rep(0:1,times=c(length(ctlI),length(trtI))); levels(clsI) <- paste(c("ctl","trt"),0:1,sep=".")
-    prjI <- ks.projection(exprs(datI),cls=clsI,gsets=geneSet(GS),collapse=collapse,weighted=weighted,absolute=absolute)
+    prjI <- ks.projection(exprs(datI),cls=clsI,gsets=getGeneSet(GS),collapse=collapse,weighted=weighted,absolute=absolute)
     PRJ <- cbind(PRJ,prjI)
 
     VERBOSE(verbose," done.\n")
@@ -428,11 +428,11 @@ if ( FALSE )
 
   GS <- GeneSet(paste(CBMMLAB,'/annot/c2.cp.v4.0.symbols.gmt',sep=''))
   GS1 <- GS
-  GS1@geneset <- GS1@geneset[unlist(sapply(c('catenin','emt'),grep,names(geneSet(GS1)),ignore.case=TRUE))]
-  sapply( lapply(lapply(geneSet(GS1),toupper),intersect,toupper(featureNames(DAT1))), length)
-  geneSetName(GS1) <- '4pathways'
+  setGeneSet(GS1) <- getGeneSet(GS1)[unlist(sapply(c('catenin','emt'),grep,names(getGeneSet(GS1)),ignore.case=TRUE))]
+  sapply( lapply(lapply(getGeneSet(GS1),toupper),intersect,toupper(featureNames(DAT1))), length)
+  setGeneSetName(GS1) <- '4pathways'
 
-  gsp.eSet <- DAT1[intersect(unique(unlist(geneSet(GS1))),featureNames(DAT1)),]
+  gsp.eSet <- DAT1[intersect(unique(unlist(getGeneSet(GS1))),featureNames(DAT1)),]
   gsp.GeneSet <- GS1
 
   save(gsp.eSet,gsp.GeneSet,file=paste(CBMGIT, "scripts/R/CBMRtools/data/gspData.rda",sep="/"))

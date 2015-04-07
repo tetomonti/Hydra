@@ -182,3 +182,23 @@ cls.median <- function(DAT,cls)
   colnames(DATctr) <- levels(cls)
   DATctr                   
 }
+part.cor <- function(X,Y,Z)
+{
+  ## compute partial correlation between X and Y, conditioning on Z
+  ##
+  X1 <- lm(X~Z)$residuals
+  Y1 <- lm(Y~Z)$residuals
+  cor(X1,Y1)
+}
+if ( FALSE )
+{
+    set.seed(123)
+    Z <- sample(0:1,100,replace=TRUE)
+    X <- rnorm(100,mean=Z,sd=.5)
+    Y <- rnorm(100,mean=Z,sd=.5)
+
+    cor(X,Y)
+    part.cor(X,Y,Z)
+}
+   
+    
