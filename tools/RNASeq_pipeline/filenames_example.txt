@@ -1,2 +1,4 @@
 FastQ_files1	FastQ_files2  sample_name
-/restricted/projectnb/montilab-p/projects/superfund/project4/rawdata/Tufts_Fh_PCB153_RNAseq/Sample_Sample01.R1.fastq.gz	/restricted/projectnb/montilab-p/projects/superfund/project4/rawdata/Tufts_Fh_PCB153_RNAseq/Sample_Sample01.R2.fastq.gz	NBH_DMSO_1
+/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025827/SRR064286_1_10000.fastq.gz	/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025827/SRR064286_2_10000.fastq.gz	Sample_1
+/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025828/SRR064438_1_10000.fastq.gz	/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025828/SRR064438_2_10000.fastq.gz	Sample_2
+/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025829/SRR064439_1_10000.fastq.gz	/restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/SRX025829/SRR064439_2_10000.fastq.gz	Sample_3

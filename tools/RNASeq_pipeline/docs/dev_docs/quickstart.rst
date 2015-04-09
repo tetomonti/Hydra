@@ -86,7 +86,7 @@ What just happend?
    pipeline. This package was created with :doc:`conda build
    <making_conda_packages>`.
 
-3. Activate the Environement
+3. Activate the Environment
 ============================
 
 Follow the instructions provided by conda following the environment's

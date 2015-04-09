@@ -1,19 +1,19 @@
-import os, sys,  time, shlex, subprocess
-from rnaseq_pipeline import module_helper
+"""This module runs other modules such as tophat or cutadapt in serial instead of
+parallelizing them.
+"""
+import shlex
+import subprocess
 
-def initialize_single_cpu(param):
-    #split module list and add module load to the list
-    module_helper.checkParameter(param,key='modules',dType=str)
-    param['modules']=[]
+def run_single_job(index, py_file):
+    """Runs jobs sequentially on the current node
 
-        
-def run_single_job(index, param, job_id, py_file, cores):
-    #fetch modules that need to be loaded and add the python command for a single sample
-    command_list = param['modules'][:]
-    command_list.append(py_file +' -i ' + str(index) + ' -n $NSLOTS')
+    :Parameter index: index of the current file
+    :Parameter job_id: not used
+    """
 
-    #call qsub script
-    for cmd in command_list:
-        args = shlex.split(cmd)
-        output,error = subprocess.Popen(args,stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
+    #right now I'm using only one core in single cpu mode
+    cmd = py_file +' -i ' + str(index) + ' -n 1'
+    args = shlex.split(cmd)
+    _, _ = subprocess.Popen(args, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE).communicate()
 

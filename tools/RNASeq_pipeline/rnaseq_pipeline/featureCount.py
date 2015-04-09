@@ -64,7 +64,7 @@ def report(param):
     if os.path.exists(param['working_dir']+'deliverables/featureCount_raw_counts.txt'):
         param['report'].write('<center><br><br><br><br><h2>featureCount statistics</h2>')    
         table=copyAndReadStatFiles(param)
-        module_helper.writeHTMLtable(param,table,out=param['report'],cell_width=80,fCol_width=150,deg=315)
+        module_helper.writeHTMLtable(param,table,out=param['report'],cell_width=80,fcol_width=150,deg=315)
         param['report'].write('<a href="featureCount/featureCount_stats.txt">featureCount statistics as tab delimited txt file</a>')
         
 

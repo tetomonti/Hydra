@@ -1,6 +1,7 @@
 import rnaseq_pipeline.module_helper
 module_helper = rnaseq_pipeline.module_helper
 import os
+import sys
 import subprocess
 
 def init(param):
@@ -30,7 +31,7 @@ def run_cutadapt(param,infile,outfile,adapter):
         f.write(output)
 
     # Error handling
-    if (not os.path.exists(outfile)) or os.stat(outfile).st_size<1000000:
+    if (not os.path.exists(outfile)) or os.stat(outfile).st_size<10000:
         sys.exit(0)
 
 
@@ -49,4 +50,3 @@ def main():
         outfile2 = param['module_dir']+param['stub'][param['file_index']]+'.clipped.2.fastq.gz'
         run_cutadapt(param,'working_file2',outfile2,param['cutadapt_second_adapter'])
         module_helper.wrapup_module(param,[outfile,outfile2]) 
-        

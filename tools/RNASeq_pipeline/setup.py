@@ -62,7 +62,6 @@ setup(
             'run_featureCount=rnaseq_pipeline.featureCount:main',
             'run_htseq=rnaseq_pipeline.htseq:main',
             'run_matched_pairs=rnaseq_pipeline.matched_pairs:main',
-            'run_tophat=rnaseq_pipeline.tophat:main',
-            'run_trimmer=rnaseq_pipeline.trimmer:main']
+            'run_tophat=rnaseq_pipeline.tophat:main']
     }
 )
