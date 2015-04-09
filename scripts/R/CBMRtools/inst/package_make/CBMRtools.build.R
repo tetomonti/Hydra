@@ -2,6 +2,7 @@
 ## and generate html page documents
 
 #install.packages(devtools)
+#require(devtools)
 #install_github('hadley/staticdocs')
 
 require(devtools)

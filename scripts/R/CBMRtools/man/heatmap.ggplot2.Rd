@@ -95,7 +95,7 @@ row.legend.name = "",
 row.scaling = "z-score.capped",
 z.norm = FALSE,
 cuttree.col = 4, cuttree.row = 3,
-verbose = FALSE, show = FALSE)#'
+verbose = FALSE, show = FALSE)
 p1
 
 x<-exprs(eSet1)

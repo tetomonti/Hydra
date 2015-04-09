@@ -53,9 +53,9 @@
 #' # load objects hyperSig (a list of signatures) and hyperGsets (a GeneSet object)
 #' # and run hyper-enrichment test
 #'
-#' #data(hyper) # contains objects hyperSig and hyperGsets
-#' #hyperE <- hyperEnrichment(drawn=hyperSig,categories=getGeneSet(hyperGsets),ntotal=10000)
-#' #head(hyperE)
+#' data(hyper) # contains objects hyperSig and hyperGsets
+#' hyperE <- hyperEnrichment(drawn=hyperSig,categories=getGeneSet(hyperGsets),ntotal=10000)
+#' head(hyperE)
 #' 
 #' @export 
 

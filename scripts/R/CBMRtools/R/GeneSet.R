@@ -36,7 +36,18 @@
 ## $LastChangedRevision: 355 $
 
 
-## GeneSet class. Represents a gene set file/rdata/package data object.
+#' GeneSet
+#'
+#' Class \code{GeneSet} represents a compendium (list) of genesets, each representing a set of gene identifiers
+#'
+#' @slot source.file the file (with path) where the geneset originates from
+#' @slot geneset the list of character vectors each representing a set of gene IDs
+#' @slot type type of gene ID (gene symbol, ensemble ID, entrez ID, etc.)
+#' @slot verbose verbose logging of class operations
+#' @slot do.save undefined
+#' @slot name of geneset compendium (most often the source.file w/o the path)
+#' 
+#' @export
 GeneSet <- setClass("GeneSet", 
                     representation(source.file="character",
                                    geneset="list", 
@@ -53,6 +64,7 @@ GeneSet <- setClass("GeneSet",
                     sealed=FALSE)
 
 ## GeneSet constructor.
+#' @export
 setMethod("initialize", "GeneSet",
   function(.Object, source.file=NULL, geneset=NULL, type="hgnc_symbol", do.save=TRUE, verbose=FALSE, name=NULL) {
     if (is(geneset, "GeneSet")) {
@@ -100,6 +112,11 @@ setMethod("show", "GeneSet", function(object)
 setMethod("print", "GeneSet", function(x, ...) show(x), sealed=FALSE)
 
 ## GeneSet: length
+#' length
+#'
+#' method \code{length} returns the number of genesets contained in the object
+#' 
+#' @export
 setMethod("length","GeneSet", function(x) length(x@geneset), sealed=FALSE)
 
 ## GeneSet: geneSetName
@@ -117,7 +134,9 @@ setReplaceMethod("geneSetName",
 ## GeneSet: Get or set geneset
 setGeneric("getGeneSet", function(object) standardGeneric("getGeneSet"))
 setGeneric("setGeneSet<-", function(object,value) standardGeneric("setGeneSet<-"))
+#' @export
 setMethod("getGeneSet", "GeneSet", function(object) return(object@geneset), sealed=FALSE)
+#' @export
 setReplaceMethod("setGeneSet",
                  "GeneSet",
                  function(object, value) {

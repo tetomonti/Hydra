@@ -6,125 +6,6 @@
 # source( "~/dvlp/R/gene.cluster.R" )
 # source( "~/dvlp/R/" )
 
-PACKAGE <- if (version$major>1 || version$minor>=9) "stats" else "ctest"
-
-load.gset <- function( gset.filename, do.save=F, verbose=T )
-{
-  if ( length(grep(".gmx$",gset.filename,perl=T))<1 )
-    stop( "'.gmx' file expected: ", gset.filename )
-
-  VERBOSE(verbose,"Reading '",gset.filename,"' .. ", sep="" )
-  gset <- read.delim(gset.filename,check.names=F,sep="\t")
-  VERBOSE(verbose,"done, [",paste(dim(gset),collapse="x"),"] matrix.\n",sep="")
-  
-  if (all(gset[1,]=="na")) {
-    gset <- gset[-1,]
-    VERBOSE(verbose,"Removed 'color' row.\n")
-  }
-  gset <- apply(gset,2,unique)
-  gset <- lapply(gset,function(z) z[z!=""])
-  gset.len <- sapply(gset,length)
-  VERBOSE(verbose,"gset lengths' quantiles:\n")
-  if(verbose) print(quantile(gset.len,probs=c(0,.05,.1,.25,.5,.75,.90,.95,1)))
-  VERBOSE(verbose,"\n")
-  if(do.save)
-  {
-    rout <- gsub(".gmx",".Rout",gset.filename)
-    VERBOSE(verbose,"Saving bindata to '", rout, "' .. ", sep="")
-    save(gset,file=rout)
-    VERBOSE(verbose,"done.\n")
-  }
-  gset
-}
-# FUNCTION: KS SCORE
-#
-ks.score <- function( x, y, alternative=c("two.sided","greater","less"),
-                      exact = NULL, do.pval=T, do.plot=F, bare=F, plot.labels=FALSE,
-                      xlab="up-regulated for class 1 (KS>0)    vs    up-regulated for class 0 (KS<0)",
-                      ylab="gene hits",
-                      ... )
-{
-  # inefficient version used for debugging purpose (same as ks.test)
-  #
-  alternative <- match.arg(alternative)
-  DNAME <- paste(deparse(substitute(x)), "and", deparse(substitute(y)))
-  x <- x[!is.na(x)]
-  n.x <- as.double(length(x))
-  if (n.x < 1)  stop("Not enough x data")
-  y <- y[!is.na(y)]
-  n.y <- length(y)
-  if (n.y < 1)  stop("Not enough y data")
-  if (n.y>=n.x) stop("y tags must be less than data length")
-  
-  if (is.null(exact)) 
-    exact <- (n.x * n.y < 10000)
-  n <- n.x * n.y/(n.x + n.y)
-  w <- c(x, y)
-  z <- cumsum( ifelse(order(w) <= n.x, 1/n.x, -1/n.y) )
-  PVAL <- NULL
-  METHOD <- "Two-sample Kolmogorov-Smirnov test"
-  TIES <- FALSE
-  if ( length(unique(w)) < (n.x + n.y) ) {
-    z <- z[c(which(diff(sort(w)) != 0), n.x + n.y)]
-    TIES <- TRUE
-  }
-  z <- -z
-  score <- ifelse( max(z)>=-min(z), max(z), min(z) )
-  if ( do.plot )
-  {
-    xaxt <- if ( is.logical(plot.labels) ) "s" else "n"
-    plot( 0:length(z), c(0,z), type="l",
-          xlab=xlab,ylab=ylab, xaxt=xaxt, ... )
-    abline(h=0)
-    abline(v=length(z)/2,lty=3)
-    ##axis(1,at=y,labels=plot.labels,tcl=0.25,las=2,cex.axis=.5)
-    axis(1,at=y,labels=plot.labels,tcl=0.25,las=2,cex.axis=.5,col.ticks="red",lwd.ticks=2,tck=.025)
-    z.max <- which.max(abs(z))
-    points( z.max, z[z.max], pch=20, col="red")
-    #cat( "txt coordinates:", z.max+length(x)/30, " ", z[z.max]*sign(z[z.max]), "\n" )
-    text(z.max+length(x)/20,z[z.max],round(z[z.max],2))
-  }
-  # IF p-value not required exit here 
-  #
-  if ( !do.pval )
-    return(score)
-
-  # ELSE, compute asymptotic p-value
-  #
-  STATISTIC <- abs( score )
-  if (exact && alternative == "two.sided" && !TIES) 
-    PVAL <- 1 - .C("psmirnov2x", p = as.double(abs(STATISTIC)), 
-                   as.integer(n.x), as.integer(n.y), PACKAGE = PACKAGE)$p
-
-  names(score) <- switch(alternative, two.sided = "D", 
-                         greater = "D^+", less = "D^-")
-  pkstwo <- function(x, tol = 1e-06) {
-    if (is.numeric(x)) 
-      x <- as.vector(x)
-    else stop("Argument x must be numeric")
-    p <- rep(0, length(x))
-    p[is.na(x)] <- NA
-    IND <- which(!is.na(x) & (x > 0))
-    if (length(IND) > 0) {
-      p[IND] <- .C("pkstwo", as.integer(length(x)), p = as.double(x[IND]), 
-                   as.double(tol), PACKAGE = PACKAGE)$p
-    }
-    return(p)
-  }
-  if (is.null(PVAL)) {
-    PVAL <- ifelse(alternative == "two.sided", 1 - pkstwo(sqrt(n) * 
-                     STATISTIC), exp(-2 * n * STATISTIC^2))
-  }
-  if ( bare ) {
-    return( c(score=score, p.value=PVAL) )
-  }
-  RVAL <- list(statistic = score,
-               p.value = PVAL, alternative = alternative, 
-               method = METHOD, data.name = DNAME)
-  class(RVAL) <- "htest"
-
-  return(RVAL)
-}
 # FUNCTION: KS GENESCORE
 #
 ks.genescore <- function
@@ -262,6 +143,8 @@ gset2list <- function( gset, verbose=F )
   }
   gset
 }
+# FUNCTION: GSET 2 IDX
+#
 glist2idx <- function( glist, names, min.gset )
 {
   # replace list of geneset names with list of geneset indices
@@ -295,6 +178,8 @@ glist2idx <- function( glist, names, min.gset )
   }
   glist.idx
 }
+# FUNCTION: KS PERM
+#
 ks.perm <- function
 (
  x,                        # an (m-genes x n-samples) matrix
