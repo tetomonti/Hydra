@@ -111,6 +111,13 @@ copy)::
 
   git clone https://github.com/montilab/CBMgithub.git
 
+
+To get the current branch use::
+
+  git clone https://user@github.com/montilab/CBMgithub.git -b v2.0.0
+
+
+
 5. Install Developer Tools
 ==========================
 
@@ -137,5 +144,22 @@ standard python package::
   python setup.py install
 
 
-Once you're happy with your changes, use git to commit them. 
+7. Test whether your changes broke the pipeline
+===============================================
+
+Once you are done with your changes and installed them, try running one 
+of the toy examples to make sure there were no unintended side effects::
+
+   cd /restricted/projectnb/montilab-p/projects/pipeline_dev/unit_tests/human_paired_end
+   RNASeq_pipeline_prototype.py -p param.txt
+
+
+Once you're sure everything works, use git to commit them::
+
+   git add <whatever_file_you_changed>
+   git commit -m "Add a meaningful commit message"
+   git push
+
+To see the files that have been changed and need to be committed use::
+   git status
 
