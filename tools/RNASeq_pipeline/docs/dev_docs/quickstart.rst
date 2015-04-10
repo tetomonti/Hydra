@@ -160,6 +160,7 @@ Once you're sure everything works, use git to commit them::
    git commit -m "Add a meaningful commit message"
    git push
 
+
 To see the files that have been changed and need to be committed use::
    git status
 
