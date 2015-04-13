@@ -6,7 +6,7 @@ an external tool on each samples.
 import os
 import sys
 
-def checkParameter(param, key, dType, allowed=[], checkFile=False, optional=False):
+def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=False):
     """generic function that checks if a parameter was in the parameter file,
     casts to the right data type and if the parameter is a file/ directory
     checks if it actually exists
@@ -30,10 +30,10 @@ def checkParameter(param, key, dType, allowed=[], checkFile=False, optional=Fals
             sys.exit(0)
 
         #cast to correct data type
-        if dType == bool:
+        if dtype == bool:
             param[key] = param[key] in ['True', 'TRUE', 'true', 'T', '1']
         else:
-            param[key] = dType(param[key])
+            param[key] = dtype(param[key])
 
         #check if the value for the key is allowed
         if len(allowed) > 0 and param[key] not in allowed:
@@ -41,12 +41,12 @@ def checkParameter(param, key, dType, allowed=[], checkFile=False, optional=Fals
             sys.exit(0)
 
         #if file or directory check if it exists
-        if checkFile and not os.path.exists(param[key]):
+        if checkfile and not os.path.exists(param[key]):
             print 'The file in '+key+' = ', param[key], ' does not exist'
             sys.exit(0)
 
 
-def getPercentage(number1, number2, ntotal):
+def get_percentage(number1, number2, ntotal):
     """generic function that checks if a parameter was in the parameter file,
     casts to the right data type and if the parameter is a file/directory
     checks if it actually exists
@@ -56,8 +56,12 @@ def getPercentage(number1, number2, ntotal):
     :Parameter ntotal: length of the arrays
     :rtype: array with percentages as strings with ntotal length
     """
-
+    if type(number1) is float:
+        number1 = [number1]
+    if type(number2) is float:
+        number2 = [number2]
     percent = [0.0]*ntotal
+    
     for idx in range(ntotal):
         percent[idx] = round(float(number1[idx])/float(number2[idx])*100, 2)
     return [str(round(pc, 1))+'%' for pc in percent]
@@ -105,36 +109,40 @@ def initialize_module():
         param['working_file2'] = param[param['input_files']+'2'][param['file_index']]
 
     #name of the log file
-    log_file = param['working_dir']+'results/log/'+ \
-               param['stub'][param['file_index']]+'.log'
+    log_file = (param['working_dir']+
+                'results/log/'+
+                param['stub'][param['file_index']]+
+                '.log')
 
     #check if it is not a clean run and if module already completed
     param['resume_module'] = False
     if not param['clean_run']:
         param['file_handle'] = open(log_file)
         #check if the module already finished
-        lines_end = [line for line in param['file_handle'].readlines() \
-                     if 'ENDING %s |' %(param['current_flag']) in line.rstrip()]
-        if len(lines_end) > 0:
+        lines_end = False
+        for line in param['file_handle'].readlines():
+            if 'ENDING %s |' %(param['current_flag']) in line.rstrip():
+                lines_end = True
+        if lines_end:
             param['file_handle'].close()
             #open file for writing
             param['file_handle'] = open(log_file, 'a')
-            param['file_handle'].write(param['current_flag']+ \
-                          ' module already run on this file .. SKIPPING\n')
+            param['file_handle'].write(param['current_flag']+
+                                       ' module already run on this file .. SKIPPING\n')
             param['file_handle'].close()
             sys.exit(0)
         #check if the module was started, but not finished the enable resuming
-        lines_start = [line for line in param['file_handle'].readlines() \
-                       if 'STARTING %s |' %(param['current_flag']) in line.rstrip()]
-        if len(lines_start) > 0:
-            param['resume_module'] = True
+
+        for line in param['file_handle'].readlines():
+            if 'STARTING %s |' %(param['current_flag']) in line.rstrip():
+                param['resume_module'] = True
 
     #start process log
     param['file_handle'] = open(log_file, 'a')
     param['file_handle'].write('STARTING '+param['current_flag']+'\n')
     return param
 
-def outputPhenotype(param, pheno_file):
+def output_phenotype(param, pheno_file):
     """Writes out a phenotype file
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -165,10 +173,8 @@ def output_sample_info(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-
-    #create a file with the phenotype data of the samples that actually made it through HTSeq
     param['pheno_file'] = param['working_dir']+'deliverables/sample_info.txt'
-    outputPhenotype(param, param['pheno_file'])
+    output_phenotype(param, param['pheno_file'])
 
 
 def rotate_word(word, deg=270):
@@ -178,15 +184,15 @@ def rotate_word(word, deg=270):
     :Parameter word: the word that should be printed
     :Parameter deg: the degree of the rotation
     """
-    return '<div style="float: center;position: relative;-moz-transform: '+ \
-          'rotate(270deg);  /* FF3.5+ */-o-transform: rotate(270deg);'+ \
-          '  /* Opera 10.5 */ -webkit-transform: rotate('+str(deg)+ \
-          'deg);  /* Saf3.1+, Chrome */ filter:  progid:DXImageTransform.'+ \
-          'Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */ -ms-filter: '+ \
-          'progid:DXImageTransform.Microsoft.BasicImage(rotation=3);' + \
-          ' /* IE8 */">' +word+'</div>'
+    return('<div style="float: center;position: relative;-moz-transform: '+
+           'rotate(270deg);  /* FF3.5+ */-o-transform: rotate(270deg);'+
+           '  /* Opera 10.5 */ -webkit-transform: rotate('+str(deg)+
+           'deg);  /* Saf3.1+, Chrome */ filter:  progid:DXImageTransform.'+
+           'Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */ -ms-filter: '+
+           'progid:DXImageTransform.Microsoft.BasicImage(rotation=3);' +
+           ' /* IE8 */">' +word+'</div>')
 
-def writeHTMLtable(param, table, out, fcol_width=200, cell_width=50, initial_breaks=8, deg=315):
+def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_breaks=8, deg=315):
     """HTML table writing function that takes a table and writes it nicely out
     as an html table
 
@@ -199,14 +205,16 @@ def writeHTMLtable(param, table, out, fcol_width=200, cell_width=50, initial_bre
     :Parameter deg: rotation of the text in the header line
     """
 
-    out.write('<table id="one-column-emphasis" class="fixed"><col width="'+ \
+    out.write('<table id="one-column-emphasis" class="fixed"><col width="'+
               str(fcol_width)+'px"/>\n')
     out.write(''.join(['<br>']*initial_breaks)+'\n')
     out.write(''.join(['<col width="'+str(cell_width)+'px"/>\n']*len(table[0])))
     #write header
-    param['report'].write('<thead><tr><th></th>'+''.join(['<th>'+ \
-          rotate_word(stub.replace('-', '_'), deg)+ \
-          '</th>\n' for stub in table[0]])+'</tr></thead>\n')
+    param['report'].write('<thead><tr><th></th>'+
+                          ''.join(['<th>'+
+                                   rotate_word(stub.replace('-', '_'), deg)+
+                                   '</th>\n' for stub in table[0]])+
+                          '</tr></thead>\n')
 
     #write the pass and fail for each module
     for idx in range(1, len(table)):

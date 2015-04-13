@@ -10,9 +10,9 @@ def init(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    rnaseq_pipeline.module_helper.checkParameter(param,
-                                                 key='match_pairs_exec',
-                                                 dType=str)
+    rnaseq_pipeline.module_helper.check_parameter(param,
+                                                  key='match_pairs_exec',
+                                                  dtype=str)
 
 
 def run_match_pairs(param, infile, infile2, outfile, outfile2):
@@ -25,10 +25,13 @@ def run_match_pairs(param, infile, infile2, outfile, outfile2):
     :Parameter outfile2: Where to write the cleaned up second mates
     """
 
-    call = param['match_pairs_exec']+' "'+param[infile]+ \
-           '" "'+param[infile2]+'" '+outfile+' '+outfile2
+    call = [param['match_pairs_exec']]
+    call.append(param[infile])
+    call.append(param[infile2])
+    call.append(outfile)
+    call.append(outfile2)
+
     output, error = subprocess.Popen(call,
-                                     shell=True,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
 
@@ -44,16 +47,18 @@ def run_match_pairs(param, infile, infile2, outfile, outfile2):
 
 
 def main():
-    """Main function that is run on each samples, which in turn calls the \
+    """Main function that is run on each samples, which in turn calls the
     actual paired mate script that matches the mates
     """
     param = rnaseq_pipeline.module_helper.initialize_module()
 
     #run match pairs
-    outfile = param['module_dir']+param['stub'][param['file_index']]+ \
-              '.clipped.matched.fastq.gz'
-    outfile2 = param['module_dir']+param['stub'][param['file_index']]+ \
-               '.clipped.matched.2.fastq.gz'
+    outfile = (param['module_dir']+
+               param['stub'][param['file_index']]+
+               '.clipped.matched.fastq.gz')
+    outfile2 = (param['module_dir']+
+                param['stub'][param['file_index']]+
+                '.clipped.matched.2.fastq.gz')
 
     run_match_pairs(param,
                     'working_file',

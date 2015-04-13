@@ -5,7 +5,6 @@ finish.
 
 import os
 import time
-import shlex
 import subprocess
 import rnaseq_pipeline.module_helper
 MODULE_HELPER = rnaseq_pipeline.module_helper
@@ -16,14 +15,14 @@ def initialize_qsub(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    MODULE_HELPER.checkParameter(param, key='qsub_email', dType=str)
-    MODULE_HELPER.checkParameter(param, key='qsub_send_email', dType=bool)
-    MODULE_HELPER.checkParameter(param, key='qsub_memory', dType=str)
-    MODULE_HELPER.checkParameter(param, key='qsub_PROJECT', dType=str)
-    MODULE_HELPER.checkParameter(param, key='qsub_MACHINE', dType=str)
-    MODULE_HELPER.checkParameter(param, key='qsub_RUNTIME_LIMIT', dType=str)
-    MODULE_HELPER.checkParameter(param, key='qsub_wait_time', dType=int)
-    MODULE_HELPER.checkParameter(param, key='qsub_num_processors', dType=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_email', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_send_email', dtype=bool)
+    MODULE_HELPER.check_parameter(param, key='qsub_memory', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_PROJECT', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_MACHINE', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_RUNTIME_LIMIT', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='qsub_wait_time', dtype=int)
+    MODULE_HELPER.check_parameter(param, key='qsub_num_processors', dtype=str)
 
 
 def wait_for_qsub(param, job_id):
@@ -33,22 +32,23 @@ def wait_for_qsub(param, job_id):
     :Parameter job_id: random integer representing the job id for the current batch
     """
 
-    user, _ = subprocess.Popen(args=shlex.split('whoami'),
+    user, _ = subprocess.Popen(args=['whoami'],
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE).communicate()
     user = user.rstrip()
 
     #wait until there are no jobs with the current job name in the queue anymore
     qjobs = param['num_samples']
-    writeLog('Waiting for single '+param['current_flag']+ \
-             ' jobs to finish.... \n', param)
+    writeLog('Waiting for single '+
+             param['current_flag']+
+             ' jobs to finish.... \n',
+             param)
     while qjobs > 0:
         qjobs = 0
         time.sleep(param['qsub_wait_time'])
         # check the number of jobs
-        cmd = 'qstat -u $USER'
-        args = shlex.split(cmd)
-        output, _ = subprocess.Popen(args,
+        call = ['qstat', '-u', '$USER']
+        output, _ = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
 
@@ -75,8 +75,10 @@ def submit_jobs(index, param, py_file, job_id, cores):
     :Parameter cores: number of cores that should be used
     """
 
-    cmd = py_file +' -i ' + str(index) + ' -n $NSLOTS' + \
-          ' -d ' +  param['working_dir']
+    cmd = (py_file +
+           ' -i ' + str(index) +
+           ' -n $NSLOTS' +
+           ' -d ' +  param['working_dir'])
 
     #make a directory for all the qsub commands
     param['qsub_dir'] = param['working_dir']+'results/qsub/'
@@ -98,9 +100,12 @@ def submit_jobs(index, param, py_file, job_id, cores):
     outhandle.output_file([cmd])
 
     #call qsub script
-    cmd = 'qsub -pe single_node '+cores+' '+qsub_filename
-    args = shlex.split(cmd)
-    _, _ = subprocess.Popen(args,
+    call = ['qsub']
+    call.append('-pe')
+    call.append('single_node')
+    call.append(cores)
+    call.append(qsub_filename)
+    _, _ = subprocess.Popen(call,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE).communicate()
 

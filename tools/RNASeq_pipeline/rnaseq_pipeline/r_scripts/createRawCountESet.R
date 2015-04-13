@@ -1,14 +1,17 @@
 
+print('test1')
 
 #Parameter handling
 args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args)%%2 !=0){
+if (length(args) != 6){
    print("You need to specify the annotation (-a), the raw counts (-c) and the output directory -o")
    quit(save='no')
 }
 keys<-args[(1:(length(args)/2))*2-1]
 values<-args[(1:(length(args)/2))*2]
+
+print('test2')
 
 #check parameters
 chkPars<-function(x,keys,values){
