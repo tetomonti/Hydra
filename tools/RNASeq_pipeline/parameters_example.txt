@@ -16,7 +16,7 @@ raw_file_header =    TRUE
 paired	        =    TRUE
 
 #start pipeline from scratch or try to pick up at the last step that was performed successfully
-clean_run       =    FALSE
+clean_run       =    TRUE
 
 #should everything also be printed on the command line
 verbose         =    TRUE
@@ -71,7 +71,7 @@ match_pairs_python_version  = python
 ############################################################################################################################################
 #FAST QC
 ############################################################################################################################################
-fastqc_exec      =      	/restricted/projectnb/montilab-p/tools/FastQC_v0.10.1/fastqc   
+fastqc_exec      =      	fastqc   
 
 ############################################################################################################################################
 #TOPHAT
