@@ -122,15 +122,15 @@
 #' 
 #' @export 
 
-
 #####
 # This function plots a heatmap from expression set object using ggplot2
 # Customization for heatmap color range (options: row.scaling and z.norm)
 # Customization for RowSideColor and ColSideColor, may include multiple features (options: col.lab, row.lab)
 # required packaged not installed on scc4: ggdendro, url: http://cran.r-project.org/web/packages/ggdendro/index.html
-#to install: 1.)download ggdendro_0.1-15.tar.gz from url
-#  		 2.)R CMD INSTALL -l LOCAL_R_DIR ggdendro_0.1-15.tar.gz
-#			 3.)make sure LOCAL_R_DIR is included in R package path: .libPaths( c( .libPaths(), "/path/to/LOCAL_R_DIR") )
+# to install:
+# 1) download ggdendro_0.1-15.tar.gz from url
+# 2) R CMD INSTALL -l LOCAL_R_DIR ggdendro_0.1-15.tar.gz
+# 3) make sure LOCAL_R_DIR is included in R package path: .libPaths( c( .libPaths(), "/path/to/LOCAL_R_DIR") )
 #####
 
 heatmap.ggplot2<-function(eSet, 

@@ -17,3 +17,5 @@ library(CBMRtools)
 #generate html pages
 setwd(package.dir)
 build_site(pkg = package.dir, examples = TRUE, launch = TRUE)
+#build_site(pkg = '.', examples = TRUE, launch = TRUE)
+#build_site(pkg = package.dir, examples = FALSE, launch = FALSE)

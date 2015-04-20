@@ -8,48 +8,273 @@
 
 ## use slotNames, getSlots, or getClass to see details about the class
 
+###############################################################################################
+#' gctdata
+###############################################################################################
+#'
+#' Class \code{gctdata} represents a gene expression microarray data in the Broad '.gct' format
+#'
+#' @slot signal is the [m x n] gene-by-sample matrix of expression levels
+#' @slot description is an m-sized character vector of genes' (or probesets') descriptions
+#' 
+#' @export
+#' 
+setClass("gctdata",
+         representation=representation(
+             signal="matrix",
+             description="character"),
+         validity=function(object) {
+             if ( is.null(object@signal) )
+                 stop( "is.null(signal)" )
+             if ( is.null(object@description) )
+                 stop( "is.null(description)" )
+             if ( nrow(object@signal)!=length(object@description) )
+                 stop('nrow(signal)!=length(description)')
+             return(TRUE)
+         })
+
+## gctdata constructor
+
+setMethod("initialize", "gctdata",
+  function(.Object, signal=matrix(), description=character(1)) {
+      .Object@signal <- signal
+      .Object@description <- description
+      #cat("*** Class: gctdata ***\n")
+      #cat(">>> signal:      [", paste(dim(.Object@signal),collapse=' x '), "] matrix\n", sep="")
+      #cat(">>> description: ", length(.Object@description), "-sized character vector\n", sep="")
+      validObject(.Object)
+      return(.Object)
+  })
+
+## GET
+setGeneric("getSignal",function(object){standardGeneric("getSignal")})
+#' @export
+setMethod("getSignal","gctdata", function(object) { return(object@signal) })
+#' @export
+setGeneric("getDescription",function(object){standardGeneric("getDescription")})
+setMethod("getDescription","gctdata", function(object) { return(object@description) })
+
+## SET SIGNAL
+setGeneric("setSignal<-",function(object,value){standardGeneric("setSignal<-")})
+#' @export
+setReplaceMethod(f="setSignal",
+                 signature="gctdata",
+                 definition=function(object,value) {
+                     object@signal <- value
+                     return(object)
+                 })
+## SET DESCRIPTION
+setGeneric("setDescription<-",function(object,value){standardGeneric("setDescription<-")})
+#' @export
+setReplaceMethod(f="setDescription",
+                 signature="gctdata",
+                 definition=function(object,value) {
+                     object@description <- value
+                     return(object)
+                 })
+
+## (GET/SET) GENENAMES
+
+setGeneric("genenames",function(object){standardGeneric("genenames")})
+#' @export
+setMethod(f="genenames",signature="gctdata",
+          definition=function(object) { return ( rownames(object@signal) ) } )
+
+setGeneric("genenames<-",function(object,value){standardGeneric("genenames<-")})
+#' @export
+setReplaceMethod(f="genenames",
+                 signature="gctdata",
+                 definition=function(object,value) {
+                     rownames(object@signal) <- value
+                     return ( object )
+                 })
+
+## (GET/SET) EXPTNAMES
+
+setGeneric("exptnames",function(object){standardGeneric("exptnames")})
+#' @export
+setMethod(f="exptnames",signature="gctdata",
+          definition=function(object) { return ( colnames(object@signal) ) } )
+
+setGeneric("exptnames<-",function(object,value){standardGeneric("exptnames<-")})
+#' @export
+setReplaceMethod(f="exptnames",
+                 signature="gctdata",
+                 definition=function(object,value) {
+                     colnames(object@signal) <- value
+                     return ( object )
+                 })
+
+## OPERATOR '['
+
+## READ GCT
+##
+read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RData",verbose=TRUE )
+{
+  # see if a binary object was cached
+  #
+  binfile <- gsub(".gct",binext,file)
+  if ( !force.read && file.access(binfile)==0 ) {
+    dat <- load.var(binfile)
+    if (class(dat)!="gctdata") {
+      stop("a gctdat object expected in '", binfile, "'", sep="")
+    }
+    return(dat)
+  }
+  VERBOSE( verbose, "\tReading signal .. " )
+  x <- read.delim(file,sep="\t",fill=TRUE,skip=2, header=TRUE,check.names=FALSE,comment.char="")
+  rownames(x) <- x[,1]
+  desc <- as.character(x[,2])
+  x <- as.matrix(x[,-c(1,2)])
+  VERBOSE( verbose, "done, ", nrow(x), " genes x ", ncol(x), " experiments.\n", sep="" )
+
+  dat <- new( "gctdata", signal=x, description=desc )
+  if (do.save) {
+    VERBOSE(verbose, "Saving binary object ..")
+    save(dat,file=binfile)
+    VERBOSE(verbose, " done.\n" )
+  }
+  return(dat)
+}
+## WRITE GCT
+##
+write.gct <- function( x, file, binext=".RData", do.save=TRUE, verbose=FALSE )
+{
+  if ( is.matrix(x) ) {
+    x <- new("gctdata",
+             signal=x,
+             description=rownames(x))             
+  }
+  else if ( class(x)!="gctdata" )
+    stop( "object does not belong to gctdata class" )
+  
+  cat( "#1.2\n", file=file )
+  cat( paste(dim(x),collapse="\t"), sep="" , "\n", file=file, append=TRUE )
+  cat( paste( c("Name\tDescription",exptnames(x)),collapse="\t"), sep="", "\n",
+       file=file, append=TRUE )
+  my.write.table(cbind(genenames(x),x@description,x@signal), row.names=FALSE, col.names=FALSE,
+                 sep="\t", file=file, append=TRUE )
+
+  if ( do.save ) {
+    VERBOSE(verbose," (saving binary object ..")
+    binfile <- gsub("\\.gct",binext,file)
+    if ( binfile==file )
+      warning("didn't save binary file (problems creating output name)")
+    else {
+      dat <- x
+      save(dat,file=binfile)
+    }
+    VERBOSE(verbose, " done)")
+  }
+}
+## DIM GCT
+##
+#' @export
+dim.gctdata <- function( x )
+{
+  if ( class(x)!="gctdata" )
+    stop( "object does not belong to gctdata class" )
+  dim(getSignal(x))
+}
+## backward compatibility
+##
+set.exptnames <- function( x, enames ) {
+    exptnames(x) <- enames
+    return(x)
+}
+set.descriptors <- function( x, dnames ) {
+    setDescprition(x) <- dnames
+    return(x)
+}
+## SUBSET GCTDATA
+##
+subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
+{
+  if (class(x)!="gctdata") stop( "'gctdata' object expected" )
+  if ( is.null(exptnames) && is.null(genenames) )
+    stop( "either exptnames or genenames must be provided" )
+
+  g.idx <- 1:nrow(x)
+  e.idx <- 1:ncol(x)
+  
+  # sample subsetting
+  #
+  if ( !is.null(exptnames) )
+  {
+    e.idx <- match.nona( exptnames, exptnames(x) )
+    if ( !ignore && any(is.na(e.idx)) )
+      stop( "subsetting on non-existing columns" )
+    else
+      e.idx <- e.idx[!is.na(e.idx)]
+    if ( length(e.idx)==0 )
+      stop( "empty subset to select" )
+  }
+  # gene subsetting
+  #
+  if ( !is.null(genenames) )
+  {
+    g.idx <- match( genenames, genenames(x) )
+    if ( !ignore && any(is.na(g.idx)) )
+      stop( "subsetting on non-existing rows" )
+    else
+      g.idx <- g.idx[!is.na(g.idx)]
+    if ( length(g.idx)==0 )
+      stop( "empty subset to select" )
+  }
+  return( new("gctdata",
+              signal=getSignal(x)[g.idx,e.idx,drop=FALSE],
+              description=getDescription(x)[g.idx]) )
+}
+###############################################################################################
+#' resdata
+###############################################################################################
+#'
+#' Class \code{resdata} represents a gene expression microarray data in the Broad '.res' format
+#'
+#' @slot signal is the [m x n] gene-by-sample matrix of expression levels
+#' @slot calls is the [m x n] gene-by-sample matrix of P/M/A calls
+#' @slot description is an m-sized character vector of genes' (or probesets') descriptions
+#' @slot scale is the scaling factor used with each sample (if any)
+#' 
+#' @export
+#' 
 setClass("resdata",
-         representation(signal="matrix",
-                        calls="matrix",
-                        description="character",
-                        scale="character"),
-         validity = function(object) {
+       contains="gctdata",
+       representation(calls="matrix",
+                      scale="character"),
+       validity = function(object) {
+           if ( is.null(object@calls) )
+               stop( "is.null(calls)" )
            if ( ncol(object@signal)!=ncol(object@calls) )
-             stop( "ncol(signal)!=ncol(calls)" )
+               stop( "ncol(signal)!=ncol(calls)" )
            if ( nrow(object@signal)!=nrow(object@calls) )
                stop( "nrow(signal)!=nrow(calls)" )
            if ( any(colnames(object@signal)!=colnames(object@calls)) )
-             stop( "colnames(signal)!=colnames(alls)" )
+               stop( "colnames(signal)!=colnames(calls)" )
            if ( any(rownames(object@signal)!=rownames(object@calls)) )
-             stop( "rownames(signal)!=rownames(alls)" )
-           if ( !is.null(object@description) && (length(object@description)!=nrow(object@signal)) )
-             stop("length(description)!=nrow(signal))")
+               stop( "rownames(signal)!=rownames(calls)" )
            if ( !is.null(object@scale) && (length(object@scale)!=ncol(object@signal)) )
-             stop( "length(scale)!=ncol(signal)" )
-         })
+               stop( "length(scale)!=ncol(signal)" )
+           return(TRUE)
+       })
 
-setClass("gctdata",
-         representation(signal="matrix",
-                        description="character"))
+## resdata CONSTRUCTOR
 
-setClass("l1000data",
-         representation(signal="matrix",
-                        meta="matrix",
-                        description="character"),
-         validity = function(object) {
-           if ( ncol(object@signal)!=ncol(object@meta) )
-             stop( "ncol(object@signal)!=ncol(object@meta)" )
-           if ( any(colnames(object@signal)!=colnames(object@meta)) )
-             stop( "colnames(object@signal)!=colnames(object@meta)" )
-         }
-         )
+setMethod("initialize", "resdata",
+  function(.Object,signal=matrix(),calls=matrix(),scale=NULL,description=character(1)) {
+    .Object@calls=calls
+    .Object@scale=scale
+    .Object <- callNextMethod(.Object,signal=signal,description=description)
+    #cat("*** Class: resdata ***\n")
+    #cat(">>> signal:      [", paste(dim(.Object@signal),collapse=' x '), "] matrix\n", sep="")
+    #cat(">>> calls:       [", paste(dim(.Object@calls),collapse=' x '), "] matrix\n", sep="")
+    #cat(">>> scale:       ", length(.Object@scale), "-sized character vector\n", sep="")
+    #cat(">>> description: ", length(.Object@description), "-sized character vector\n", sep="")
+    validObject(.Object)
+    return(.Object)
+  })
 
-
-# to get the names of the class slots, use
-#
-# names(attributes(tmp))
-#
-# where tmp is an instance of the class
+## READ RES
 
 read.res <- function
 (
@@ -61,7 +286,7 @@ read.res <- function
  accession="Accession",
  force.read=FALSE,
  do.save=TRUE,
- binext=".RDS",
+ binext=".RData",
  verbose=TRUE
  )
 {
@@ -70,7 +295,7 @@ read.res <- function
   binfile <- gsub("\\.res",binext,file)
   if ( !force.read && file.access(binfile)==0 ) {
     VERBOSE( verbose, "Loadin bin file '", binfile, "' ..", sep="")
-    dat <- readRDS(binfile)
+    dat <- load.var(binfile)
     if (class(dat)!="resdata") {
       stop("a resdat object expected in '", binfile, "'", sep="")
     }
@@ -84,7 +309,8 @@ read.res <- function
   
   # Reading header line
   #
-  chip.names <- sapply(read.delim(file,nrows=1,sep=sep,header=FALSE,colClasses="character",fill=TRUE),as.character)
+  chip.names <-
+    sapply(read.delim(file,nrows=1,sep=sep,header=FALSE,colClasses="character",fill=TRUE),as.character)
 
   if (chip.names[length(chip.names)]=="") chip.names <- chip.names[-length(chip.names)]
   if (chip.names[1]!=description)
@@ -140,95 +366,34 @@ read.res <- function
   }
   dat
 }
-write.res <- function( x, file=NULL, binext=".RDS", rnd=NULL, verbose=TRUE, do.save=TRUE )
-{
-  if ( class(x)!="resdata" )
-    stop( "object does not belong to resdata class" )
-
-  res <- matrix( NA, nrow(x@signal), ncol(x@signal)*2 )
-  idx <- seq( 1, ncol(res)-1, 2 )
-  res[,idx]  <- if (is.null(rnd)) x@signal else round(x@signal,rnd)
-  res[,-idx] <- x@calls
-  
-  cat( "Description\tAccession\t",
-      paste( colnames(x@signal), collapse="\t\t", sep="" ),
-      "\t\n", sep="", file=file )
-  cat("\t\t",
-      paste( x@scale, collapse="\t\t", sep="" ),
-      "\t\n", sep="", file=file, append=TRUE )
-  cat(dim(x)[1], "\n", sep="", file=file, append=TRUE )
-
-  my.write.table(cbind(x@description, rownames(x@signal), res ),
-                 sep="\t", row.names=FALSE, col.names=FALSE, file=file, append=TRUE )
-  if ( do.save ) {
-    VERBOSE(verbose," (saving binary object ..")
-    binfile <- gsub("\\.res",binext,file)
-    if ( binfile==file )
-      warning("didn't save binary file (problems creating output name)")
-    else {
-      dat <- x
-      saveRDS(dat,file=binfile)
-    }
-    VERBOSE(verbose, " done)")
-  }
-}
+## DIM RESDATA
+##
+#' @export
 dim.resdata <- function( x )
 {
   if ( class(x)!="resdata" )
     stop( "object does not belong to resdata class" )
-  dim(x@signal)
+  dim(getSignal(x))
 }
-genenames <- function( x )
+## MERGE RESDATA
+##
+merge.resdata <- function( X, Y )
 {
-  if ( !(class(x) %in% c("resdata","gctdata","l1000data")) )
-    stop( "'resdata|gctdata' object expected" )
-  rownames(x@signal)
+  if (class(X)!="resdata") stop("resdata expected for X")
+  if (class(Y)!="resdata") stop("resdata expected for Y")
+  if ( length(expts <- intersect(exptnames(X),exptnames(Y)))>0 )
+    stop("non unique experiment names: ", paste( expts, collapse=", " ), sep="")
+  genes <- match(genenames(X),genenames(Y))
+  if (any(is.na(genes)))   stop( "X and Y don't have the same genes" )
+
+  new("resdata",
+      signal=cbind(getSignal(X),getSignal(Y)[genes,]),
+      calls =cbind(getCalls(X),getCalls(Y)[genes,]),
+      description=getDescription(X),
+      scale=c(getScale(X),getScale(Y)) )  
 }
-exptnames <- function( x )
-{
-  if ( !(class(x) %in% c("resdata","gctdata","l1000data")) )
-    stop( "'resdata|gctdata|l1000data' object expected" )
-  colnames(x@signal)
-}
-signal <- function( x )
-{
-  x@signal
-}
-descriptors <- function( x )
-{
-  if ( !(class(x) %in% c("resdata","gctdata","l1000data")) )
-    stop( "'resdata|gctdata' object expected" )
-  x@description
-}
-set.genenames <- function( x, gnames )
-{
-  if ( length(gnames)!=nrow(x) )
-    stop( "number of gene names doesn't match number of data rows" )
-  if ( length(gnames)!=length(unique(gnames)) )
-    stop( "gene names must be unique" )
-  rownames(x@signal) <- gnames
-  if ( class(x)=="resdata" )
-    rownames(x@calls) <- gnames
-  x
-}
-set.exptnames <- function( x, enames )
-{
-  if ( length(enames)!=ncol(x) )
-    stop( "number of experiment names doesn't match number of data columns" )
-  if ( length(enames)!=length(unique(enames)) )
-    stop( "experiment names must be unique" )
-  colnames(x@signal) <- enames
-  if ( class(x)=="resdata" )
-    rownames(x@calls) <- enames
-  x
-}
-set.descriptors <- function( x, dnames )
-{
-  if ( length(dnames)!=nrow(x) )
-    stop( "number of descriptors doesn't match number of data rows" )
-  x@description <- dnames
-  x
-}
+## SUBSET RESDATA
+##
 subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)!="resdata") stop( "'resdata' object expected" )
@@ -242,7 +407,7 @@ subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
   #
   if ( !is.null(exptnames) )
   {
-    e.idx <- match( exptnames, colnames(x@signal) )
+    e.idx <- match( exptnames, colnames(getSignal(x)) )
     if ( !ignore && any(is.na(e.idx)) )
       stop( "subsetting on non-existing columns" )
     else
@@ -254,7 +419,7 @@ subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
   #
   if ( !is.null(genenames) )
   {
-    g.idx <- match( genenames, rownames(x@signal) )
+    g.idx <- match( genenames, rownames(getSignal(x)) )
     if ( !ignore && any(is.na(g.idx)) )
       stop( "subsetting on non-existing rows" )
     else
@@ -263,268 +428,13 @@ subset.resdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
       stop( "empty subset to select" )
   }
   return( new("resdata",
-              signal=x@signal[g.idx,e.idx,drop=FALSE],
-              calls=x@calls[g.idx,e.idx,drop=FALSE],
-              description=x@description[g.idx],
-              scale=if (length(x@scale)>1) x@scale[e.idx] else "") )
+              signal=getSignal(x)[g.idx,e.idx,drop=FALSE],
+              calls=getCalls(x)[g.idx,e.idx,drop=FALSE],
+              description=getDescription(x)[g.idx],
+              scale=if (length(getScale(x))>1) getScale(x)[e.idx] else "") )
 }
-merge.resdata <- function( X, Y )
-{
-  if (class(X)!="resdata") stop("resdata expected for X")
-  if (class(Y)!="resdata") stop("resdata expected for Y")
-  if ( length(expts <- intersect(exptnames(X),exptnames(Y)))>0 )
-    stop("non unique experiment names: ", paste( expts, collapse=", " ), sep="")
-  genes <- match(genenames(X),genenames(Y))
-  if (any(is.na(genes)))   stop( "X and Y don't have the same genes" )
-
-  new("resdata",
-      signal=cbind(X@signal,Y@signal[genes,]),
-      calls =cbind(X@calls,Y@calls[genes,]),
-      description=X@description,
-      scale=c(X@scale,Y@scale) )  
-}
-read.gct <- function( file, force.read=FALSE, do.save=TRUE, binext=".RDS",verbose=TRUE )
-{
-  # see if a binary object was cached
-  #
-  binfile <- gsub(".gct",binext,file)
-  if ( !force.read && file.access(binfile)==0 ) {
-    dat <- readRDS(binfile)
-    if (class(dat)!="gctdata") {
-      stop("a gctdat object expected in '", binfile, "'", sep="")
-    }
-    return(dat)
-  }
-  VERBOSE( verbose, "\tReading signal .. " )
-  x <- read.delim(file,sep="\t",fill=TRUE,skip=2, header=TRUE,check.names=FALSE,comment.char="")
-  rownames(x) <- x[,1]
-  desc <- as.character(x[,2])
-  x <- as.matrix(x[,-c(1,2)])
-  VERBOSE( verbose, "done, ", nrow(x), " genes x ", ncol(x), " experiments.\n", sep="" )
-
-  dat <- new( "gctdata", signal=x, description=desc )
-  if (do.save) {
-    VERBOSE(verbose, "Saving binary object ..")
-    saveRDS(dat,file=binfile)
-    VERBOSE(verbose, " done.\n" )
-  }
-  return(dat)
-}
-dim.gctdata <- function( x )
-{
-  if ( class(x)!="gctdata" )
-    stop( "object does not belong to gctdata class" )
-  dim(x@signal)
-}
-write.gct <- function( x, file, binext=".RDS", do.save=TRUE, verbose=FALSE )
-{
-  if ( is.matrix(x) ) {
-    x <- new("gctdata",
-             signal=x,
-             description=rownames(x))             
-  }
-  else if ( class(x)!="gctdata" )
-    stop( "object does not belong to gctdata class" )
-  
-  cat( "#1.2\n", file=file )
-  cat( paste(dim(x),collapse="\t"), sep="" , "\n", file=file, append=TRUE )
-  cat( paste( c("Name\tDescription",exptnames(x)),collapse="\t"), sep="", "\n",
-       file=file, append=TRUE )
-  my.write.table(cbind(genenames(x),x@description,x@signal), row.names=FALSE, col.names=FALSE,
-                 sep="\t", file=file, append=TRUE )
-
-  if ( do.save ) {
-    VERBOSE(verbose," (saving binary object ..")
-    binfile <- gsub("\\.gct",binext,file)
-    if ( binfile==file )
-      warning("didn't save binary file (problems creating output name)")
-    else {
-      dat <- x
-      saveRDS(dat,file=binfile)
-    }
-    VERBOSE(verbose, " done)")
-  }
-}
-subset.gctdata <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
-{
-  if (class(x)!="gctdata") stop( "'gctdata' object expected" )
-  if ( is.null(exptnames) && is.null(genenames) )
-    stop( "either exptnames or genenames must be provided" )
-
-  g.idx <- 1:nrow(x)
-  e.idx <- 1:ncol(x)
-  
-  # sample subsetting
-  #
-  if ( !is.null(exptnames) )
-  {
-    e.idx <- match( exptnames, colnames(x@signal) )
-    if ( !ignore && any(is.na(e.idx)) )
-      stop( "subsetting on non-existing columns" )
-    else
-      e.idx <- e.idx[!is.na(e.idx)]
-    if ( length(e.idx)==0 )
-      stop( "empty subset to select" )
-  }
-  # gene subsetting
-  #
-  if ( !is.null(genenames) )
-  {
-    g.idx <- match( genenames, rownames(x@signal) )
-    if ( !ignore && any(is.na(g.idx)) )
-      stop( "subsetting on non-existing rows" )
-    else
-      g.idx <- g.idx[!is.na(g.idx)]
-    if ( length(g.idx)==0 )
-      stop( "empty subset to select" )
-  }
-  return( new("gctdata",
-              signal=x@signal[g.idx,e.idx,drop=FALSE],
-              description=x@description[g.idx]) )
-}
-read.l1000 <- function( fname, force.read=FALSE, do.save=TRUE, binext=".RDS",verbose=TRUE )
-{
-  gene.headings <- c("pr_gene_symbol","pr_gene_title")
-  
-  ## see if a binary object was cached
-  ##
-  binfile <- gsub("\\.gct",binext,fname)
-  if ( !force.read && file.access(binfile)==0 ) {
-    dat <- readRDS(binfile)
-    if (class(dat)!="l1000data") {
-      stop("a l1000data object expected in '", binfile, "'", sep="")
-    }
-    return(dat)
-  }
-  heading <- as.vector(as.matrix(read.tab.delim(fname,header=FALSE,skip=1,nrows=1)))
-
-  VERBOSE( verbose, "\tReading signal .. " )
-  x <- read.delim(fname,sep="\t",fill=TRUE,skip=2, row.names=1,header=TRUE,check.names=FALSE,comment.char="",stringsAsFactors=FALSE)
-  if ( nrow(x)!=heading[1]+heading[4] )
-    stop( "unexpected # of rows:", heading[1]+heading[4], "expected" )
-  if ( ncol(x)!=heading[2]+heading[3] )
-    stop( "unexpected # of columns:", heading[2]+heading[3], "expected" )
-  if ( any(is.na(desc.idx <- match(gene.headings,colnames(x)))) )
-    stop( "missing columns: ", gene.headings[is.na(desc.idx)] )
-  
-  meta <- x[1:heading[4],-(1:heading[3])]
-  desc <- apply(x[,desc.idx],1,paste,collapse=":")[-(1:heading[4])]
-  x <- as.matrix(x[-(1:heading[4]),-(1:heading[3])])
-  rnames <- rownames(x)
-  x <- apply(x,2,as.numeric)
-  rownames(x) <- rnames
-  dat <- new( "l1000data", signal=as.matrix(x), description=desc, meta=as.matrix(meta) )
-
-  VERBOSE( verbose, "done, ", nrow(dat), " genes x ", ncol(dat), " experiments.\n", sep="" )
-
-  if (do.save) {
-    VERBOSE(verbose, "Saving binary object ..")
-    saveRDS(dat,file=binfile)
-    VERBOSE(verbose, " done.\n" )
-  }
-  return(dat)
-}
-dim.l1000data <- function( x )
-{
-  if ( class(x)!="l1000data" )
-    stop( "object does not belong to l1000data class" )
-  dim(x@signal)
-}
-subset.l1000data <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
-{
-  if (class(x)!="l1000data") stop( "'l1000data' object expected" )
-  if ( is.null(exptnames) && is.null(genenames) )
-    stop( "either exptnames or genenames must be provided" )
-
-  g.idx <- 1:nrow(x)
-  e.idx <- 1:ncol(x)
-  
-  # sample subsetting
-  #
-  if ( !is.null(exptnames) )
-  {
-    e.idx <- match( exptnames, colnames(x@signal) )
-    if ( !ignore && any(is.na(e.idx)) )
-      stop( "subsetting on non-existing columns" )
-    else
-      e.idx <- e.idx[!is.na(e.idx)]
-    if ( length(e.idx)==0 )
-      stop( "empty subset to select" )
-  }
-  # gene subsetting
-  #
-  if ( !is.null(genenames) )
-  {
-    g.idx <- match( genenames, rownames(x@signal) )
-    if ( !ignore && any(is.na(g.idx)) )
-      stop( "subsetting on non-existing rows" )
-    else
-      g.idx <- g.idx[!is.na(g.idx)]
-    if ( length(g.idx)==0 )
-      stop( "empty subset to select" )
-  }
-  return( new("l1000data",
-              signal=x@signal[g.idx,e.idx,drop=FALSE],
-              meta=x@meta[,e.idx,drop=FALSE],
-              description=x@description[g.idx]) )
-}
-l1000.from.gctx <- function( GCTX, cnames=c("cell_id","pert_time","pert_id") )
-{
-  ## checks on inputs
-  ##
-  if ( !all(names(GCTX) %in% c("matrix","row.annotations","column.annotations")) )
-    stop( "GCTX expected to have fields 'matrix','row.annotations','column.annotations'" )
-  if ( !all(cnames %in% colnames(GCTX$column.annotations)) )
-    stop( "cnames missing from GCTX$column.annotations' column names" )
-  if ( !("id" %in% colnames(GCTX$row.annotations)) )
-    stop( "'id' not found among row.annotations' column names" )
-  if ( ncol(GCTX$matrix)!=nrow(GCTX$column.annotations) )
-    stop( "ncol(GCTX$matrix)!=nrow(GCTX$column.annotations)" )
-  ## end checks
-  
-  rownames(GCTX$matrix) <- GCTX$row.annotations[,'id']
-  META <- t(as.matrix(GCTX$column.annotations))
-  colnames(META) <- colnames(GCTX$matrix) <- apply(GCTX$column.annotations[,cnames],1,paste,collapse="_")
-  
-  DAT <- new("l1000data",
-             signal=GCTX$matrix,
-             meta=META,
-             description=apply(GCTX$row.annotations[,c('pr_gene_symbol','pr_gene_title')],1,paste,collapse=" : ")) 
-}
-merge.data <- function( D1, D2 )
-{
-  if ( class(D2)!=class(D1) )
-    stop( "D2's class must be same as D1's class:",class(D2) )
-  if ( any(genenames(D1)!=genenames(D2)) )
-    stop( "genenames(D1)!=genenames(D2)" )
-  
-  if ( class(D1)=="l1000data" )
-  {
-    if ( any(rownames(D1@meta)!=rownames(D2@meta)) )
-      stop( "rownames(D1@meta)!=rownames(D2@meta)" )
-    return(new("l1000data",
-               signal=cbind(D1@signal,D2@signal),
-               description=D1@description,
-               meta=cbind(D1@meta,D2@meta)))
-  }
-  else if ( class(D1)=="gctdata" )
-  {
-    return(new("gctdata",
-               signal=cbind(D1@signal,D2@signal),
-               description=D1@description))
-  }
-  else if ( class(D1)=="resdata" )
-  {
-    return(new("resdata",
-               signal=cbind(D1@signal,D2@signal),
-               calls=cbind(D1@calls,D2@calls),
-               scale=c(D1@scale,D2@scale),
-               description=D1@description))
-  }
-  else {
-    stop( "merge.data not implemented for class:",class(D1) )
-  }
-}
+## RENAME RESDATA
+##
 rename.data <- function( x, expt.names=NULL, gene.names=NULL, descriptors=NULL, new.names )
 {
   ## EXPERIMENT name substitution
@@ -540,9 +450,9 @@ rename.data <- function( x, expt.names=NULL, gene.names=NULL, descriptors=NULL, 
       colnames(x@calls)[match.idx] <- new.names
       names(x@scale)[match.idx] <- new.names
     }
-    if (class(x)=="l1000data") {
-      colnames(x@meta)[match.idx] <- new.names
-    }
+    #if (class(x)=="l1000data") {
+    #  colnames(x@meta)[match.idx] <- new.names
+    #}
   }
   ## GENE name substitution
   ##
@@ -571,6 +481,8 @@ rename.data <- function( x, expt.names=NULL, gene.names=NULL, descriptors=NULL, 
     stop( "either expt.names or gene.names or descriptors must be non-null")
   x
 }
+## SUBSET DATA
+##
 subset.data <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
 {
   if (class(x)=="gctdata") {
@@ -579,43 +491,13 @@ subset.data <- function( x, exptnames=NULL, genenames=NULL, ignore=FALSE )
   else if (class(x)=="resdata") {
     return( subset.resdata(x, exptnames=exptnames, genenames=genenames, ignore=ignore) )
   }
-  else if ( class(x)=="l1000data" ) {
-    return( subset.l1000data(x, exptnames=exptnames, genenames=genenames, ignore=ignore) )
-  }
-  else stop( "unrecognized data format" )
+  #else if ( class(x)=="l1000data" ) {
+  #  return( subset.l1000data(x, exptnames=exptnames, genenames=genenames, ignore=ignore) )
+  #}
+  else stop( "unrecognized data format: ", class(x) )
 }
-read.data.gp <- function( data.filename, verbose=TRUE, ... )
-{
-  #file.test( data.filename )
-  ext <- file.ext( data.filename )
-
-  VERBOSE( verbose, "File extension: '.", ext, "'.\n", sep="" )
-
-  res <- switch( ext,
-                 res=read.res( data.filename, verbose=verbose, ... ),
-                 gct=read.gct( data.filename, verbose=verbose, ... ),
-                 odf=stop( "odf reader not implemented yet" ),
-                 stop("unrecognized file extension: ", ext) )
-}
-write.data.gp <- function( data, filename, do.save=FALSE, verbose=TRUE )
-{
-  #file.test( filename, mode=2 )
-  ext <- file.ext(filename)
-
-  VERBOSE(verbose, "Writing data to file '", filename, "' ..", sep="");
-  if ( class(data)=="resdata" ) {
-    if ( ext!="res" ) warning( "improper extension for res file: ", ext )
-    write.res( data, filename, do.save=do.save, verbose=verbose )
-  }
-  else if ( class(data)=="gctdata" ) {
-    if ( ext!="gct" ) warning( "improper extension for gct file: ", ext )
-    write.gct( data, filename, do.save=do.save, verbose=verbose )
-  }
-  else {
-    stop( "unsupported data format: ", class(data) )
-  }
-  VERBOSE(verbose, "done.\n" )
-}
+## READ CLS
+##
 read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=FALSE, verbose=TRUE )
 {
   # INPUT:
@@ -651,6 +533,8 @@ read.cls <- function( file, rowskip=2, do.lbls=(rowskip==2), gc.lbl=FALSE, verbo
   }
   return( cls )    
 }
+## WRITE CLS
+##
 write.cls <- function( cls, filen )
 {
   cat( length(cls), length(levels(cls)), "1\n", file=filen )
@@ -659,6 +543,8 @@ write.cls <- function( cls, filen )
   cat( paste( cls ), sep=" ", file=filen, append=TRUE )
   cat( "\n", file=filen, append=TRUE )
 }
+## SUBSET CLS
+##
 subset.cls <- function( cls, sub, do.renum=FALSE )
 {
   levs <- if (is.null(levels(cls))) sort(unique(cls)) else levels(cls)
@@ -668,6 +554,8 @@ subset.cls <- function( cls, sub, do.renum=FALSE )
   levels(cls1) <- cls1.lev
   cls1
 }
+## TAB 2 CLS
+##
 tab2cls <- function(tab,col.name=NULL,cnames=NULL,levs=NULL,na.rm=TRUE)
 {
   if ( is.null(col.name) && !is.null(dim(tab)) )
@@ -688,6 +576,8 @@ tab2cls <- function(tab,col.name=NULL,cnames=NULL,levs=NULL,na.rm=TRUE)
 
   cls
 }
+## MANY 2 ONE CLS
+##
 many2one <- function( cls ) many2one.cls(cls) # just for backward compatibility
 many2one.cls <- function( cls )
 {
@@ -703,6 +593,8 @@ many2one.cls <- function( cls )
   levels(cls.new) <- levs
   cls.new
 }
+## CREATE CLS
+##
 create.cls <- function( X, levs=NULL, nms=NULL, do.sort=TRUE )
 {
   if ( !is.null(nms) && !is.null(names(X)) )
@@ -720,6 +612,8 @@ create.cls <- function( X, levs=NULL, nms=NULL, do.sort=TRUE )
   levels(X) <- if (is.null(levs)) unique(sort(X)) else levs
   X
 }
+## SUBSET ALL
+##
 subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=FALSE )
 {
   if ( is.null(subset) && is.null(subfile) )
@@ -737,110 +631,29 @@ subset.all <- function( dat, cls, subfile=NULL, subset=NULL, verbose=FALSE )
   VERBOSE( verbose, "done, [", paste(dim(dat),collapse=" x "), "] data entries.\n", sep="" )
   list( data=dat, cls=cls )
 }
-change.description <- function( dat, gene2desc, ignore=FALSE )
+
+###############################################################################################
+###############################################################################################
+if (FALSE)
 {
-  idx <- match(genenames(dat),gene2desc[,1])
-  
-  if (any(is.na(idx))) {
-    if (ignore) {
-      warning(sum(is.na(idx)), " probes w/o description, discarding.\n" )
-      idx <- idx[!is.na(idx)]
-    }
-    else {
-      stop( sum(is.na(idx)), " probes w/o description, exiting" )
-    }
-  }
-  newidx <- if (ignore) match(gene2desc[idx,1],rownames(dat@signal)) else 1:nrow(dat)
-  newdat <- if(class(dat)=="resdata")
-    new("resdata",
-        signal=dat@signal[newidx,],
-        calls=dat@calls[newidx,],
-        description=sapply(gene2desc[idx,2],as.character),
-        scale=dat@scale)
-  else if (class(dat)=="gctdata")
-    new("gctdata",
-        signal=dat@signal[newidx,],
-        description=sapply(gene2desc[idx,2],as.character))
-  else
-    stop( "unrecognized data format: ", class(dat) )
-  
-  newdat
+    CBMGIT <- Sys.getenv('CBMGIT')
+    if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
+    source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.R", sep="/") )
+    source( paste(CBMGIT, "scripts/R/broad.file.formats.dvlp.R", sep="/") )
+
+    setwd('~/Research/Projects/oralcancer/taz_yap_dpagt1/processed_data/')
+
+    GCT <- read.gct('DUMMY.gct',force.read=TRUE)
+    
+    print(genenames(GCT))
+    genenames(GCT) <- paste("G",1:nrow(GCT),sep="")
+    print(genenames(GCT))
+
+    print(exptnames(GCT)[1:10])
+    exptnames(GCT) <- paste("E",1:ncol(GCT),sep="")
+    print(exptnames(GCT)[1:10])
+    
+
+    RES <- read.res('DUMMY.res',force.read=TRUE)
 }
-xcel2cls <- function( X, levs=NULL, do.sort=FALSE )
-{
-  if (is.null(levs))
-    levs <- unique(X)
-  X <- match(X,levs)-1
-  ord <- if (do.sort) order(X) else 1:length(X)
-  X <- X[ord]
-  levels(X) <- levs
-  if (do.sort)
-    return(list(cls=X,order=ord))
-  else
-    return(X)
-}
-factor2cls <- function(FCT)
-{
-  cls <- match(FCT,levels(FCT))-1
-  levels(cls) <- levels(FCT)
-  cls
-}
-## READ GMT
-##
-## Read gmt file into a named list
-##
-read.gmt <- function( gmtfile, verbose=TRUE )
-{
-  gsets <- lapply(scan(gmtfile,what="character",sep="\n",quiet=TRUE),
-                  function(z) unlist(strsplit(z,"\t"))[-2])
-  names(gsets) <- sapply(gsets,function(z) z[1])
-  
-  ## *** IMPORTANT: all gene names are 'upper-cased' and replicates are removed ***
-  gsets <- lapply(gsets,function(z) {z <- z[-1]; unique(toupper(z[z!=""]))}) # <== upper-case + removal
-  gsets
-}
-## GMT 2 TABLE
-##
-## create a 0-1 table of genesets from a GSEA '.gmt' file. The output is in
-## the format appropriate for hyper.enrichment (the 'categories' argument)
-##
-gmt2table <- function
-(
- gmtfile,
- verbose=TRUE,
- do.save=FALSE,   # save binary format of 0-1 table
- force.read=FALSE # force to read 'gmt' table even if binary already available
-)
-{
-  binfile <- gsub(".gmt",".RData",gmtfile)
-  if ( !force.read && file.access(binfile)==0 ) {
-    VERBOSE(verbose, "binary object found, loading...\n")
-    return( load.var(binfile) )
-  }
-  # creating a list of genesets
-  # *** IMPORTANT: all gene names are 'upper-cased' and replicates are removed ***
-  #
-  gsets <- read.gmt(gmtfile,verbose=verbose)
-  items <- sort(unique(unlist(gsets)))
-  pathways <- matrix(0,length(items),length(gsets),
-                     dimnames=list(items,names(gsets)))
-  percent <- 0.1
-  for ( i in 1:length(gsets) )
-  {
-    gidx <- match(gsets[[i]],rownames(pathways))
-    if ( any(is.na(gidx)) )
-      stop("something wrong")
-    pathways[gidx,i] <- 1
-    if (verbose && i>=round(percent*length(gsets)) ) {
-      VERBOSE(verbose,round(percent*100),"% ",sep="")
-      percent <- percent+0.1
-    }
-  }
-  VERBOSE(verbose,"done, [",paste(dim(pathways),collapse="x"),"] table created.\n",sep="")
-  if ( do.save ) {
-    VERBOSE(verbose,"Saving binary object .. ")
-    save(pathways,file=binfile)
-    VERBOSE(verbose,"done.\n")
-  }
-  return(pathways)
-}
+

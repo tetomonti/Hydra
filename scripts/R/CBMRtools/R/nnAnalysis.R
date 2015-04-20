@@ -51,7 +51,8 @@
 #' @return list object with attributes 'pval' and 'nperm' corresponding to nn analysis permutation results
 #' @examples
 #'
-#'  data(eSet.brca.100)
+#' require(Biobase)
+#' data(eSet.brca.100)
 #'
 #'  ## passing the actual vector as argument
 #'  ##
@@ -149,14 +150,14 @@ nnAnalysis <- function
   if ( is.null(y) && (y.i>nrow(dat) || y.i<1) )  stop( "y.i out of range" )
   if ( is.null(y) )
   {
-    y <- dat@signal[y.i,]
+    y <- getSignal(dat)[y.i,]
     #dat <- dat[-y.i,]
   }
   if ( ncol(dat)!=length(y) ) stop( "*** ncol(dat)!=length(y) ***" )
 
   ## eliminating entries with no variation
   ##
-  SD <- drop(fast.sd(dat@signal))
+  SD <- drop(fast.sd(getSignal(dat)))
   if ( any(SD<.00001) ) {
     SDrm <- SD<.00001
     dat <- subset.data(dat,genenames=genenames(dat)[!SDrm])
@@ -166,10 +167,10 @@ nnAnalysis <- function
   
   nn.perm <- {
     if ( score=="euclid" )
-      perm.1side(dat@signal, y, score=SCORE, nperm=nperm, seed=seed,
+      perm.1side(getSignal(dat), y, score=SCORE, nperm=nperm, seed=seed,
                  control=control, verbose=verbose, smoother=smooth )
     else
-      perm.2side(dat@signal, y, score=SCORE, nperm=nperm, seed=seed,
+      perm.2side(getSignal(dat), y, score=SCORE, nperm=nperm, seed=seed,
                  control=control, verbose=verbose, smoother=smooth )
   }
   if ( nperm==0 )
@@ -177,7 +178,8 @@ nnAnalysis <- function
 
   nn.perm$pval <- nn.perm$pval[rev(1:nrow(nn.perm$pval)),,drop=FALSE]
   
-  list(pval=data.frame(nn.perm$pval,description=dat@description[match(rownames(nn.perm$pval),genenames(dat))],check.names=FALSE),
+  list(pval=data.frame(nn.perm$pval,
+           description=getDescription(dat)[match(rownames(nn.perm$pval),genenames(dat))],check.names=FALSE),
        nperm=nn.perm$nperm)
 }
 nnAnalysis.4gp <- function( gp.filename, gene.name, out.filename,

@@ -46,8 +46,9 @@
 #' @slot verbose verbose logging of class operations
 #' @slot do.save undefined
 #' @slot name of geneset compendium (most often the source.file w/o the path)
-#' 
+#'
 #' @export
+
 GeneSet <- setClass("GeneSet", 
                     representation(source.file="character",
                                    geneset="list", 
@@ -60,10 +61,9 @@ GeneSet <- setClass("GeneSet",
                               type="hgnc_symbol",  
                               do.save=TRUE, 
                               verbose=FALSE, 
-                              name=NULL), 
-                    sealed=FALSE)
+                              name=NULL))
 
-## GeneSet constructor.
+## GeneSet constructor
 #' @export
 setMethod("initialize", "GeneSet",
   function(.Object, source.file=NULL, geneset=NULL, type="hgnc_symbol", do.save=TRUE, verbose=FALSE, name=NULL) {
@@ -101,48 +101,48 @@ setMethod("initialize", "GeneSet",
         stop("Character string or GeneSet expected.")
     }
     return(.Object)
-}, sealed=FALSE)
+})
 
 ## GeneSet: show
-setAs("GeneSet", "character", function(from) sprintf("%s (%s): %s", from@name, from@type, from@geneset))
+setAs("GeneSet", "character",
+      function(from) sprintf("%s (%s): %s", from@name, from@type, from@geneset))
 setMethod("show", "GeneSet", function(object) 
-   cat('GeneSet Object containing: ',length(object@geneset),'gene sets\n'),sealed=FALSE)
+   cat('GeneSet Object containing: ',length(object@geneset),'gene sets\n'))
 
 ## GeneSet: print
-setMethod("print", "GeneSet", function(x, ...) show(x), sealed=FALSE)
+#setMethod(f="print", signature="GeneSet", function(x, ...) show(x))
 
 ## GeneSet: length
 #' length
 #'
 #' method \code{length} returns the number of genesets contained in the object
 #' 
-#' @export
-setMethod("length","GeneSet", function(x) length(x@geneset), sealed=FALSE)
+
+setMethod("length","GeneSet", function(x) length(x@geneset))
 
 ## GeneSet: geneSetName
 setGeneric("geneSetName", function(object) standardGeneric("geneSetName"))
 setGeneric("geneSetName<-", function(object,value) standardGeneric("geneSetName<-"))
-setMethod("geneSetName", "GeneSet", function(object) object@name, sealed=FALSE)
+setMethod("geneSetName", "GeneSet", function(object) object@name)
 setReplaceMethod("geneSetName",
                  "GeneSet",
                  function(object, value) {
                    object@name <- value
                    return(object)
-                 },
-                 sealed=FALSE)
+                 })
 
 ## GeneSet: Get or set geneset
+##
+#' @export
 setGeneric("getGeneSet", function(object) standardGeneric("getGeneSet"))
 setGeneric("setGeneSet<-", function(object,value) standardGeneric("setGeneSet<-"))
-#' @export
-setMethod("getGeneSet", "GeneSet", function(object) return(object@geneset), sealed=FALSE)
-#' @export
+
+setMethod("getGeneSet", "GeneSet", function(object) return(object@geneset))
+
 setReplaceMethod("setGeneSet",
                  "GeneSet",
                  function(object, value) {
                      object@geneset <- value
                      validObject(object)
                      return(object)
-                 },
-                 sealed=FALSE)
-
+                 })

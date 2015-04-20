@@ -1,7 +1,5 @@
-#library(combinat)
-# source( "~/dvlp/R/levels.R" )
-# source( "~/dvlp/R/permute.array.R" )
-
+# function JOIN CROSSPROD
+#
 join.crossprod <- function( mx1, mx2 )
 {
   if ( !is.matrix(mx1) )

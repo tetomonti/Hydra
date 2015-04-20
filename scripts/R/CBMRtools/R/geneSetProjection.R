@@ -54,55 +54,8 @@
 #' @param absolute use absolute values when calculating the KS score ignoring up and down (FALSE)
 #' @param verbose verbosity on/off (TRUE)
 #'
-#' @examples
+#' @return an expression set 
 #'
-#' # comment
-#' 
-#' # the very basic steps are:
-#' 
-#' # 1) load the data (expression and genesets)
-#' # 2) rename the dataset by replacing probesetIDs by gene symbols ==> DB
-#' # 3) create the list of lists pairing ==> PAIRS
-#' # 4) run geneSetProjection(dat=DB,pairing=PAIRS,gset.db=GSET, ...)
-#'
-#' ## 1) LOAD the data
-#' ##
-#' data(gspData)
-#' if (is.null(gsp.eSet)) stop("is.null(gsp.eSet)")
-#' if (is.null(gsp.GeneSet)) stop("is.null(gsp.GeneSet)")
-#' 
-#' ## 2) RENAME the dataset rows (w/ gene symbols)
-#' ##
-#' DAT1 <- gsp.eSet[pData(featureData(gsp.eSet))[,"symbol"]!="",]
-#' featureNames(DAT1) <- toupper(pData(featureData(DAT1))[,"symbol"])
-#' 
-#' ## 3) CREATE the list of lists pairing
-#' ##
-#' PAIRS <- list(OSCC=list(control=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]=="AN"],
-#'                         treatment=sampleNames(DAT1)[pData(DAT1)[,"tissue_type"]!="AN"]))
-#' 
-#' ## 4) RUN geneSetProjection ..
-#' ##
-#' GSPdir <- geneSetProjection(dat=DAT1,
-#'                             pairing=PAIRS,
-#'                             GS=gsp.GeneSet,
-#'                             collapse=FALSE,
-#'                             weighted=FALSE,
-#'                             absolute=FALSE, # keep the directionality of the enrichment scores
-#'                             min.gset=5,
-#'                             verbose=TRUE)
-#' 
-#' gradeID <- 'my_grade'
-#' stageID <- 'my_stage'
-#' p2 <- heatmap.ggplot2(eSet=GSPdir,col.clust=TRUE,row.clust=TRUE,
-#'                       col.lab=c(gradeID,stageID),row.lab="",
-#'                       heatmap.y.text=FALSE, heatmap.x.text=FALSE,
-#'                       heatmap.colorlegend.name="RNASeq_expression",
-#'                       title.text="TCGA BRCA log2 gene set projection",
-#'                       col.legend.name=c(gradeID,stageID), row.legend.name="", 
-#'                       row.scaling="none",z.norm=FALSE, 
-#'                       cuttree.col=0, cuttree.row=0,
-#'                       verbose=FALSE, show=TRUE)
 #' @export
 
 ## END documentation support
@@ -416,9 +369,14 @@ control.based.standardize <- function
 }
 if ( FALSE )
 {
+  CBMGIT <- Sys.getenv('CBMGIT')
+  if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
   CBMMLAB <- Sys.getenv('CBMMLAB')
   if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
-
+  source( paste(CBMGIT, "scripts/R/CBMRtools/R/broad.file.formats.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/CBMRtools/R/GeneSet.R", sep="/") )
+  require(Biobase)
+  
   ## CREATION OF 'TOY' DATA
   ##
   DAT <- readRDS('~/Research/Projects/oralcancer/tcga/firehose_2014_12_06/TCGA_OSCC_mRNA.annotated.rds')
@@ -430,7 +388,7 @@ if ( FALSE )
   GS1 <- GS
   setGeneSet(GS1) <- getGeneSet(GS1)[unlist(sapply(c('catenin','emt'),grep,names(getGeneSet(GS1)),ignore.case=TRUE))]
   sapply( lapply(lapply(getGeneSet(GS1),toupper),intersect,toupper(featureNames(DAT1))), length)
-  setGeneSetName(GS1) <- '4pathways'
+  geneSetName(GS1) <- '4pathways'
 
   gsp.eSet <- DAT1[intersect(unique(unlist(getGeneSet(GS1))),featureNames(DAT1)),]
   gsp.GeneSet <- GS1
@@ -455,12 +413,17 @@ if ( FALSE )
   if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.math.R", sep="/") )
-  source( paste(CBMGIT, "scripts/R/CBMRtools/R/broad.file.formats.R", sep="/") )
+  #source( paste(CBMGIT, "scripts/R/CBMRtools/R/broad.file.formats.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/broad.file.formats.dvlp.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/GeneSet.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/ks.score.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/geneSetProjection.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/heatmap.ggplot.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/CBMRtools/R/heatmap..R", sep="/") )
   require(Biobase)
+  require(ggplot)
+  require(grid)
+  require(cba)
 
   CBMMLAB <- Sys.getenv('CBMMLAB')
   if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
@@ -494,7 +457,6 @@ if ( FALSE )
                               absolute=FALSE, # keep the directionality of the enrichment scores
                               min.gset=5,
                               verbose=TRUE)
-
 
   gradeID <- 'my_grade'
   stageID <- 'my_stage'

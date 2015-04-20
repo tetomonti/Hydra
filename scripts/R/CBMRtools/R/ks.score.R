@@ -376,7 +376,7 @@ ks.perm <- function
     cls.perm <- permute.paired(cls,nperm=nperm,exhaustive=exhaustive,balanced=balanced)
   }
   else {
-    cls.perm <- permute.binarray( cls, n=nperm, control=control, exhaustive=exhaustive,
+    cls.perm <- permute.binarray( cls, nperm=nperm, control=control, exhaustive=exhaustive,
                                   balanced=balanced, verbose=verbose)
     nperm <- nrow(cls.perm)
   }
