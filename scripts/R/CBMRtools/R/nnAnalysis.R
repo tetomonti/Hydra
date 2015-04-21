@@ -44,8 +44,8 @@
 #' @param score similarity measure, must be one of 'pearson', 'spearman' or 'euclid'
 #' @param nperm number of permutation iterations (default 0)
 #' @param control constrained permutations (control for confounding factor)
-#' @param seed
-#' @param verbose
+#' @param seed random number generator seed (for reproducible results)
+#' @param verbose verbose output
 #' @param smooth smoother to prevent 0 p-values (default 1)
 #'
 #' @return list object with attributes 'pval' and 'nperm' corresponding to nn analysis permutation results

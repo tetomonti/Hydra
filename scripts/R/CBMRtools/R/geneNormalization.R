@@ -61,7 +61,7 @@
 #'
 #' # normalize using all samples
 #' NORMall <- geneNormalization(exprs(N),exprs(B))
-#' plot(apply(exprs(B),1,mean),apply(NORMall,1,mean),xlab="base",ylab="norm",main="sub")
+#' plot(apply(exprs(B),1,mean),apply(NORMall,1,mean),xlab="base",ylab="norm",main="all")
 #' all.equal(apply(exprs(B),1,mean),apply(NORMall,1,mean)) # TRUE
 #'  
 #' # normalize using a subset of samples in both datasets
@@ -69,12 +69,12 @@
 #'
 #' # the overall gene means are different
 #' plot(apply(exprs(B),1,mean),apply(NORMsub,1,mean),
-#'      xlab="base",ylab="norm",main="all")
+#'      xlab="base",ylab="norm",main="sub")
 #' all.equal(apply(exprs(B),1,mean),apply(NORMsub,1,mean)) # FALSE
 #'
 #' # but they are the same within the subsets
 #' plot(apply(exprs(B[,B.sub]),1,mean),apply(NORMsub[,N.sub],1,mean),
-#'      xlab="base",ylab="norm",main="all")
+#'      xlab="base",ylab="norm",main="within sub")
 #' all.equal(apply(exprs(B[,B.sub]),1,mean),apply(NORMsub[,N.sub],1,mean)) # TRUE
 #'  
 #' @export

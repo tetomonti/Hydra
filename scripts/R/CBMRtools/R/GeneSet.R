@@ -113,11 +113,6 @@ setMethod("show", "GeneSet", function(object)
 #setMethod(f="print", signature="GeneSet", function(x, ...) show(x))
 
 ## GeneSet: length
-#' length
-#'
-#' method \code{length} returns the number of genesets contained in the object
-#' 
-
 setMethod("length","GeneSet", function(x) length(x@geneset))
 
 ## GeneSet: geneSetName
