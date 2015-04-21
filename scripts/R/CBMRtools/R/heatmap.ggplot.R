@@ -3,6 +3,7 @@
 #' \code{heatmap.ggplot2} is the main function to draw and/or save the heatmap from an 
 #'expression set object
 #'
+#' @import Biobase ggplot2 reshape2 ggdendro grid gridExtra gtable RColorBrewer scales stats
 #' @param eSet expression set object to plot
 #' @param brewer.pal.name name of colorbrewer, see options at RColorBrewer::display.brewer.all()
 #' @param brewer.pal.rev reverse colorbrewer (TRUE or FALSE)
