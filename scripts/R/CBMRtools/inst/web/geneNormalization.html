@@ -79,9 +79,10 @@ B.sub &lt;- sampleNames(B)[sort(sample(ncol(B),ncol(B)/2))]
 # normalize using all samples
 NORMall &lt;- geneNormalization(exprs(N),exprs(B))
 plot(apply(exprs(B),1,mean),apply(NORMall,1,mean),xlab=&quot;base&quot;,ylab=&quot;norm&quot;,main=&quot;sub&quot;)
-all.equal(apply(exprs(B),1,mean),apply(NORMall,1,mean)) # TRUE
 </div>
 <p><img src='geneNormalization-2.png' alt='' width='540' height='400' /></p>
+<div class='input'>all.equal(apply(exprs(B),1,mean),apply(NORMall,1,mean)) # TRUE
+</div>
 <div class='output'>[1] TRUE
 </div>
 <div class='input'>
@@ -92,7 +93,7 @@ NORMsub &lt;- geneNormalization(exprs(N),exprs(B),norm.sub=N.sub,base.sub=B.sub)
 plot(apply(exprs(B),1,mean),apply(NORMsub,1,mean),
      xlab=&quot;base&quot;,ylab=&quot;norm&quot;,main=&quot;all&quot;)
 </div>
-<p><img src='geneNormalization-5.png' alt='' width='540' height='400' /></p>
+<p><img src='geneNormalization-6.png' alt='' width='540' height='400' /></p>
 <div class='input'>all.equal(apply(exprs(B),1,mean),apply(NORMsub,1,mean)) # FALSE
 </div>
 <div class='output'>[1] &quot;Mean relative difference: 0.0335559&quot;
@@ -102,7 +103,7 @@ plot(apply(exprs(B),1,mean),apply(NORMsub,1,mean),
 plot(apply(exprs(B[,B.sub]),1,mean),apply(NORMsub[,N.sub],1,mean),
      xlab=&quot;base&quot;,ylab=&quot;norm&quot;,main=&quot;all&quot;)
 </div>
-<p><img src='geneNormalization-9.png' alt='' width='540' height='400' /></p>
+<p><img src='geneNormalization-10.png' alt='' width='540' height='400' /></p>
 <div class='input'>all.equal(apply(exprs(B[,B.sub]),1,mean),apply(NORMsub[,N.sub],1,mean)) # TRUE
 </div>
 <div class='output'>[1] TRUE
