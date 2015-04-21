@@ -14,6 +14,8 @@ check(package.dir) #package checking
 load_all(package.dir) #building package
 library(CBMRtools)
 
+STATICDIR <- '../staticdocs'
+if ( is.na(file.info(STATICDIR)$isdir) ) system(paste('mkdir',STATICDIR))
 #generate html pages
 setwd(package.dir)
 build_site(pkg = package.dir, examples = TRUE, launch = TRUE)

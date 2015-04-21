@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>nnAnalysis. CBMRtools 0.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">CBMRtools 0.1</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>nnAnalysis</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>nnAnalysis(dat, y&nbsp;=&nbsp;NULL, y.i&nbsp;=&nbsp;NULL, score&nbsp;=&nbsp;c("pearson", "spearman", "euclid"), nperm&nbsp;=&nbsp;0, control&nbsp;=&nbsp;NULL, seed&nbsp;=&nbsp;NULL, verbose&nbsp;=&nbsp;F, smooth&nbsp;=&nbsp;1)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>dat</dt>
+      <dd>NxM genes-by-sample matrix ('ExpressionSet' or 'resdata' or 'gctdata' object)</dd>
+      <dt>y</dt>
+      <dd>M-tuple vector to use as the prototype profile</dd>
+      <dt>y.i</dt>
+      <dd>alternatively, specify the row index in dat where to find the prototype profile</dd>
+      <dt>score</dt>
+      <dd>similarity measure, must be one of 'pearson', 'spearman' or 'euclid'</dd>
+      <dt>nperm</dt>
+      <dd>number of permutation iterations (default 0)</dd>
+      <dt>control</dt>
+      <dd>constrained permutations (control for confounding factor)</dd>
+      <dt>seed</dt>
+      <dd></dd>
+      <dt>verbose</dt>
+      <dd></dd>
+      <dt>smooth</dt>
+      <dd>smoother to prevent 0 p-values (default 1)</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+
+      <p><dl>
+list object with attributes 'pval' and 'nperm' corresponding to nn analysis permutation results
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p><code>nnAnalysis</code> rank rows (genes) by their 'similarity' to a
+prototype profile and carries out permutation-based p-value
+calculation</p>
+  
+    </div>
+    
+    <h2 id="examples">Examples</h2>
+    <pre class="examples"><div class='input'>require(Biobase)
+data(eSet.brca.100)
+
+ ## passing the actual vector as argument
+ ##
+ NNout1 &lt;- nnAnalysis(dat=eSet.brca.100,y=exprs(eSet.brca.100)[1,],score=&#39;pearson&#39;,
+                      nperm=1000,seed=123,verbose=TRUE,smooth=1)
+</div>
+<div class='output'>NN analysis based on pearson
+  Computing observed scores .. sorting them .. done.
+  Permutation test (1000 iterations) .. 10% 20% 30% 40% 50% 60% 70% 80% 90% 100% 
+</div>
+<div class='input'> head(NNout1$pval)
+</div>
+<div class='output'>                    score          p1          p2         fdr maxT description
+ENSG00000162989 1.0000000 0.000999001 0.001998002 0.003171432    0       KCNJ3
+ENSG00000167619 0.4342640 0.000999001 0.001998002 0.003171432    0     TMEM145
+ENSG00000175985 0.4336144 0.000999001 0.001998002 0.003171432    0     UPF0639
+ENSG00000164756 0.3952662 0.000999001 0.001998002 0.003171432    0     SLC30A8
+ENSG00000162891 0.3569408 0.000999001 0.001998002 0.003171432    0        IL20
+ENSG00000188175 0.3441332 0.000999001 0.001998002 0.003171432    0    HEPACAM2
+</div>
+<div class='input'>
+ ## passing the index (within the matrix) as argument
+ ##
+ NNout2 &lt;- nnAnalysis(dat=eSet.brca.100,y.i=1,score=&#39;pearson&#39;,nperm=1000,
+                      seed=123,verbose=TRUE,smooth=1)
+</div>
+<div class='output'>NN analysis based on pearson
+  Computing observed scores .. sorting them .. done.
+  Permutation test (1000 iterations) .. 10% 20% 30% 40% 50% 60% 70% 80% 90% 100% 
+</div>
+<div class='input'> head(NNout2$pval)
+</div>
+<div class='output'>                    score          p1          p2         fdr maxT description
+ENSG00000162989 1.0000000 0.000999001 0.001998002 0.003171432    0       KCNJ3
+ENSG00000167619 0.4342640 0.000999001 0.001998002 0.003171432    0     TMEM145
+ENSG00000175985 0.4336144 0.000999001 0.001998002 0.003171432    0     UPF0639
+ENSG00000164756 0.3952662 0.000999001 0.001998002 0.003171432    0     SLC30A8
+ENSG00000162891 0.3569408 0.000999001 0.001998002 0.003171432    0        IL20
+ENSG00000188175 0.3441332 0.000999001 0.001998002 0.003171432    0    HEPACAM2
+</div>
+<div class='input'> all.equal(NNout1$pval,NNout2$pval) # TRUE
+</div>
+<div class='output'>[1] TRUE
+</div>
+<div class='input'>
+ ## controlling for a confounder (only discrete)
+ ##
+ CTL &lt;- pData(eSet.brca.100)[,&#39;ER_status&#39;]
+ NNout3 &lt;- nnAnalysis(dat=eSet.brca.100,y.i=1,score=&#39;pearson&#39;,nperm=1000,
+                      seed=123,control=CTL,verbose=TRUE,smooth=1)
+</div>
+<div class='output'>NN analysis based on pearson
+  Computing observed scores .. sorting them .. done.
+  Permutation test (1000 iterations) .. 	controlling for 2-level confounder
+  nchoose[1]:   5.998826e+277
+  nchoose[2]:   Inf
+nchoose[tot]: Inf 
+10% 20% 30% 40% 50% 60% 70% 80% 90% 100% 
+</div>
+<div class='input'> head(NNout3$pval)
+</div>
+<div class='output'>                    score          p1          p2         fdr  maxT description
+ENSG00000162989 1.0000000 0.000999001 0.001998002 0.003996004 0.000       KCNJ3
+ENSG00000167619 0.4342640 0.000999001 0.001998002 0.003996004 0.000     TMEM145
+ENSG00000175985 0.4336144 0.000999001 0.001998002 0.003996004 0.000     UPF0639
+ENSG00000164756 0.3952662 0.000999001 0.001998002 0.003996004 0.000     SLC30A8
+ENSG00000162891 0.3569408 0.000999001 0.001998002 0.003996004 0.000        IL20
+ENSG00000188175 0.3441332 0.000999001 0.001998002 0.003996004 0.001    HEPACAM2
+</div></pre>
+  </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>nnAnalysis</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="http://twitter.github.com/bootstrap">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>

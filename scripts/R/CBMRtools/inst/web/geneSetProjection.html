@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+<title>geneSetProjection. CBMRtools 0.1</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="">
+
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/bootstrap-responsive.css" rel="stylesheet">
+<link href="css/highlight.css" rel="stylesheet">
+<link href="css/staticdocs.css" rel="stylesheet">
+
+<!--[if lt IE 9]>
+  <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+  </head>
+
+  <body>
+    <div class="navbar">
+  <div class="navbar-inner">
+    <div class="container">
+      <a class="brand" href="#">CBMRtools 0.1</a>
+      <div class="nav">
+        <ul class="nav">
+          <li><a href="index.html"><i class="icon-home icon-white"></i> Index</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <div class="container">
+      <header>
+        
+      </header>
+      
+      <h1>geneSetProjection</h1>
+
+<div class="row">
+  <div class="span8">
+    <h2>Usage</h2>
+    <pre><div>geneSetProjection(dat, pairing, GS, method&nbsp;=&nbsp;c("ks", "logistic", "median", "mean"), collapse&nbsp;=&nbsp;T, weighted&nbsp;=&nbsp;T, absolute&nbsp;=&nbsp;F, min.gset&nbsp;=&nbsp;5, verbose&nbsp;=&nbsp;T)</div></pre>
+    
+    <h2>Arguments</h2>
+    <dl>
+      <dt>dat</dt>
+      <dd>ExpressionSet data object ( require(biobase) )</dd>
+      <dt>pairing</dt>
+      <dd>list with pairing between treatment and control (see format below)</dd>
+      <dt>method</dt>
+      <dd>one of "ks","logistic","median","mean" (only ks implemented so far)</dd>
+      <dt>collapse</dt>
+      <dd>collapse multiple replicates into a single output vector (TRUE)</dd>
+      <dt>weighted</dt>
+      <dd>gsea-like weighting of KS score (TRUE)</dd>
+      <dt>absolute</dt>
+      <dd>use absolute values when calculating the KS score ignoring up and down (FALSE)</dd>
+      <dt>verbose</dt>
+      <dd>verbosity on/off (TRUE)</dd>
+      <dt>gsets</dt>
+      <dd>GeneSet data object (see GeneSet.R)</dd>
+    </dl>
+    
+    <div class="Value">
+      <h2>Value</h2>
+
+      <p><dl>
+an expression set
+</dl></p>
+  
+    </div>
+
+    <div class="Description">
+      <h2>Description</h2>
+
+      <p><code>geneSetProjection</code> map a gene-level dataset to a
+geneset-level dataset based on control-treatment pairing (i.e., the
+ks score is done with respect to the 'control vs. treatment'
+phenotype).  This function is ideal for 'time-series' data of
+response to treatment, where for each time point there are several
+replicates for both the control and the treated.</p>
+  
+    </div>
+      </div>
+  <div class="span4">
+    <!-- <ul>
+      <li>geneSetProjection</li>
+    </ul>
+    <ul>
+      
+    </ul> -->
+      
+        
+  </div>
+</div>
+      
+      <footer>
+      <p class="pull-right"><a href="#">Back to top</a></p>
+<p>Built by <a href="https://github.com/hadley/staticdocs">staticdocs</a>. Styled with <a href="http://twitter.github.com/bootstrap">bootstrap</a>.</p>
+      </footer>
+    </div>
+  </body>
+</html>
