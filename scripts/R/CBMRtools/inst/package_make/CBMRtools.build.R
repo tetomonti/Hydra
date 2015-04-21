@@ -24,3 +24,6 @@ if ( is.na(file.info(STATICDIR)$isdir) ) system(paste('mkdir',STATICDIR))
 setwd(package.dir)
 build_site(pkg = package.dir, examples = TRUE, launch = TRUE)
 
+## install CBMRtools locally
+cat("installing package...\n")
+install.packages(package.dir, repos = NULL, type = "source")
