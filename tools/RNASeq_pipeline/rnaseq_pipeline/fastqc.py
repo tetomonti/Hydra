@@ -323,7 +323,7 @@ def run_fastqc(filename, param):
     :Parameter filename: param key pointing to the inputfile list
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    out_dir = param['module_dir']+'/'+param['stub'][param['file_index']]
+    out_dir = param['module_dir']+'/'+param['outstub']
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 

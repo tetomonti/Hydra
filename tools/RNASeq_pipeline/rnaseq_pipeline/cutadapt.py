@@ -60,7 +60,7 @@ def main():
 
     #run fastqc
     outfile = (param['module_dir']+
-               param['stub'][param['file_index']]+
+               param['outstub']+
                '.clipped.fastq.gz')
     run_cutadapt(param,
                  'working_file',
@@ -72,7 +72,7 @@ def main():
     #calling it on the second fastq file if it is paired
     else:
         outfile2 = (param['module_dir']+
-                    param['stub'][param['file_index']]+
+                    param['outstub']+
                     '.clipped.2.fastq.gz')
         run_cutadapt(param,
                      'working_file2',

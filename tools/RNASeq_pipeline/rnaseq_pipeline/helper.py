@@ -77,7 +77,7 @@ def initialize_standard(param):
     check_parameter(param, key='run_cufflinks', dtype=bool)
     check_parameter(param, key='run_htseq', dtype=bool)
     check_parameter(param, key='run_featureCount', dtype=bool)
-
+    check_parameter(param, key='zipped_fastq', dtype=bool)
 
     qsub_module.initialize_qsub(param)
 
@@ -306,7 +306,7 @@ def is_module_finished(param):
         finished = len(success) == 1
     return finished
 
-def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
+def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_free = 'standard'):
     """submit a job, which runs the same wrapper on every single file
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -321,7 +321,7 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
 
     #get the current flag for the log file
     # this is a terrible hard coded solution assuming that py_file has a value
-    # 'run_currennt_dir' and we want to drop the 'run_' to get 'current_dir'
+    # 'run_current_dir' and we want to drop the 'run_' to get 'current_dir'
     param['current_dir'] = py_file[4:]
     param['current_flag'] = param['current_dir'] + '_' + input_files
 
@@ -379,7 +379,7 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
                 if param['run_single_cpu']:
                     single_cpu_module.run_single_job(index, py_file)
                 else:
-                    qsub_module.submit_jobs(index, param, py_file, job_id, cores)
+                    qsub_module.submit_jobs(index, param, py_file, job_id, cores, mem_free)
 
         #wait for qsub scripts to finish
         if not param['run_single_cpu']:

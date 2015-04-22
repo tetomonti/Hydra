@@ -66,7 +66,7 @@ def wait_for_qsub(param, job_id):
 
 
 
-def submit_jobs(index, param, py_file, job_id, cores):
+def submit_jobs(index, param, py_file, job_id, cores, mem_free):
     """Function that submits a single job into the qsub system
 
     :Parameter index: index of the current file we are working on
@@ -93,7 +93,10 @@ def submit_jobs(index, param, py_file, job_id, cores):
     outhandle.job_id = job_id
     outhandle.email = param['qsub_email']
     outhandle.send_email = param['qsub_send_email']
-    outhandle.memory = param['qsub_memory']
+    if mem_free == 'standard':
+        outhandle.memory = param['qsub_memory']
+    else:
+        outhandle.memory = mem_free
     outhandle.project = param['qsub_PROJECT']
     outhandle.machine = param['qsub_MACHINE']
     outhandle.runtime_limit = param['qsub_RUNTIME_LIMIT']

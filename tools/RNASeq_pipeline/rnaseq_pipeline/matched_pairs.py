@@ -54,10 +54,10 @@ def main():
 
     #run match pairs
     outfile = (param['module_dir']+
-               param['stub'][param['file_index']]+
+               param['outstub']+
                '.clipped.matched.fastq.gz')
     outfile2 = (param['module_dir']+
-                param['stub'][param['file_index']]+
+                param['outstub']+
                 '.clipped.matched.2.fastq.gz')
 
     run_match_pairs(param,

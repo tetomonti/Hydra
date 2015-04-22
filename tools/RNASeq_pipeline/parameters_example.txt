@@ -1,4 +1,4 @@
-#Last edited on 09/04/2015 by Daniel Gusenleitner
+#Last edited on 21/04/2015 by Daniel Gusenleitner
 #########################################################################################################
 # Standard parameters
 #########################################################################################################
@@ -22,7 +22,7 @@ clean_run       =    TRUE
 verbose         =    TRUE
 
 #chose the aligner
-aligner = tophat     #right now only 'skip' and 'tophat' are allowed
+aligner = star     #right now only 'skip', 'star' and 'tophat' are allowed
 
 #choose which of the programs you want to run to quantify reads
 run_cufflinks = TRUE   # NOTE: Cufflinks does not work with single-end data and will not be run by default if your data is not paired-end sequencing data
@@ -33,6 +33,9 @@ run_featureCount = TRUE
 #used to check if all adapters were trimmed before running the actual alignment
 QC_and_trim_only   =   FALSE
 
+
+#Are the rawfiles provided as zips?
+zipped_fastq      =    TRUE
 
 #########################################################################################################
 # QSUB parameters
@@ -85,6 +88,28 @@ tophat_gap_length           =   2                                #Default is 2
 tophat_edit_dist            =   2                               #Default is 2
 mate_inner_dist             =   50
 mate_std_dev                =   20
+
+######################################################################################
+#STAR ALIGNER
+######################################################################################
+star_exec                 =   STAR     
+
+#The Star index index must be built prior to running star
+star_index                =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/star_index/
+
+#optional parameters (do not change unless you've read the documentation):
+outFilterType              = BySJout #default is BySJout
+outFilterMultimapNmax      = 20      #max number of multiple alignments allowed (def: 20)
+alignSJoverhangMin         = 8       #minimum overhang for unannotated junctions (def: 8)
+alignSJDBoverhangMin       = 1       #minimum overhang for annotated junctions (def: 1)
+outFilterMismatchNmax      = 999     #max number of mismatches per pair (def: 999 - inactive)
+outFilterMismatchNoverLmax = 0.04    #max number of mismatches per pair relative to the read length(def: 0.04 - 8 for paired reads with length 100)
+alignIntronMin             = 20      #minimum intron length
+alignIntronMax             = 1000000 #maximum intron length
+alignMatesGapMax           = 1000000 #maximum genomic distance between mates
+outputSAMtype              = BAM_SortedByCoordinate  #Can be BAM_SortedByCoordinate or BAM_unsorted
+
+
 
 ############################################################################################################################################
 #BAMQC

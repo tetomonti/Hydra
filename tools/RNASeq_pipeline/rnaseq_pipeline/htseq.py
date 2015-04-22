@@ -217,7 +217,7 @@ def main():
 
     #write output
     outfile = (param['module_dir']+
-               param['stub'][param['file_index']]+
+               param['outstub']+
                '.txt')
     handle = open(outfile, 'w')
     handle.write(output)

@@ -235,7 +235,7 @@ def main():
     param = MODULE_HELPER.initialize_module()
 
 
-    outfile = param['module_dir']+param['stub'][param['file_index']]
+    outfile = param['module_dir']+param['outstub']
     call = [param['featureCount_exec']]
 
 

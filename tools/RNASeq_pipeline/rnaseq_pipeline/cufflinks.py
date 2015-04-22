@@ -104,7 +104,7 @@ def main():
     param = MODULE_HELPER.initialize_module()
 
     #run create output directory
-    outdir = param['module_dir']+param['stub'][param['file_index']]+'/'
+    outdir = param['module_dir']+param['outstub']+'/'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 

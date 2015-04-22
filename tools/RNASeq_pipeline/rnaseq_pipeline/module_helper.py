@@ -102,6 +102,7 @@ def initialize_module():
         param = json.load(filehandle)
     param['file_index'] = int(file_index)
     param['num_processors'] = num_processors
+    param['outstub'] = param['stub'][param['file_index']]
 
     #use the input files that were specified in the pipeline call
     param['working_file'] = param[param['input_files']][param['file_index']]
