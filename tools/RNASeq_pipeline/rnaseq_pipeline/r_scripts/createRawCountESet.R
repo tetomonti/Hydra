@@ -1,6 +1,4 @@
 
-print('test1')
-
 #Parameter handling
 args <- commandArgs(trailingOnly = TRUE)
 
@@ -10,8 +8,6 @@ if (length(args) != 6){
 }
 keys<-args[(1:(length(args)/2))*2-1]
 values<-args[(1:(length(args)/2))*2]
-
-print('test2')
 
 #check parameters
 chkPars<-function(x,keys,values){
@@ -35,7 +31,6 @@ rownames(counts)<-counts[,1]
 counts<-counts[,-1]
 colnames(counts)<-gsub('[-\\.]','_',colnames(counts))
 
-
 #create and save eSet
 require(Biobase)
 metadata<-data.frame(labelDescription=colnames(annot),row.names=colnames(annot))               
@@ -44,5 +39,5 @@ expr.data<-new("ExpressionSet",
                exprs=as.matrix(counts), 
                phenoData=phenoData, 
                annotation='RNASeq raw counts')
-saveRDS(expr.data,file=paste(out_dir,'deliverables/rawCounts.RDS',sep=''))
+saveRDS(expr.data,file=out_dir)
 

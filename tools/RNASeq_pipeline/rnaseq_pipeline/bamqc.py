@@ -74,8 +74,6 @@ def create_overview_table(param):
     #header
     table.append(['Percentages based on total number of reads:'])
 
-    print 'TEST2'+str(len(param['bam_qc']['single_count_alignments']))
-
     #percent aligned
     table.append(['Percent aligned'] +
                  MODULE_HELPER.get_percentage(number1=param['bam_qc']['single_count_alignments'],

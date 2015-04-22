@@ -35,9 +35,12 @@ def create_eset(count_file, pheno_file, param):
     """
     call = [param['Rscript_exec']]
     call.append(get_script_path('createRawCountESet.R'))
-    call = call + ['-c', count_file]
-    call = call + ['-a', pheno_file]
-    call = call + ['-o', param['working_dir']]
+    call.append('-c')
+    call.append(count_file)
+    call.append('-a')
+    call.append(pheno_file)
+    call.append('-o')
+    call.append(param['working_dir']+'deliverables/featureCount_raw_counts.RDS')
     HELPER.writeLog('Creating ESet ... \n', param)
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,

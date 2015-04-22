@@ -47,7 +47,7 @@ def create_eset(count_file, pheno_file, param):
     call.append('-a')
     call.append(pheno_file)
     call.append('-o')
-    call.append(param['working_dir'])
+    call.append(param['working_dir']+'deliverables/htseq_raw_counts.RDS')
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
