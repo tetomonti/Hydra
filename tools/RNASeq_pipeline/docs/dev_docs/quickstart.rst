@@ -125,6 +125,11 @@ The source contains a "dev_requirements.txt" file that lists all the
 packages used in development. Install these using conda::
 
   cd CBMgithub/tools/RNASeq_pipeline
+  pip install -r dev_requirements.txt
+
+
+This used to be::
+
   conda install --file dev_requirements.txt
 
 .. warning::
@@ -162,5 +167,6 @@ Once you're sure everything works, use git to commit them::
 
 
 To see the files that have been changed and need to be committed use::
+
    git status
 
