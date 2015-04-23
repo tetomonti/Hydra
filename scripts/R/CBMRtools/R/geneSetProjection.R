@@ -100,7 +100,7 @@
 #'                             GS=gsp.GeneSet,
 #'                             collapse=FALSE, # single-sample projection
 #'                             weighted=FALSE, # standard KS score, no weighting
-#'                             absolute=FALSE, # keep directionality of enrichment scores
+#'                             absolute=FALSE, # keep sign of enrichment scores
 #'                             min.gset=5,
 #'                             verbose=TRUE)
 #' 
@@ -115,6 +115,7 @@
 #'                       row.scaling="none",z.norm=FALSE, 
 #'                       cuttree.col=0, cuttree.row=0,
 #'                       verbose=FALSE, show=TRUE)
+#' p2
 #'
 #' @export
 

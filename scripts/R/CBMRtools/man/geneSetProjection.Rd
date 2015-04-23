@@ -94,5 +94,6 @@ p2 <- heatmap.ggplot2(eSet=GSPdir,col.clust=TRUE,row.clust=TRUE,
                       row.scaling="none",z.norm=FALSE,
                       cuttree.col=0, cuttree.row=0,
                       verbose=FALSE, show=TRUE)
+p2
 }
 
