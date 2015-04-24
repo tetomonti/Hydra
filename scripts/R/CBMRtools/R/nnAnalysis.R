@@ -104,9 +104,9 @@ nnAnalysis <- function
   {
     dsc <- { # attempting to identify the description column
       if ( length(idx <- grep('symbol',colnames(fData(dat)),ignore.case=TRUE))==1 )
-        fData(dat)[,idx]
+        sapply(fData(dat)[,idx],as.character)
       else if ( ncol(featureData(dat))>0 )
-        fData(dat)[,1]
+        sapply(fData(dat)[,1],as.character)
       else
         featureNames(dat)
     }      

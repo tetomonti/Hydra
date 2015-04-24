@@ -32,9 +32,9 @@
 
 ## BEGIN documentation support (what follows are keyworded entries from which documentation pages will be extracted automatically)
 
-#' variation.filter
+#' variationFilter
 #' 
-#' \code{variation.filter} subset an expression dataset by extracting genes based on their level of variation 
+#' \code{variationFilter} subset an expression dataset by extracting genes based on their level of variation 
 #'
 #' @param dat an expressionSet object
 #' @param score type of variation measure to use (can be 'mad', 'sd', or 'cv')
@@ -52,7 +52,7 @@
 #' # Use example data, for data set information: ?eSet.brca.100
 #' data(eSet.brca.100)
 #'
-#' variation.filter(eSet.brca.100,score='mad',ngenes=50,do.plot=TRUE)
+#' variationFilter(eSet.brca.100,score='mad',ngenes=50,do.plot=TRUE)
 #' 
 #' @export 
 
@@ -60,22 +60,22 @@
 ########################################################################
 #                              MAIN                                    #
 ########################################################################
-variation.filter <- function(dat,
-                             score=c("mad","sd","cv"),
-                             dir=c("top","bottom"),
-                             transform=c("none","log2","exp2","log","exp"),
-                             ngenes=NULL,
-                             min.score=NULL,
-                             min.log=1,
-                             rnd=4,
-                             do.plot=FALSE,
-                             pch=".",
-                             lgnd.coord=1,
-                             do.log=NULL,
-                             qnt.lev=0.5,
-                             min.qnt=-Inf,
-                             no.affx=FALSE,
-                             verbose=TRUE)
+variationFilter <- function(dat,
+                            score=c("mad","sd","cv"),
+                            dir=c("top","bottom"),
+                            transform=c("none","log2","exp2","log","exp"),
+                            ngenes=NULL,
+                            min.score=NULL,
+                            min.log=1,
+                            rnd=4,
+                            do.plot=FALSE,
+                            pch=".",
+                            lgnd.coord=1,
+                            do.log=NULL,
+                            qnt.lev=0.5,
+                            min.qnt=-Inf,
+                            no.affx=FALSE,
+                            verbose=TRUE)
 {
   if (is.null(ngenes) && is.null(min.score) )
     stop( "must specify either ngenes or min.score" )

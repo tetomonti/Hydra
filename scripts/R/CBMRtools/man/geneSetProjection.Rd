@@ -79,7 +79,7 @@ GSPdir <- geneSetProjection(dat=DAT1,
                             GS=gsp.GeneSet,
                             collapse=FALSE, # single-sample projection
                             weighted=FALSE, # standard KS score, no weighting
-                            absolute=FALSE, # keep directionality of enrichment scores
+                            absolute=FALSE, # keep sign of enrichment scores
                             min.gset=5,
                             verbose=TRUE)
 
