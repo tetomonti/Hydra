@@ -474,18 +474,23 @@ if ( FALSE )
   if (CBMGIT=="") stop( "Use 'setenv CBMGIT ..' to set CBMgithub's base directory" )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/misc.math.R", sep="/") )
-  #source( paste(CBMGIT, "scripts/R/CBMRtools/R/broad.file.formats.R", sep="/") )
-  source( paste(CBMGIT, "scripts/R/broad.file.formats.dvlp.R", sep="/") )
+  source( paste(CBMGIT, "scripts/R/CBMRtools/R/broad.file.formats.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/GeneSet.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/ks.score.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/geneSetProjection.R", sep="/") )
   source( paste(CBMGIT, "scripts/R/CBMRtools/R/heatmap.ggplot.R", sep="/") )
-  source( paste(CBMGIT, "scripts/R/CBMRtools/R/heatmap..R", sep="/") )
   require(Biobase)
-  require(ggplot)
+  require(RColorBrewer)
+  require(ggdendro)
+  require(ggplot2)
   require(grid)
+  require(gridExtra)
+  require(gtable)
+  require(reshape2)
+  require(scales)
+  require(stats)
   require(cba)
-
+  
   CBMMLAB <- Sys.getenv('CBMMLAB')
   if (CBMMLAB=="") stop( "Use 'setenv CBMMLAB ..' to set CBMrepository's base directory" )
   source( paste(CBMMLAB, "R/heatmap.R", sep="/") )
@@ -521,12 +526,15 @@ if ( FALSE )
 
   gradeID <- 'my_grade'
   stageID <- 'my_stage'
+  short.names <- sapply(gsub("REACTOME_","",featureNames(GSPdir)),function(z)
+      paste(unlist(strsplit(z,"_"))[1:3],collapse="_"))
+  
   p2 <- heatmap.ggplot2(eSet=GSPdir,col.clust=TRUE,row.clust=TRUE,col.lab=c(gradeID,stageID),row.lab="",
                         heatmap.y.text=FALSE, heatmap.x.text=FALSE,heatmap.colorlegend.name="RNASeq_expression",
                         title.text="TCGA BRCA log2 gene set projection",
                         col.legend.name=c(gradeID,stageID), 
                         row.legend.name="", 
-                        row.scaling="none", 
+                        row.scaling="none",
                         z.norm=FALSE, 
                         cuttree.col=0, cuttree.row=0,
                         verbose=FALSE, show=TRUE)

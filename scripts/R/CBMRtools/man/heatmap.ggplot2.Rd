@@ -104,7 +104,7 @@ hc.row<-hcopt(stats::as.dist(1-cor(t(x))),method="ward.D")
 hc.col <- hcopt(stats::dist(t(x)), method="ward.D") #'
 
 #Adding custom hclust object in col.clust.hc and row.clust.hc
-p2<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
+p2 <- heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
 col.clust.hc = hc.col, row.clust.hc = hc.row,
 col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "",
 heatmap.y.text = TRUE, heatmap.x.text = TRUE,
@@ -119,7 +119,7 @@ verbose = FALSE, show = FALSE)
 p2
 
 #Saving plot in verbose format
-p3<-heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
+p3 <- heatmap.ggplot2(eSet=eSet1, col.clust = TRUE, row.clust = TRUE,
 col.clust.hc = hc.col, row.clust.hc = hc.row,
 col.lab = c("HER2_status", "ER_status", "PR_status", "TN_status"), row.lab = "",
 heatmap.y.text = TRUE, heatmap.x.text = TRUE,
