@@ -30,12 +30,12 @@ def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=Fal
     :Parameter optional: indicates a parameter is optional, if it doesn't exits
                          it will be created
     """
-    module_helper.checkParameter(param=param,
-                                 key=key,
-                                 dType=dtype,
-                                 allowed=allowed,
-                                 checkFile=checkfile,
-                                 optional=optional)
+    module_helper.check_parameter(param=param,
+                                  key=key,
+                                  dtype=dtype,
+                                  allowed=allowed,
+                                  checkfile=checkfile,
+                                  optional=optional)
 
 def initialize_logfiles(param):
     """Function that creates the log files
@@ -77,7 +77,7 @@ def initialize_standard(param):
     check_parameter(param, key='run_cufflinks', dtype=bool)
     check_parameter(param, key='run_htseq', dtype=bool)
     check_parameter(param, key='run_featureCount', dtype=bool)
-
+    check_parameter(param, key='zipped_fastq', dtype=bool)
 
     qsub_module.initialize_qsub(param)
 
@@ -90,7 +90,7 @@ def initialize_standard(param):
     #should be run from scratch delete the directory
     if param['clean_run']:
         #check before deleting any previous results
-        answer = raw_input('Are you sure you want to delete '+ \
+        answer = raw_input('Are you sure you want to delete '+
                            'all existing results? (yes/no): ')
         if answer == 'yes':
             if os.path.exists(param['working_dir']+'results/'):
@@ -100,8 +100,8 @@ def initialize_standard(param):
             if os.path.exists(param['working_dir']+'deliverables/'):
                 shutil.rmtree(param['working_dir']+'deliverables/')
         else:
-            print 'Stopping... If you want to resume, '+ \
-                            'please adjust the parameter file.'
+            print ('Stopping... If you want to resume, '+
+                   'please adjust the parameter file.')
             exit(0)
 
     #if results or report directory do not exist create them
@@ -203,8 +203,10 @@ def write_updated_file(updated, param, parameter_file):
     :Parameter parameter_file: parameter filename
 
     """
-    new_parameter_file = param['working_dir']+'results/'+ \
-                            (parameter_file.split('/')[-1])[:-4]+'_used.txt'
+    new_parameter_file = (param['working_dir']+
+                          'results/'+
+                          (parameter_file.split('/')[-1])[:-4]+
+                          '_used.txt')
     with open(parameter_file) as infile:
         with open(new_parameter_file, "w") as outfile:
             for line in infile:
@@ -304,7 +306,7 @@ def is_module_finished(param):
         finished = len(success) == 1
     return finished
 
-def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
+def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_free = 'standard'):
     """submit a job, which runs the same wrapper on every single file
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -319,18 +321,22 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
 
     #get the current flag for the log file
     # this is a terrible hard coded solution assuming that py_file has a value
-    # 'run_currennt_dir' and we want to drop the 'run_' to get 'current_dir'
+    # 'run_current_dir' and we want to drop the 'run_' to get 'current_dir'
     param['current_dir'] = py_file[4:]
     param['current_flag'] = param['current_dir'] + '_' + input_files
 
     if is_module_finished(param):
         #add coment into main log file
-        writeLog('Skipping '+param['current_flag']+ \
-                 ' since it was already successfully finished.\n', param)
+        writeLog('Skipping '+
+                 param['current_flag']+
+                 ' since it was already successfully finished.\n',
+                 param)
         #and fetch the current working files
         for idx in range(param['num_samples']):
-            logfile = open(param['working_dir']+ \
-                           'results/log/'+param['stub'][idx]+'.log')
+            logfile = open(param['working_dir']+
+                           'results/log/'+
+                           param['stub'][idx]+
+                           '.log')
             #check if the current module actually produces output files that are
             #used subsequently. (i.e. tophat or the trimmer as opposed to fastqc or bamqc)
             if  param['output_files'] != '':
@@ -353,7 +359,9 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
     else:
         writeLog('Starting '+param['current_flag']+'\n', param)
         #create current working directory
-        param['module_dir'] = param['working_dir']+'results/'+param['current_dir']+'/'
+        param['module_dir'] = (param['working_dir']+
+                               'results/'+
+                               param['current_dir']+'/')
         if not os.path.exists(param['module_dir']):
             os.makedirs(param['module_dir'])
 
@@ -371,7 +379,7 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8'):
                 if param['run_single_cpu']:
                     single_cpu_module.run_single_job(index, py_file)
                 else:
-                    qsub_module.submit_jobs(index, param, py_file, job_id, cores)
+                    qsub_module.submit_jobs(index, param, py_file, job_id, cores, mem_free)
 
         #wait for qsub scripts to finish
         if not param['run_single_cpu']:
@@ -396,12 +404,13 @@ def copy_and_link(param, param_key, text):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    call = 'cp '+ param[param_key]+' '+param['working_dir']+'report/'
-    _, _ = subprocess.Popen(call.split(),
+    call = ['cp', param[param_key], param['working_dir']+'report/']
+    _, _ = subprocess.Popen(call,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE).communicate()
     #add file to html
-    param['report'].write('<a href="'+param[param_key].split('/')[-1]+ \
+    param['report'].write('<a href="'+
+                          param[param_key].split('/')[-1]+
                           '">'+text+'</a><br>')
 
 
@@ -411,18 +420,18 @@ def report_finish(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    param['report'].write('<style>table.fixed { table-layout:fixed; } '+ \
-                          'table.fixed td { overflow: hidden; }#one-column'+ \
-                          '-emphasis{font-family:"Lucida Sans Unicode", '+ \
-                          '"Lucida Grande", Sans-Serif;font-size:12px;width:'+ \
-                          '480px;text-align:left;border-collapse:collapse;'+ \
-                          'margin:20px;}#one-column-emphasis th{font-size:'+ \
-                          '14px;font-weight:normal;color:#039;padding:12px'+ \
-                          ' 15px;}#one-column-emphasis td{color:#669;border'+ \
-                          '-top:1px solid #e8edff;padding:10px 15px;}.oce-'+ \
-                          'first{background:#d0dafd;border-right:10px solid'+ \
-                          ' transparent;border-left:10px solid transparent;}'+ \
-                          '#one-column-emphasis tr:hover td{color:#339;'+ \
+    param['report'].write('<style>table.fixed { table-layout:fixed; } '+
+                          'table.fixed td { overflow: hidden; }#one-column'+
+                          '-emphasis{font-family:"Lucida Sans Unicode", '+
+                          '"Lucida Grande", Sans-Serif;font-size:12px;width:'+
+                          '480px;text-align:left;border-collapse:collapse;'+
+                          'margin:20px;}#one-column-emphasis th{font-size:'+
+                          '14px;font-weight:normal;color:#039;padding:12px'+
+                          ' 15px;}#one-column-emphasis td{color:#669;border'+
+                          '-top:1px solid #e8edff;padding:10px 15px;}.oce-'+
+                          'first{background:#d0dafd;border-right:10px solid'+
+                          ' transparent;border-left:10px solid transparent;}'+
+                          '#one-column-emphasis tr:hover td{color:#339;'+
                           'background:#eff2ff;}</style></body>\n')
     param['report'].close()
 
@@ -453,7 +462,7 @@ def report_run_log(param):
         table.append(line)
 
     #write the table as html
-    module_helper.writeHTMLtable(param, table, out=param['report'])
+    module_helper.write_html_table(param, table, out=param['report'])
 
 def report_start(param):
     """Writes the header of the html report
@@ -462,17 +471,18 @@ def report_start(param):
     """
     writeLog('Starting to write the report ... \n', param)
     param['report'] = open(param['working_dir']+'report/index.html', 'w')
-    param['report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+ \
-                      'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+ \
-                      '-strict.dtd"><head><title></title></head><body>\n')
+    param['report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                          'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                          '-strict.dtd"><head><title></title></head><body>\n')
     param['report'].write('<center><br><h1>RNASeq Report</h1>')
     copy_and_link(param, 'parameter_file', 'Parameter file')
     copy_and_link(param, 'raw_filenames', 'Raw files')
 
     #copy the pass/fail icons into the directory
-    call = 'cp -R '+ os.path.join(RNASEQ_PIPELINE_DIR, 'Icons') + \
-             ' ' +param['working_dir']+'report/'
-    _, _ = subprocess.Popen(call.split(),
+    call = ['cp', '-R']
+    call.append(os.path.join(RNASEQ_PIPELINE_DIR, 'Icons'))
+    call.append(param['working_dir']+'report/')
+    _, _ = subprocess.Popen(call,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE).communicate()
 

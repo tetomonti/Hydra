@@ -28,7 +28,9 @@ Use `conda` to install a basic developement environment::
   
   conda create \
     -p ./dev_env \
+    --override-channels \
     -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    -c 'defaults' \
     --yes \
     rnaseq_pipeline
 
@@ -36,7 +38,9 @@ Alternatively, you can just install the dependencies:
 
   conda create \
     -p ./dev_env \
+    --override-channels \
     -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    -c 'defaults' \
     --yes \
     samtools \
     bowtie2 \
@@ -64,14 +68,38 @@ What just happend?
    store all the files needed to run the programs you install using
    `conda`.
 
-2. `-c 'file:///restricted/projectnb/montilab-p/conda_channel'` -- use a
-   custion "channel".
+   .. warning::
+
+      If you try to run this command in a very long-named directory, then
+      the command will fail. How long is too long? Well the total "bin"
+      directory path must be less than 128 characters long. If that's a
+      problem, then you can use the `-n` option instead of `-p` option,
+      which will install the named environment in a centrally located
+      space, typically a subdirectory of your home directory. So::
+
+	conda create -n dev_env \
+	# everything else is the same
+
+2. The three lines:
+   
+   `--override-channels`
+   
+   `-c 'file:///restricted/projectnb/montilab-p/conda_channel'`
+   
+   `-c 'defaults'`
+
+   mean use a custom list of "channels".
 
    When `conda` downloads the files needed to install your programs, it
    looks in certain predefined locations. The `-c` flag adds a location to
    this search path, and it's the way to add custon packages to
    install. The Monti lab has a custom channel on SCC, which you've
-   included in the search path with the above instruction.
+   included in the search path with the above instruction. The
+   `--override-channels` flag says ignore the predifined list, which has
+   the `'defaults'` channel as the first option when looking for a package.
+   It's important that the Monti lab's channels is first on the list, so we
+   use this flag to reset the list, and then we use two `-c` options to
+   control the order of the list.
 
 3. `--yes` -- say "yes" to all posed questions.
 
@@ -125,15 +153,37 @@ The source contains a "dev_requirements.txt" file that lists all the
 packages used in development. Install these using conda::
 
   cd CBMgithub/tools/RNASeq_pipeline
-  conda install --file dev_requirements.txt
+  pip install -r dev_requirements.txt
+
+
+This used to be::
+
+  conda install \
+    --override-channels \
+    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    -c 'defaults' \
+    --file dev_requirements.txt
 
 .. warning::
 
    Make sure you're installing into the correct environment. `which
    python` will print the path to the python being used, and make sure
    it's the one in the development environment. If not, see
-   `3. Activate the Environement`_ to setup the environment. 
+   `3. Activate the Environement`_ to setup the environment.
 
+.. note::
+
+   It might get annoying to constantly type
+
+           --override-channels \
+	   -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+	   -c 'defaults' \
+
+   An alternative would be to modify your conda configuration file. Edit
+   the file `$HOME/.condarc` so that the 'channels:' section has the
+   `- 'file:///restricted/projectnb/montilab-p/conda_channel'` value as the
+   first value in the list. By default, '- defaults' is the only other value
+   there. 
 
 6. Make Your Edits and Install
 ==============================
@@ -162,5 +212,6 @@ Once you're sure everything works, use git to commit them::
 
 
 To see the files that have been changed and need to be committed use::
+
    git status
 

@@ -11,19 +11,17 @@ def init(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    MODULE_HELPER.checkParameter(param, key='tophat_exec', dType=str)
-    MODULE_HELPER.checkParameter(param, key='tophat_index', dType=str)
-    MODULE_HELPER.checkParameter(param, key='tophat_qual', dType=str, optional=True)
-    MODULE_HELPER.checkParameter(param, key='tophat_N', dType=str)
-    MODULE_HELPER.checkParameter(param, key='tophat_gap_length', dType=str)
-    MODULE_HELPER.checkParameter(param, key='tophat_edit_dist', dType=str)
-    MODULE_HELPER.checkParameter(param, key='mate_inner_dist', dType=str)
-    MODULE_HELPER.checkParameter(param, key='mate_std_dev', dType=str)
-
-
+    MODULE_HELPER.check_parameter(param, key='tophat_exec', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='tophat_index', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='tophat_qual', dtype=str, optional=True)
+    MODULE_HELPER.check_parameter(param, key='tophat_N', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='tophat_gap_length', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='tophat_edit_dist', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='mate_inner_dist', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='mate_std_dev', dtype=str)
 
 def main():
-    """Main function that is run on each samples, which in turn calls runs \
+    """Main function that is run on each samples, which in turn calls runs
     tophat on a sample.
     """
     import subprocess
@@ -31,41 +29,49 @@ def main():
     import os
     param = MODULE_HELPER.initialize_module()
     #run create output directory
-    outdir = param['module_dir']+param['stub'][param['file_index']]+'/'
+    outdir = param['module_dir']+param['outstub']+'/'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
     #build tophat call:
-    call = param['tophat_exec']+' '
+    call = [param['tophat_exec']]
 
     #resume option
     if param['resume_module']:
-        call = call + '-R ' + outdir
+        call.append('-R')
+        call.append(outdir)
 
     else:
         #optional quality value
         if param['tophat_qual'] != 'none':
-            call = call+param['tophat_qual']+' '
+            call.append(param['tophat_qual'])
 
         #add paired parameters if paired
         if param['paired']:
-            call = call + ' --mate-inner-dist ' + param['mate_inner_dist'] + \
-                   ' --mate-std-dev ' + param['mate_std_dev'] + ' '
+            call.append('--mate-inner-dist')
+            call.append(param['mate_inner_dist'])
+            call.append('--mate-std-dev')
+            call.append(param['mate_std_dev'])
 
-        call = call+'-o '+outdir+' -p '+param['num_processors']+' -N '+ \
-               param['tophat_N']+' --read-gap-length '+ \
-               param['tophat_gap_length']+' --read-edit-dist '+ \
-               param['tophat_edit_dist']+' '+param['tophat_index'] \
-               +' '+ param['working_file']
-
+        call.append('-o')
+        call.append(outdir)
+        call.append('-p')
+        call.append(param['num_processors'])
+        call.append('-N')
+        call.append(param['tophat_N'])
+        call.append('--read-gap-length')
+        call.append(param['tophat_gap_length'])
+        call.append('--read-edit-dist')
+        call.append(param['tophat_edit_dist'])
+        call.append(param['tophat_index'])
+        call.append(param['working_file'])
 
         #if paired add second working file
         if param['paired']:
-            call = call+' '+param['working_file2']
+            call.append(param['working_file2'])
 
-
-    param['file_handle'].write('CALL: '+call+'\n')
-    output, error = subprocess.Popen(call.split(),
+    param['file_handle'].write('CALL: '+' '.join(call)+'\n')
+    output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
     param['file_handle'].write(error)
@@ -79,8 +85,11 @@ def main():
         sys.exit(0)
     else:
         log = open(tophat_logfile)
-        lines_end = [line for line in log.readlines() \
-                       if ' Run complete: ' in line.rstrip()]
+
+        lines_end = []
+        for line in log.readlines():
+            if ' Run complete: ' in line.rstrip():
+                lines_end.append(line)
         log.close()
         if len(lines_end) == 0:
             sys.exit(0)

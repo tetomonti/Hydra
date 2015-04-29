@@ -1,9 +1,8 @@
 
-
 #Parameter handling
 args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args)%%2 !=0){
+if (length(args) != 6){
    print("You need to specify the annotation (-a), the raw counts (-c) and the output directory -o")
    quit(save='no')
 }
@@ -32,7 +31,6 @@ rownames(counts)<-counts[,1]
 counts<-counts[,-1]
 colnames(counts)<-gsub('[-\\.]','_',colnames(counts))
 
-
 #create and save eSet
 require(Biobase)
 metadata<-data.frame(labelDescription=colnames(annot),row.names=colnames(annot))               
@@ -41,5 +39,5 @@ expr.data<-new("ExpressionSet",
                exprs=as.matrix(counts), 
                phenoData=phenoData, 
                annotation='RNASeq raw counts')
-saveRDS(expr.data,file=paste(out_dir,'deliverables/rawCounts.RDS',sep=''))
+saveRDS(expr.data,file=out_dir)
 

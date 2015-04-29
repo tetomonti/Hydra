@@ -12,8 +12,13 @@ def run_single_job(index, py_file):
     """
 
     #right now I'm using only one core in single cpu mode
-    cmd = py_file +' -i ' + str(index) + ' -n 1'
-    args = shlex.split(cmd)
-    _, _ = subprocess.Popen(args, stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE).communicate()
+    call = [py_file]
+    call.append('-i')
+    call.append(str(index))
+    call.append('-n')
+    call.append('1')
+    args = shlex.split(' '.join(call))
+    _, _ = subprocess.Popen(args,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE).communicate()
 

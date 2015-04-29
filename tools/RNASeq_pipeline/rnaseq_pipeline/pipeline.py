@@ -20,6 +20,8 @@ import rnaseq_pipeline.matched_pairs
 import rnaseq_pipeline.cutadapt
 import rnaseq_pipeline.htseq
 import rnaseq_pipeline.featureCount
+import rnaseq_pipeline.star
+
 import sys
 
 
@@ -36,7 +38,7 @@ def initialize_all(param):
     rnaseq_pipeline.cufflinks.init(param)
     rnaseq_pipeline.htseq.init(param)
     rnaseq_pipeline.featureCount.init(param)
-
+    rnaseq_pipeline.star.init(param)
 
 def run_all(param):
     """this function defines the workflow of the pipeline
@@ -73,6 +75,14 @@ def run_all(param):
                                   input_files='fastq_files',
                                   output_files='bam_files',
                                   cores=param['qsub_num_processors'])
+            if param['aligner'] == 'star':
+                #running the aligner
+                HELPER.submit_job(param,
+                                  'run_star',
+                                  input_files='fastq_files',
+                                  output_files='bam_files',
+                                  cores=param['qsub_num_processors'],
+                                  mem_free='32G')
             else:
                 HELPER.writeLog('The selected aligner does not exist.', param)
                 sys.exit(0)

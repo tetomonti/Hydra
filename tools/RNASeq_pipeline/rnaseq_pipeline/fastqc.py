@@ -1,317 +1,364 @@
-import os, subprocess, csv
+"""Fastqc module
+This module contains functions for running fastqc as
+well as multiple reporting and plotting functions to add the QC into the
+report html
+"""
+import os
+import subprocess
+import sys
+import csv
+import numpy as np
+import matplotlib.pyplot as plt
+import pylab
 import rnaseq_pipeline.module_helper
-module_helper = rnaseq_pipeline.module_helper
+MODULE_HELPER = rnaseq_pipeline.module_helper
 
 
 
-def copyFiles(param, input_files):
+def copy_files(param, input_files):
+    """Copies all relevant fastqc files from the results directory into the report directory
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    """
     #if there is no fastqc directory in the report make one
-    param['fastqc_dir']=param['working_dir']+'report/fastqc/'
+    param['fastqc_dir'] = param['working_dir']+'report/fastqc/'
     #Create a report fastqc subdirectory for each sample
-    for s in param['stub']:
-     if not os.path.exists(param['fastqc_dir']+'/'+s):
-        os.makedirs(param['fastqc_dir']+'/'+s)
-    
+    for stub in param['stub']:
+        if not os.path.exists(param['fastqc_dir']+'/'+stub):
+            os.makedirs(param['fastqc_dir']+'/'+stub)
+
     #reconstruct file names
-    param['fastqc_stub']=[stb+'/'+fn.split('/')[-1] for stb,fn in zip(param['stub'],param[input_files])]
+    param['fastqc_stub'] = []
+
+    for stb, filename in zip(param['stub'], param[input_files]):
+        param['fastqc_stub'].append(stb+'/'+filename.split('/')[-1])
+
     if param['paired']:
-        param['fastqc_stub']=param['fastqc_stub']+[stb+'/'+fn.split('/')[-1] for stb,fn in zip(param['stub'],param[input_files+'2'])]
-    
-    #for fn in param['fastqc_stub']:
-    # print fn
+        for stb, filename in zip(param['stub'], param[input_files+'2']):
+            param['fastqc_stub'].append(stb+'/'+filename.split('/')[-1])
 
     #fix the suffix
-    param['fastqc_stub']=[fn.replace('.fastq.gz','_fastqc') for fn in param['fastqc_stub']]
-        
+    for idx in range(len(param['fastqc_stub'])):
+        param['fastqc_stub'][idx] = param['fastqc_stub'][idx].replace('.fastq.gz',
+                                                                      '_fastqc')
+
     #use only the files that exist
-    fqc_dir=param['working_dir']+'results/fastqc/'
-    #for fn in param['fastqc_stub']:
-     #print fn
-    param['fastqc_stub']=[fn for fn in param['fastqc_stub'] if os.path.exists(fqc_dir+fn)]
-    #print param['fastqc_stub']
-    #copy the unpacked directories   
+    fqc_dir = param['working_dir']+'results/fastqc/'
+    param['fastqc_stub'] = [fn for fn in param['fastqc_stub'] if os.path.exists(fqc_dir+fn)]
+
+    #copy the unpacked directories
     for fastqc_file in param['fastqc_stub']:
-        call='cp -R '+ fqc_dir +fastqc_file+'/ '+param['fastqc_dir']+fastqc_file.split('/')[0]
-#        print call
-        output,error = subprocess.Popen(call.split(),stdout = subprocess.PIPE, stderr= subprocess.PIPE).communicate()
-
+        call = ['cp', '-R']
+        call.append(fqc_dir + fastqc_file+'/')
+        call.append(param['fastqc_dir']+fastqc_file.split('/')[0])
+        output, error = subprocess.Popen(call,
+                                stdout=subprocess.PIPE,
+                                stderr=subprocess.PIPE).communicate()
     #cut off the suffix
-    param['fastqc_stub']=[fn.replace('_fastqc','') for fn in param['fastqc_stub']]
+    param['fastqc_stub'] = [fn.replace('_fastqc', '') for fn in param['fastqc_stub']]
 
 
 
-def createOverviewTable(param):
-    
-#    print['Summary files']+['<a href="fastqc/'+stub+'_fastqc/fastqc_data.txt">raw</a>' for stub in param['fastqc_stub']]
-#    print ['Full report']+['<a href="fastqc/'+stub+'_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>' for stub in param['fastqc_stub']] 
-    
+def create_overview_table(param):
+    """Function that creates an html overview table continaing the most important fastqc statistics
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    """
     #create a table
-    table=[]
+    table = []
     #put in headers
     table.append([stub for stub in param['fastqc_stub']])
     #link to summary files
-    table.append(['Summary files']+['<a href="fastqc/'+stub+'_fastqc/fastqc_data.txt">raw</a>' for stub in param['fastqc_stub']])
+
+    temp = ['Summary files']
+    for stub in param['fastqc_stub']:
+        temp.append('<a href="fastqc/'+stub+
+                    '_fastqc/fastqc_data.txt">raw</a>')
+    table.append(temp)
+
     #link to overview files
-    table.append(['Full report']+['<a href="fastqc/'+stub+'_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>' for stub in param['fastqc_stub']])
+    temp = ['Full report']
+    for stub in param['fastqc_stub']:
+        temp.append('<a href="fastqc/'+stub+
+                    '_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>')
+    table.append(temp)
     #extract check marks
-    table=table+extractTables(param)    
-    #write the table as html     
-    module_helper.writeHTMLtable(param,table,out=param['report'])
-     
-def extractTables(param):
+    table = table+extract_tables(param)
+    #write the table as html
+    MODULE_HELPER.write_html_table(param, table, out=param['report'])
+
+def extract_tables(param):
+    """Extracts all relevant information for the overview table and writes it
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    """
     #get the rownames
     csv_file = open(param['fastqc_dir']+param['fastqc_stub'][0]+'_fastqc/summary.txt')
     csv_reader = csv.reader(csv_file, delimiter='\t')
-    #get the rownames    
+    #get the rownames
     checks = [[row[1]] for row in csv_reader]
     csv_file.close()
-  
+
     #links to the icons
-    PASS='<img src="Icons/tick.png">'
-    FAIL='<img src="Icons/error.png">'
-    WARN='<img src="Icons/warning.png">'
+    pass_icon = '<img src="Icons/tick.png">'
+    fail_icon = '<img src="Icons/error.png">'
+    warn_icon = '<img src="Icons/warning.png">'
 
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(param['fastqc_stub'])):
         csv_file = open(param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/summary.txt')
-        overview_file='fastqc/'+param['fastqc_stub'][idx]+'_fastqc/fastqc_report.html#M'
+        overview_file = 'fastqc/'+param['fastqc_stub'][idx]+'_fastqc/fastqc_report.html#M'
         csv_reader = csv.reader(csv_file, delimiter='\t')
 
-        i=0
+        i = 0
         for row in csv_reader:
-            cell='<a href="'+overview_file+str(i)+'">'
-            if row[0]=='PASS': cell=cell+PASS
-            if row[0]=='FAIL': cell=cell+FAIL
-            if row[0]=='WARN': cell=cell+WARN
-            cell=cell+'</a>'
+            cell = '<a href="'+overview_file+str(i)+'">'
+            if row[0] == 'PASS':
+                cell = cell+pass_icon
+            if row[0] == 'FAIL':
+                cell = cell+fail_icon
+            if row[0] == 'WARN':
+                cell = cell+warn_icon
+            cell = cell+'</a>'
             checks[i].append(cell)
-            i+=1
+            i += 1
         csv_file.close()
     return checks
 
 
-def readRawfastqc(param,input_files):
-    #print param['fastqc_dir']
-    #print param['fastqc_stub']
-    
-    summary_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc'+'/summary.txt' for idx in range(len(param['fastqc_stub']))]
-    
-    print "Summary files .."
-    print summary_files
+def read_raw_fastqc(param, output_files):
+    """Reads raw fastqc outputs and processes it
 
-    fastqc=dict()
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter output_files: filenames to write teh summaries in
+    """
+    summary_files = []
+    for idx in range(len(param['fastqc_stub'])):
+        summary_files.append(param['fastqc_dir']+
+                             param['fastqc_stub'][idx]+
+                             '_fastqc'+
+                             '/summary.txt')
+
+    fastqc = dict()
     #add entries into fastqc dictionary
-    fh=open(summary_files[0])
-    fastqc = dict([(name.split('\t')[1].strip(), []) for name in fh.readlines()])
-    fh.close()
+    filehandle = open(summary_files[0])
+    fastqc = dict([(name.split('\t')[1].strip(), []) for name in filehandle.readlines()])
+    filehandle.close()
 
     #fill fastqc dictionary with information from the summary files
     for sum_file in summary_files:
-        fh=open(sum_file)
-        for name in (fh.readlines()):
+        filehandle = open(sum_file)
+        for name in filehandle.readlines():
             fastqc[name.split('\t')[1].rstrip()].append(name.split('\t')[0].strip())
-        fh.close()
-    
+        filehandle.close()
+
     key_list = fastqc.keys()
-    
+
     #fill fastqc dictionary with information from the data file
-    data_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc'+'/fastqc_data.txt' for idx in range(len(param['fastqc_stub']))]
-    labels = ['Encoding', 'Total Sequences', 'Filtered Sequences', 'Sequence length',	'%GC']
-    #print "Data files .."
-    #print data_files 
+    data_files = []
+    for idx in range(len(param['fastqc_stub'])):
+        data_files.append(param['fastqc_dir']+
+                          param['fastqc_stub'][idx]+
+                          '_fastqc/fastqc_data.txt')
+
+    labels = ['Encoding',
+              'Total Sequences',
+              'Filtered Sequences',
+              'Sequence length',
+              '%GC']
+
     fastqc.update(dict([(l, []) for l in labels]))
     key_list.extend(labels)
-    
+
     for d_file in data_files:
-        fh=open(d_file)
-        for name in (fh.readlines()):
+        filehandle = open(d_file)
+        for name in filehandle.readlines():
             if name.split('\t')[0].strip() in fastqc.keys():
                 fastqc[name.split('\t')[0].strip()].append(name.split('\t')[1].rstrip())
-        fh.close()
-    
-    param['fast_qc_summary']=fastqc
+        filehandle.close()
 
-    # write overview file 
-    fh=open(param['fastqc_dir']+input_files+'overview.txt','w')
-    fh.write(' \t'+'\t'.join(param['fastqc_stub'])+'\n')
-    for nam in key_list: fh.write(nam+'\t'+'\t'.join([str(vv) for vv in param['fast_qc_summary'][nam]])+'\n') 
-    fh.close()
+    param['fast_qc_summary'] = fastqc
 
+    # write overview file
+    filehandle = open(param['fastqc_dir']+output_files+'overview.txt', 'w')
+    filehandle.write(' \t'+'\t'.join(param['fastqc_stub'])+'\n')
+    for nam in key_list:
+        filehandle.write(nam+'\t'+'\t'.join([str(vv) \
+                         for vv in param['fast_qc_summary'][nam]])+'\n')
+    filehandle.close()
 
+def plot_number_of_reads(param, output_files):
+    """Creates a plot with the number of reads per sample and plots it
 
-def plotNumberOfReads(param,input_files):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import math, pylab
-    #extract number of reads, these are needed not only here but also for the bamqc
-    #for idx in range(len(param['fastqc_stub'])):
-     #print idx
-    summary_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/fastqc_data.txt' for idx in range(len(param['fastqc_stub']))]
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter output_files: filenames to save th plot in
+    """
+    summary_files = []
+    for idx in range(len(param['fastqc_stub'])):
+        summary_files.append(param['fastqc_dir']+
+                             param['fastqc_stub'][idx]+
+                             '_fastqc/fastqc_data.txt')
     #print summary_files
+    num_total_reads = []
+    for sum_file in summary_files:
+        num_total_reads.append(open(sum_file).readlines()[6].split('\t')[1].strip().rstrip())
+    num_total_reads = [int(num) for num in num_total_reads]
 
-    num_total_reads=[open(sum_file).readlines()[6].split('\t')[1].strip().rstrip() for sum_file in summary_files]
-    num_total_reads=[int(num) for num in num_total_reads]
-    
-    #if we deal with unpaired data the total number of reads used downstream is equivalent to the fastqc reads, but for paired it is the sum of the two paired files
-    #print range(param['num_samples'])
-    #print num_total_reads
-    #for idx in range(param['num_samples']):
-    #print idx
-    #print param[input_files][0]
-    #print param[input_files][1]
-#    print param['fastqc_stub']
     if not param['paired']:
-        param['num_total_reads']=num_total_reads
+        param['num_total_reads'] = num_total_reads
     else:
-        param['num_total_reads']=[0]*param['num_samples']
-        #samples_1=[param[input_files][idx].split('/')[-1].replace('.fastq','').replace('.fq','').replace('.gz','') for idx in range(param['num_samples'])]
-        #samples_2=[param[input_files][idx].split('/')[-1].replace('.fastq','').replace('.fq','').replace('.gz','') for idx in range(param['num_samples'])]
-        samples_1=[param['fastqc_stub'][0]]
-        samples_2=[param['fastqc_stub'][1]]
-        
-        #print samples_1
-        #print samples_2
-        #print param['stub']
-#        print param['fastqc_stub'] 
-#        print param['num_samples']
-        #print num_total_reads 
+        param['num_total_reads'] = [0]*param['num_samples']
+
         for idx in range(param['num_samples']):
-        #    print idx
-        #    index1=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_1[idx]][0]
-        #    index2=[i for i in range(len(param['fastqc_stub'])) if param['fastqc_stub'][i]==samples_2[idx]][0]           
-            param['num_total_reads'][idx]=num_total_reads[idx]+num_total_reads[idx+param['num_samples']]
-    #    print param['num_total_reads']
-        
-    #create plot 
-    fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4,8)
+            param['num_total_reads'][idx] = (num_total_reads[idx]+
+                                             num_total_reads[idx+param['num_samples']])
+
+    #create plot
+    fig, _ = plt.subplots()
+    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4, 8)
     index = np.arange(len(num_total_reads))
     bar_width = 0.8
     opacity = 0.4
-    rects1 = plt.bar(index, num_total_reads, bar_width,
-                     alpha=opacity,
-                     color='b')
+    _ = plt.bar(index,
+                num_total_reads,
+                bar_width,
+                alpha=opacity,
+                color='b')
     plt.xlabel('Samples')
     plt.ylabel('Total number of reads')
     plt.title('Total number of reads across samples')
-    ticks=param['fastqc_stub']
-    plt.xticks(index + bar_width, ticks,rotation='vertical')
+    ticks = param['fastqc_stub']
+    plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.tight_layout()
-    
+
     #put it into the report
-    filename='report/fastqc/'+input_files+'total_reads.png'
+    filename = 'report/fastqc/'+output_files+'total_reads.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="fastqc/'+input_files+'total_reads.png" alt="total number of reads"><br><br>\n')
+    param['report'].write('<img src="fastqc/'+
+                          output_files+
+                          'total_reads.png" '+
+                          'alt="total number of reads"><br><br>\n')
 
-def plotGCContent(param,input_files):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import math, pylab
+def plot_gc_content(param, input_files):
+    """Creates a plot with the gc content per sample and plots it
 
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter output_files: filenames to save th plot in
+    """
     #extract number of reads, these are needed not only here but also for the bamqc
-    summary_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/fastqc_data.txt' for idx in range(len(param['fastqc_stub']))]
-    gc_content=[open(sum_file).readlines()[9].split('\t')[1].strip().rstrip() for sum_file in summary_files]
-    gc_content=[int(num) for num in gc_content]
-    
-    #create plot 
-    fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4,8)
+    summary_files = []
+    for idx in range(len(param['fastqc_stub'])):
+        summary_files.append(param['fastqc_dir']+
+                             param['fastqc_stub'][idx]+
+                             '_fastqc/fastqc_data.txt')
+
+    gc_content = []
+    for sum_file in summary_files:
+        gc_content.append(open(sum_file).readlines()[9].split('\t')[1].strip().rstrip())
+    gc_content = [int(num) for num in gc_content]
+
+    #create plot
+    fig, axis = plt.subplots()
+    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4, 8)
     index = np.arange(len(gc_content))
     bar_width = 0.8
     opacity = 0.4
-    rects1 = plt.bar(index, gc_content, bar_width,
-                     alpha=opacity,
-                     color='b')
+    _ = plt.bar(index,
+                gc_content,
+                bar_width,
+                alpha=opacity,
+                color='b')
     plt.xlabel('Samples')
     plt.ylabel('%GC content')
     plt.title('GC content across samples')
-    ticks=param['fastqc_stub']
-    plt.xticks(index + bar_width, ticks,rotation='vertical')
+    ticks = param['fastqc_stub']
+    plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.tight_layout()
-    ax.set_ylim(0, 100)
-    
+    axis.set_ylim(0, 100)
+
     #put it into the report
-    filename='report/fastqc/'+input_files+'gc_content.png'
+    filename = 'report/fastqc/'+input_files+'gc_content.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="fastqc/'+input_files+'gc_content.png" alt="GC content"><br><br>\n')
+    param['report'].write('<img src="fastqc/'+
+                          input_files+
+                          'gc_content.png" alt="GC content"><br><br>\n')
 
 
-def plotAgvLengthOfReads(param):
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import math, pylab
+def report(param, input_files='fastq_files', header='FastQC results'):
+    """Writes out html report with all relevant fastqc stats
 
-    #extract number of reads, these are needed not only here but also for the bamqc
-    summary_files = [param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/fastqc_data.txt' for idx in range(len(param['fastqc_stub']))]
-    seq_length=[open(sum_file).readlines()[8].split('\t')[1].strip().rstrip() for sum_file in summary_files]
-    seq_length=[int(num) for num in seq_length]
-    
-    #create plot 
-    fig, ax = plt.subplots()
-    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4,6)
-    index = np.arange(len(seq_length))
-    bar_width = 0.8
-    opacity = 0.4
-    rects1 = plt.bar(index, seq_length, bar_width,
-                     alpha=opacity,
-                     color='b')
-    plt.xlabel('Samples')
-    plt.ylabel('Read length')
-    plt.title('Read length across samples')
-    ticks=param['fastqc_stub']
-    plt.xticks(index + bar_width, ticks,rotation='vertical')
-    plt.tight_layout()
-    
-    #put it into the report
-    filename='report/fastqc/read_length.png'
-    pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="fastqc/read_length.png" alt="read length"><br><br>\n')
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter input_files: flag indicating which files to use (param key)
+    :Parameter header: plain text that contains the header for the report
+    """
 
-
-def report(param,input_files='fastq_files',header='FastQC results'):  
     #assemble the full fastqc report
-    copyFiles(param,input_files)
-    param['num_total_reads']=[0]*param['num_samples']
-    if len(param['fastqc_stub'])>0:
-        param['report'].write('<center><br><h2>'+header+'</h2>')    
-        readRawfastqc(param,input_files)
-        createOverviewTable(param)
-        param['report'].write('<a href="fastqc/'+input_files+'overview.txt">Table as tab delimited file</a><br><br><br>')
-        plotNumberOfReads(param,input_files)
-        plotGCContent(param,input_files)
-        #plotAgvLengthOfReads(param)
+    copy_files(param, input_files)
+    param['num_total_reads'] = [0]*param['num_samples']
+    if len(param['fastqc_stub']) > 0:
+        param['report'].write('<center><br><h2>'+header+'</h2>')
+        read_raw_fastqc(param, input_files)
+        create_overview_table(param)
+        param['report'].write('<a href="fastqc/'+
+                              input_files+
+                              'overview.txt">Table as tab delimited file'+
+                              '</a><br><br><br>')
+        plot_number_of_reads(param, input_files)
+        plot_gc_content(param, input_files)
     else:
-        param['report'].write('There were no results to show.')    
+        param['report'].write('There were no results to show.')
 
 
 def init(param):
-   module_helper.checkParameter(param,key='fastqc_exec',dType=str)
+    """Initialization function, that checks if the bamqc_script that is run
+    on every single samples is available
 
-def run_fastqc(filename,param):
-    out_dir = param['module_dir']+'/'+param['stub'][param['file_index']]
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    """
+    MODULE_HELPER.check_parameter(param, key='fastqc_exec', dtype=str)
+
+def run_fastqc(filename, param):
+    """Wrapper that build the command line call
+
+    :Parameter filename: param key pointing to the inputfile list
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    """
+    out_dir = param['module_dir']+'/'+param['outstub']
     if not os.path.exists(out_dir):
-       os.makedirs(out_dir)
-    call = param['fastqc_exec']+" '"+param[filename]+"' -o "+out_dir+' --extract'
-    param['file_handle'].write('CALL: '+call+'\n')
-    output,error = subprocess.Popen(call ,stdout = subprocess.PIPE,shell=True, stderr= subprocess.PIPE).communicate()
+        os.makedirs(out_dir)
+
+    #build command line call
+    call = [param['fastqc_exec']]
+    call.append(param[filename])
+    call.append('-o')
+    call.append(out_dir)
+    call.append('--extract')
+    param['file_handle'].write('CALL: '+' '.join(call)+'\n')
+
+    output, error = subprocess.Popen(call,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE).communicate()
     param['file_handle'].write(error)
     param['file_handle'].write(output)
-    if ('Analysis complete for' not in output):
-       sys.exit()
+    if 'Analysis complete for' not in output:
+        sys.exit()
 
 
 def main():
-    import subprocess, sys
-    param=module_helper.initialize_module()
+    """Main function that is run on each samples, which in turn calls the
+    actual fastqc tool to extract the QC statistics
+    """
+    param = MODULE_HELPER.initialize_module()
 
     #run fastqc
-    run_fastqc('working_file',param)
-    
+    run_fastqc('working_file', param)
+
     if not param['paired']:
-        module_helper.wrapup_module(param)
-    #calling it on the second fastq file if it is paired    
+        MODULE_HELPER.wrapup_module(param)
+
+    #calling it on the second fastq file if it is paired
     else:
-        run_fastqc('working_file2',param)
-        module_helper.wrapup_module(param) 
+        run_fastqc('working_file2', param)
+        MODULE_HELPER.wrapup_module(param)
 
 

@@ -15,14 +15,14 @@ def init(param):
     """Initialization function that checks the all relevant tophat parameters
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    MODULE_HELPER.checkParameter(param, key='cufflinks_exec', dType=str)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_G', dType=str, checkFile=True)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_b', dType=str, checkFile=True)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_library_type', dType=str)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_compatible_hits', dType=str)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_total_hits', dType=str)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_N', dType=str)
-    MODULE_HELPER.checkParameter(param, key='cufflinks_u', dType=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_exec', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_G', dtype=str, checkfile=True)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_b', dtype=str, checkfile=True)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_library_type', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_compatible_hits', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_total_hits', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_N', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cufflinks_u', dtype=str)
 
 def report(param):
     """This function runs PCA and writes the corresponding link in the html report
@@ -35,15 +35,26 @@ def report(param):
     cufflinks_dir = param['working_dir']+'report/cufflinks/'
     if not os.path.exists(cufflinks_dir):
         os.makedirs(cufflinks_dir)
+
     #output_phenotype_file
     MODULE_HELPER.output_sample_info(param)
+
     #run R script that creates a PCA
+    HELPER.writeLog('Running PCA ... \n', param)
     counts = param['working_dir']+'deliverables/cufflinks_counts_fpkm.txt'
-    cmd = [param['Rscript_exec'], get_script_path('cufflinks_pca.R'),
-           '-c', counts, '-a', param['pheno_file'], '-o', param['working_dir']]
-    _, _ = subprocess.Popen(cmd, stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE).communicate()
+    call = [param['Rscript_exec']]
+    call.append(get_script_path('cufflinks_pca.R'))
+    call = call + ['-c', counts]
+    call = call + ['-a', param['pheno_file']]
+    call = call + ['-o', param['working_dir']]
+    output, error = subprocess.Popen(call,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE).communicate()
+    HELPER.writeLog(output, param)
+    HELPER.writeLog(error, param)
     param['report'].write('<a href="cufflinks/pca.html">PCA</a>')
+
+
 
 def finalize(param, input_files='count_files'):
     """
@@ -93,30 +104,33 @@ def main():
     param = MODULE_HELPER.initialize_module()
 
     #run create output directory
-    outdir = param['module_dir']+param['stub'][param['file_index']]+'/'
+    outdir = param['module_dir']+param['outstub']+'/'
     if not os.path.exists(outdir):
         os.makedirs(outdir)
 
     #build cufflinks call:
-    call = param['cufflinks_exec']+' '
+    call = [param['cufflinks_exec']]
     #optional parameters
     if param['cufflinks_compatible_hits'] == 'active':
-        call = call + '--compatible-hits-norm '
+        call.append('--compatible-hits-norm')
     if param['cufflinks_N'] == 'active':
-        call = call + '-N '
+        call.append('-N')
     if param['cufflinks_u'] == 'active':
-        call = call + '-u '
+        call.append('-u')
     if param['cufflinks_total_hits'] == 'active':
-        call = call + '--total-hits-norm '
+        call.append('--total-hits-norm')
 
     #finish call
-    call = call + ' --no-update-check --library-type ' + \
-           param['cufflinks_library_type'] + ' -o ' + outdir + \
-           ' -p '+ param['num_processors'] + ' -G ' + param['cufflinks_G'] \
-           +  ' '+ param['working_file']
+    call.append('--no-update-check')
+    call.append('--library-type')
+    call.append(param['cufflinks_library_type'])
+    call = call + ['-o' + outdir]
+    call = call + ['-p' + param['num_processors']]
+    call = call + ['-G' + param['cufflinks_G']]
+    call.append(param['working_file'])
 
-    param['file_handle'].write('CALL: '+call+'\n')
-    output, _ = subprocess.Popen(call.split(),
+    param['file_handle'].write('CALL: '+' '.join(call)+'\n')
+    output, _ = subprocess.Popen(call,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE).communicate()
     param['file_handle'].write(output)
