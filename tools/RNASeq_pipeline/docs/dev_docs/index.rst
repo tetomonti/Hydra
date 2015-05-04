@@ -9,3 +9,4 @@
    documentation
    quickstart
    making_conda_packages
+   new_module
