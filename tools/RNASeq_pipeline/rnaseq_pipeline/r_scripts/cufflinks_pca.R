@@ -47,16 +47,13 @@ if ('clickme' %in% rownames(installed.packages())){
    all<-prcomp(t((data)))
    all<-all$x[,1:2]
    all<-all/apply(all,2,max)
-
-   clickme("points", 
-        all[,1],
-        all[,2],
-        color_groups=annot[,ncol(annot)],
-        names = rownames(all),
-        title = "Principle Component Analysis",
-        xlab = "PCA 1", 
-        ylab = "PCA 2",
-        file = "pca.html",
-        dir=paste(out_dir,'report/cufflinks/',sep=''))$hide()
-      
+   code<-clickme("points", 
+                 all[,1],
+                 all[,2],
+                 color_groups=annot[,ncol(annot)],
+                 names = rownames(all),
+                 title = "Principle Component Analysis",
+                 xlab = "PCA 1", 
+                 ylab = "PCA 2",
+                 file_path = paste0(out_dir,'cufflinks_PCA.hmtl'))
 }

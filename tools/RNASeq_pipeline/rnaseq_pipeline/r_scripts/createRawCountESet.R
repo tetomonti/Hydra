@@ -1,5 +1,7 @@
 
+###################################################################
 #Parameter handling
+###################################################################
 args <- commandArgs(trailingOnly = TRUE)
 
 if (length(args) != 6){
@@ -22,6 +24,14 @@ out_dir<-chkPars('-o',keys,values)
 counts_file<-chkPars('-c',keys,values)
 annot_file<-chkPars('-a',keys,values)
 
+#out_dir='./featureCount_raw_counts.RDS'
+#counts_file<-'featureCount_raw_counts.txt'
+#annot_file<-'sample_info.txt'
+
+###################################################################
+#Output raw files
+###################################################################
+
 #read files
 annot<-read.table(annot_file,header=T,sep='\t',as.is=T)
 rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
@@ -40,4 +50,28 @@ expr.data<-new("ExpressionSet",
                phenoData=phenoData, 
                annotation='RNASeq raw counts')
 saveRDS(expr.data,file=out_dir)
+
+###################################################################
+#Normalizing and output counts
+###################################################################
+require(edgeR)
+
+eSet<-expr.data
+exprs(eSet)<-cpm(eSet,log=T)
+saveRDS(eSet,file=sub('raw','normalized',out_dir))
+
+
+###################################################################
+#Additional QC
+###################################################################
+
+
+
+
+
+
+
+
+
+
 
