@@ -32,7 +32,7 @@ The two most important parameters to add are the executable for Star and the pre
 Since Star is already included in our conda enviroment all we add is STAR as ``star_exec``. If you would like to use another version 
 you can specify the directory and executable, but we do not offer support in this case (and therefore haven't tested it extensively), 
 so you have to make sure it plays nicely with our current python2.7.9 version. Alternatively, you can read our documentation on how to 
-deploy your own version of a program into the conda environment. (Link??)
+deploy your own version of a program into the conda environment (see :ref:`rst_tutorial`)
 
 The second parameter ``star_index`` is a pre-built index, which has to be built only once, for which we provide the code in the supplement 
 of this document. Star also allows the specification of a large variety of parameters. We are not changing these, but provide them in 
