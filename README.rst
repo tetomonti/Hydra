@@ -47,7 +47,24 @@ Use `conda` to install a basic developement environment::
     --yes \
     rnaseq_pipeline
 
-This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide.
+This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
+
+*3. Install all necessary R packages*
+Activate the environment so you have access to the R version that the pipeline uses::
+ 
+  source activate ./dev_env
+
+Start R::
+
+  R
+
+Within R install all necessary packages::
+
+  source("http://bioconductor.org/biocLite.R")
+  biocLite(c("Biobase",'edgeR'),ask=F)
+  install.packages(c("devtools","knitr", "yaml", "rjson"), repos='http://cran.us.r-project.org')
+  devtools::install_github("clickme", "nachocab")
+
 
 
 **Running**
