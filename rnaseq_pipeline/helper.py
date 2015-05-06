@@ -69,6 +69,7 @@ def initialize_standard(param):
     check_parameter(param, key='raw_filenames', dtype=str, checkfile=True)
     check_parameter(param, key='paired', dtype=bool)
     check_parameter(param, key='clean_run', dtype=bool)
+    check_parameter(param, key='ask_before_deleting', dtype=bool)
     check_parameter(param, key='verbose', dtype=bool)
     check_parameter(param, key='run_single_cpu', dtype=bool)
     check_parameter(param, key='raw_file_header', dtype=bool)
@@ -89,9 +90,14 @@ def initialize_standard(param):
     #if directory exists and the pipeline
     #should be run from scratch delete the directory
     if param['clean_run']:
+
         #check before deleting any previous results
-        answer = raw_input('Are you sure you want to delete '+
-                           'all existing results? (yes/no): ')
+        if param['ask_before_deleting']:
+            answer = raw_input('Are you sure you want to delete '+
+                               'all existing results? (yes/no): ')
+        else:
+            answer = 'yes'
+
         if answer == 'yes':
             if os.path.exists(param['working_dir']+'results/'):
                 shutil.rmtree(param['working_dir']+'results/')
@@ -306,7 +312,7 @@ def is_module_finished(param):
         finished = len(success) == 1
     return finished
 
-def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_free = 'standard'):
+def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_free='standard'):
     """submit a job, which runs the same wrapper on every single file
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters

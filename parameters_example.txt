@@ -17,6 +17,8 @@ paired	        =    TRUE
 
 #start pipeline from scratch or try to pick up at the last step that was performed successfully
 clean_run       =    TRUE
+ask_before_deleting =    TRUE     #pipeline will ask before deleting any file. If you submit the pipeline as a batch job you want to set this to FALSE
+
 
 #should everything also be printed on the command line
 verbose         =    TRUE
@@ -46,8 +48,8 @@ run_single_cpu = FALSE         #in case you have nothing to do for the next 2 mo
 #MAKE SURE YOU CHANGE THIS to avoid e-mails to default user
 qsub_email          = name@bu.edu
 qsub_send_email     = FALSE
-qsub_memory         = 2g
-qsub_PROJECT        = gsc-p
+qsub_memory         = 4g
+qsub_PROJECT        = gsc-p          #in some qsub systems you need to specify a project name (-P) for the purpose of accounting
 qsub_MACHINE        = scc
 qsub_RUNTIME_LIMIT  = 96:00:00    
 qsub_wait_time      = 10
