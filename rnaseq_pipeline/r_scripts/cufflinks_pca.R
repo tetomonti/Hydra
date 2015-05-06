@@ -19,41 +19,90 @@ chkPars<-function(x,keys,values){
    return (values[grep(x,keys)])
 }
 
+#extract the relevant parameters
 out_dir<-chkPars('-o',keys,values)
 counts_file<-chkPars('-c',keys,values)
 annot_file<-chkPars('-a',keys,values)
+paired<-chkPars('-p',keys,values)
+stub<-chkPars('-s',keys,values)
 
-#out_dir='./'
-#counts_file<-'cufflinks_counts_fpkm.txt'
-#annot_file<-'sample_info.txt'
 
-#read files
+#actual values for testing purposes
+# out_dir='./'
+# counts_file<-'deliverables/cufflinks_counts_fpkm.txt'
+# annot_file<-'deliverables/sample_info.txt'
+# stub='cufflinks'
+# paired='TRUE'
+
+
+#read phenotype file
 annot<-read.table(annot_file,header=T,sep='\t',as.is=T)
 rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 
+
+#read the raw counts file
 counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
 counts<-counts[-1,]
 mat<-counts[,-(1:2)]
 colnames(mat)<-gsub('[-\\.]','_',colnames(mat))
 mat<-apply(mat,2,as.numeric)
+data<-mat
+
+#function to create a 
+plotCov<-function(idx,annot,all,stub,con){
+   current_filename <- paste0(stub,'_',colnames(annot)[idx])
+   code<-clickme("points", 
+                 all[,1],
+                 all[,2],
+                 color_groups=annot[,idx],
+                 names = rownames(all),
+                 title = colnames(annot)[idx],
+                 xlab = "PCA 1", 
+                 ylab = "PCA 2",
+                 file_path = paste0(out_dir,'report/clickme/',current_filename,'.html'))
+   write(paste0('<iframe width="1100" height="850" src="',
+               '../clickme/',
+               current_filename,
+               '.html" frameborder=0> </iframe>'),
+         con)
+}
 
 #run PCA for all the samples
-data<-mat
 if ('clickme' %in% rownames(installed.packages())){
    library(clickme)
-   data<-data[rowSums(data>100)>=2,]
-
+   #if the clickme directory does not work create it
+   dir.create(file.path(paste0(out_dir,'report/'), 'clickme'), showWarnings = FALSE)
+      
+   #remove the raw file names
+   if (paired == 'TRUE'){
+      annot<-annot[,-(1:2)]
+   }else{
+      annot<-annot[,-1]
+   }
+   
    # do a PCA
    all<-prcomp(t((data)))
    all<-all$x[,1:2]
    all<-all/apply(all,2,max)
-   code<-clickme("points", 
-                 all[,1],
-                 all[,2],
-                 color_groups=annot[,ncol(annot)],
-                 names = rownames(all),
-                 title = "Principle Component Analysis",
-                 xlab = "PCA 1", 
-                 ylab = "PCA 2",
-                 file_path = paste0(out_dir,'cufflinks_PCA.hmtl'))
+
+   #plot the pca   
+   con<-file(paste0(out_dir,'report/',stub,'/',stub,'_pca.html'),open='w')
+   
+   #always plot the sample names, just in case
+   plotCov(1,annot,all,stub,con)
+   annot<-annot[,-1]
+   
+   #and then plot all covariates that have more than 1 and equal or less than 10 levels/classes
+   no_levels<-apply(annot,2,function(x)length(unique(x)))
+   valid_indices<-(1:ncol(annot))[no_levels>1 & no_levels<=10]
+   
+   #only if there is actually something to plot
+   if (length(valid_indices)>0){   
+      sapply(valid_indices,plotCov,annot,all,stub,con)
+   }
+   
+   #close the html file
+   close(con) 
 }
+
+
