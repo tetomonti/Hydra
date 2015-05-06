@@ -55,10 +55,9 @@ The following list explains some of the more important parameters:
 ``QC_and_trim_only``: runs only the initial preprocessing step to make sure the adapter clipping was successful before continuing. 
 One you confirm the QC looks alright you can run the pipeline in resume mode, which the skips the fastqc runs and adapter clipping.
 
-.. warning:: 
-
-	We have to add details here about annotations and building tophat and star.
 	
 There are also parameters for every single module (most important are the genome and annotation files) that have to be specified correctly. 
+
+Annotation files can be downloaded at `<http://useast.ensembl.org/Homo_sapiens/Info/Index?redirect=no>`_ 
 
 

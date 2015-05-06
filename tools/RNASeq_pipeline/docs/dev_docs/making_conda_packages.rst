@@ -1,4 +1,4 @@
-
+.. _rst_tutorial:
 
 =====================
  Conda Package Guide

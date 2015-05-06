@@ -413,16 +413,11 @@ And once these are installed you can simply install the pipeline:
 We already prepared unit test cases with only 10,000 reads that should allow you to test the pipeline in a reasonable amount
 of time (depending on the cluster load usually <1h)
 
-How to add a tool into the anaconda environment???
---------------------------------------------------
+How to add a tool into the anaconda environment
+-----------------------------------------------
 
-.. warning:: 
+A "star" package can be created by following the steps described in :ref:`rst_tutorial`
 
-	This is still not quite settled.
-
-Edit the build.sh
-
-Edit meta.yaml
 
 Supplement:
 ----------
