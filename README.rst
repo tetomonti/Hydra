@@ -1,6 +1,6 @@
 
 ==================
- RNASeq Pipeline.
+ Hydra - a flexible RNASeq pipeline.
 ==================
 
 Features
@@ -78,4 +78,4 @@ Once you are done with your changes and installed them, you can run the pipeline
 
 Example:
 
-   RNASeq_pipeline_prototype.py -p param.txt
+   hydra.py -p param.txt
