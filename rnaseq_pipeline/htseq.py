@@ -60,7 +60,6 @@ def process_stat_files(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-
     #if there is no htseq directory in the report make one
     htseq_dir = param['working_dir']+'report/htseq/'
     if not os.path.exists(htseq_dir):
@@ -90,11 +89,12 @@ def process_stat_files(param):
     filehandle = open(htseq_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        perc = [cur_line[0]]
-        perc.append(MODULE_HELPER.get_percentage(cur_line[1:],
-                                                 tot_reads[1:],
-                                                 len(cur_line)-1))
-        table.append(perc)
+        perc = ([cur_line[0]]+
+                MODULE_HELPER.get_percentage(cur_line[1:],
+                                             tot_reads[1:],
+                                             len(cur_line)-1))
+        table.append(perc)        
+        
     filehandle.close()
     return table
 

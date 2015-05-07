@@ -338,10 +338,8 @@ def plot_paired_singleton(param):
     single = param['bam_qc']['is_singleton'][:]
     paired = param['bam_qc']['is_paired'][:]
     proper = param['bam_qc']['is_proper_pair'][:]
-    paired_bottom = []
-    for i in range(len(param['bamqc_stub'])):
-        paired_bottom = (single[i] + proper[i])
-    paired = [paired[i]-proper[i] for i in range(len(param['bamqc_stub']))]
+    paired_bottom = [(single[i] + proper[i]) for i in range(len(param['bamqc_stub']))]
+    paired = [paired[i] - proper[i] for i in range(len(param['bamqc_stub']))]
 
     #create plot
     fig, _ = plt.subplots()
