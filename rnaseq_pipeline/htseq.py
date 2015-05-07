@@ -42,17 +42,21 @@ def create_eset(count_file, pheno_file, param):
     #create a Bioconductor ExpresionSet
     call = [param['Rscript_exec']]
     call.append(get_script_path('createRawCountESet.R'))
-    call.append('-c')
-    call.append(count_file)
-    call.append('-a')
-    call.append(pheno_file)
-    call.append('-o')
-    call.append(param['working_dir']+'deliverables/htseq_raw_counts.RDS')
+    call = call + ['-c', count_file]
+    call = call + ['-a', pheno_file]
+    call = call + ['-o', param['working_dir']]
+    call = call + ['-s', 'htseq']
+    if param['paired']:
+        paired = 'TRUE'
+    else:
+        paired = 'FALSE'
+    call = call + ['-p', paired]
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
-    HELPER.writeLog(output+'\n', param)
-    HELPER.writeLog(error+'\n', param)
+    HELPER.writeLog(output, param)
+    HELPER.writeLog(error, param)
+    param['report'].write('<br><a href="htseq/htseq_pca.html">PCA on normalized samples</a>')
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -93,8 +97,8 @@ def process_stat_files(param):
                 MODULE_HELPER.get_percentage(cur_line[1:],
                                              tot_reads[1:],
                                              len(cur_line)-1))
-        table.append(perc)        
-        
+        table.append(perc)
+
     filehandle.close()
     return table
 
@@ -106,8 +110,9 @@ def report(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
 
+    out_file = param['working_dir']+'deliverables/htseq_raw_counts.txt'
     #report only if there were actually results
-    if os.path.exists(param['working_dir']+'deliverables/htseq_raw_counts.txt'):
+    if os.path.exists(out_file):
         param['report'].write('<center><br><br><br><br><h2>HTSeq statistics</h2>')
         table = process_stat_files(param)
         MODULE_HELPER.write_html_table(param,
@@ -118,6 +123,10 @@ def report(param):
                                        deg=315)
         param['report'].write('<a href="htseq/htseq_stats.txt">'+
                               'HTSeq statistics as tab delimited txt file</a>')
+        #create an eSet:
+        create_eset(out_file,
+                    param['pheno_file'],
+                    param)
 
 
 
@@ -167,9 +176,6 @@ def finalize(param, input_files='count_files'):
         #output_phenotype_file
         HELPER.writeLog('Writing phenotype data ... \n', param)
         MODULE_HELPER.output_sample_info(param)
-
-        #create an eSet:
-        create_eset(out_file, param['pheno_file'], param)
 
         #write summary stats
         out_handle = open(param['working_dir']+

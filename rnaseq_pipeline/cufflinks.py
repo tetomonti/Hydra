@@ -53,7 +53,6 @@ def report(param):
     else:
         paired = 'FALSE'
     call = call + ['-p', paired]
-
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()

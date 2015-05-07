@@ -33,20 +33,28 @@ def create_eset(count_file, pheno_file, param):
     :Parameter pheno_file: location of the phenotype file
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+
+    HELPER.writeLog('Creating ESet ... \n', param)
+    #create a Bioconductor ExpresionSet
     call = [param['Rscript_exec']]
     call.append(get_script_path('createRawCountESet.R'))
-    call.append('-c')
-    call.append(count_file)
-    call.append('-a')
-    call.append(pheno_file)
-    call.append('-o')
-    call.append(param['working_dir']+'deliverables/featureCount_raw_counts.RDS')
-    HELPER.writeLog('Creating ESet ... \n', param)
+    call = call + ['-c', count_file]
+    call = call + ['-a', pheno_file]
+    call = call + ['-o', param['working_dir']]
+    call = call + ['-s', 'featureCount']
+    if param['paired']:
+        paired = 'TRUE'
+    else:
+        paired = 'FALSE'
+    call = call + ['-p', paired]
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
-    HELPER.writeLog(output+'\n', param)
-    HELPER.writeLog(error+'\n', param)
+    HELPER.writeLog(output, param)
+    HELPER.writeLog(error, param)
+    param['report'].write('<br><a href="featureCount/featureCount_pca.html"' +
+                          '>PCA on normalized samples</a>')
+
 
 
 def process_stat_files(param):
@@ -102,7 +110,8 @@ def report(param):
     """
 
     #report only if there were actually results
-    if os.path.exists(param['working_dir']+'deliverables/featureCount_raw_counts.txt'):
+    out_file = param['working_dir']+'deliverables/featureCount_raw_counts.txt'
+    if os.path.exists(out_file):
         param['report'].write('<center><br><br><br><br><h2>featureCount statistics</h2>')
         table = process_stat_files(param)
         MODULE_HELPER.write_html_table(param,
@@ -113,6 +122,10 @@ def report(param):
                                        deg=315)
         param['report'].write('<a href="featureCount/featureCount_stats.txt">'+
                               'featureCount statistics as tab delimited txt file</a>')
+        #create an eSet:
+        create_eset(out_file,
+                    param['pheno_file'],
+                    param)
 
 def finalize(param, input_files='count_files'):
     """This function is run after featureCount is run on each sample. It collects all results
@@ -173,9 +186,6 @@ def finalize(param, input_files='count_files'):
         #output_phenotype_file
         HELPER.writeLog('Writing phenotype data ... \n', param)
         MODULE_HELPER.output_sample_info(param)
-
-        #create an eSet:
-        create_eset(out_file, param['pheno_file'], param)
 
         #write summary stats
         #featureCount does this on its own so we can just fetch each summary file

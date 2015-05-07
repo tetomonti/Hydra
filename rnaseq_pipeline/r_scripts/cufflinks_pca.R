@@ -1,10 +1,12 @@
 
-
+###################################################################
 #Parameter handling
+###################################################################
 args <- commandArgs(trailingOnly = TRUE)
 
-if (length(args)%%2 !=0){
-   print("You need to specify the annotation (-a), the raw counts (-c) and the output directory -o")
+if (length(args) != 10){
+   print("You need to specify the annotation (-a), the raw counts (-c),")
+   print("the working directory (-o), whether the reads are paired (-p), and the stub name (-s)")
    quit(save='no')
 }
 keys<-args[(1:(length(args)/2))*2-1]
@@ -47,6 +49,10 @@ mat<-counts[,-(1:2)]
 colnames(mat)<-gsub('[-\\.]','_',colnames(mat))
 mat<-apply(mat,2,as.numeric)
 data<-mat
+
+###################################################################
+#PCA and clickme
+###################################################################
 
 #function to create a 
 plotCov<-function(idx,annot,all,stub,con){
