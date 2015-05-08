@@ -1,11 +1,11 @@
 [console_scripts]
-run_bamqc = rnaseq_pipeline.bamqc:main
-run_cufflinks = rnaseq_pipeline.cufflinks:main
-run_cutadapt = rnaseq_pipeline.cutadapt:main
-run_fastqc = rnaseq_pipeline.fastqc:main
-run_featureCount = rnaseq_pipeline.featureCount:main
-run_htseq = rnaseq_pipeline.htseq:main
-run_matched_pairs = rnaseq_pipeline.matched_pairs:main
-run_star = rnaseq_pipeline.star:main
-run_tophat = rnaseq_pipeline.tophat:main
+run_bamqc = hydra.bamqc:main
+run_cufflinks = hydra.cufflinks:main
+run_cutadapt = hydra.cutadapt:main
+run_fastqc = hydra.fastqc:main
+run_featureCount = hydra.featureCount:main
+run_htseq = hydra.htseq:main
+run_matched_pairs = hydra.matched_pairs:main
+run_star = hydra.star:main
+run_tophat = hydra.tophat:main
 
