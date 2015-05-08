@@ -4,11 +4,11 @@ a wrapper that that runs tophat using those parameters on a single sample.
 In addition it also contains functions to extract and write statistics and
 a wrapper that calls an R script
 """
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
-import rnaseq_pipeline.helper
-HELPER = rnaseq_pipeline.helper
-from rnaseq_pipeline.r_scripts import get_script_path
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
+import hydra.helper
+HELPER = hydra.helper
+from hydra.r_scripts import get_script_path
 import subprocess
 import os
 

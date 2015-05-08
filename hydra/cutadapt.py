@@ -2,8 +2,8 @@
 This module contains functions for running the cutadapt tool
 """
 
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
 import os
 import sys
 import subprocess

@@ -10,8 +10,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import pylab
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
 
 
 

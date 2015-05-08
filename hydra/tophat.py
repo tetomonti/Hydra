@@ -3,8 +3,8 @@ This module contains functions for initializing all tophat specific variables an
 a wrapper that that runs tophat using those parameters on a single sample.
 """
 
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters

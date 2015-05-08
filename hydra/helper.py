@@ -7,11 +7,11 @@ import shutil
 import json
 import subprocess
 import random
-from rnaseq_pipeline.logs import writeLog
-from rnaseq_pipeline import qsub_module
-from rnaseq_pipeline import single_cpu_module
-from rnaseq_pipeline import module_helper
-from rnaseq_pipeline import RNASEQ_PIPELINE_DIR
+from hydra.logs import writeLog
+from hydra import qsub_module
+from hydra import single_cpu_module
+from hydra import module_helper
+from hydra import RNASEQ_PIPELINE_DIR
 
 
 ###############################################################################

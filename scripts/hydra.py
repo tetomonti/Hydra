@@ -1,6 +1,6 @@
 # -*- coding: cp936 -*-
 """
-Usage: RNASeq_pipeline.py -p parameter_file.txt
+Usage: hydra.py -p parameter_file.txt
 -p parameter file				*[No default value]
 """
 
@@ -10,10 +10,10 @@ if __name__ == "__main__":
     import matplotlib
     matplotlib.use('Agg')
     import sys
-    import rnaseq_pipeline.pipeline
-    PIPELINE = rnaseq_pipeline.pipeline
-    import rnaseq_pipeline.helper
-    HELPER = rnaseq_pipeline.helper
+    import hydra.pipeline
+    PIPELINE = hydra.pipeline
+    import hydra.helper
+    HELPER = hydra.helper
 
     list_args = sys.argv[1:]
 

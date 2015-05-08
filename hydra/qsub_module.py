@@ -6,9 +6,9 @@ finish.
 import os
 import time
 import subprocess
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
-from rnaseq_pipeline.logs import writeLog
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
+from hydra.logs import writeLog
 
 def initialize_qsub(param):
     """ Init function that initializes all qsub parameters

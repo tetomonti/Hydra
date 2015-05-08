@@ -5,8 +5,8 @@ a wrapper that that runs tophat using those parameters on a single sample.
 import subprocess
 import os
 import sys
-import rnaseq_pipeline.module_helper
-MODULE_HELPER = rnaseq_pipeline.module_helper
+import hydra.module_helper
+MODULE_HELPER = hydra.module_helper
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters

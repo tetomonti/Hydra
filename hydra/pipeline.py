@@ -10,17 +10,17 @@ In addition to the workflow, all module specific parameters are initialized here
 before the pipeline starts running and the all module specific reporting functions
 are executed as well.
 """
-import rnaseq_pipeline.helper
-HELPER = rnaseq_pipeline.helper
-import rnaseq_pipeline.fastqc
-import rnaseq_pipeline.tophat
-import rnaseq_pipeline.bamqc
-import rnaseq_pipeline.cufflinks
-import rnaseq_pipeline.matched_pairs
-import rnaseq_pipeline.cutadapt
-import rnaseq_pipeline.htseq
-import rnaseq_pipeline.featureCount
-import rnaseq_pipeline.star
+import hydra.helper
+HELPER = hydra.helper
+import hydra.fastqc
+import hydra.tophat
+import hydra.bamqc
+import hydra.cufflinks
+import hydra.matched_pairs
+import hydra.cutadapt
+import hydra.htseq
+import hydra.featureCount
+import hydra.star
 
 import sys
 
@@ -30,15 +30,15 @@ def initialize_all(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    rnaseq_pipeline.cutadapt.init(param)
-    rnaseq_pipeline.matched_pairs.init(param)
-    rnaseq_pipeline.fastqc.init(param)
-    rnaseq_pipeline.tophat.init(param)
-    rnaseq_pipeline.bamqc.init(param)
-    rnaseq_pipeline.cufflinks.init(param)
-    rnaseq_pipeline.htseq.init(param)
-    rnaseq_pipeline.featureCount.init(param)
-    rnaseq_pipeline.star.init(param)
+    hydra.cutadapt.init(param)
+    hydra.matched_pairs.init(param)
+    hydra.fastqc.init(param)
+    hydra.tophat.init(param)
+    hydra.bamqc.init(param)
+    hydra.cufflinks.init(param)
+    hydra.htseq.init(param)
+    hydra.featureCount.init(param)
+    hydra.star.init(param)
 
 def run_all(param):
     """this function defines the workflow of the pipeline
@@ -99,7 +99,7 @@ def run_all(param):
                               'run_cufflinks',
                               input_files='bam_files',
                               output_files='count_files')
-            rnaseq_pipeline.cufflinks.finalize(param,
+            hydra.cufflinks.finalize(param,
                                                input_files='count_files')
 
         if param['run_htseq']:
@@ -107,7 +107,7 @@ def run_all(param):
                               'run_htseq',
                               input_files='bam_files',
                               output_files='count_files')
-            rnaseq_pipeline.htseq.finalize(param,
+            hydra.htseq.finalize(param,
                                            input_files='count_files')
 
         if param['run_featureCount']:
@@ -115,7 +115,7 @@ def run_all(param):
                               'run_featureCount',
                               input_files='bam_files',
                               output_files='count_files')
-            rnaseq_pipeline.featureCount.finalize(param,
+            hydra.featureCount.finalize(param,
                                                   input_files='count_files')
 
 def report_all(param):
@@ -124,19 +124,19 @@ def report_all(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     if param['aligner'] != 'skip':
-        rnaseq_pipeline.fastqc.report(param,
+        hydra.fastqc.report(param,
                                       input_files='raw_files',
                                       header='FastQC results on the raw data')
-        rnaseq_pipeline.fastqc.report(param,
+        hydra.fastqc.report(param,
                                       input_files='fastq_files',
                                       header='FastQC results after preprocessing')
-    rnaseq_pipeline.bamqc.report(param)
+    hydra.bamqc.report(param)
     if param['run_cufflinks']:
-        rnaseq_pipeline.cufflinks.report(param)
+        hydra.cufflinks.report(param)
     if param['run_htseq']:
-        rnaseq_pipeline.htseq.report(param)
+        hydra.htseq.report(param)
     if param['run_featureCount']:
-        rnaseq_pipeline.featureCount.report(param)
+        hydra.featureCount.report(param)
 
 
 
