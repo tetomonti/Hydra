@@ -45,7 +45,7 @@ setup(
     ],
     test_suite='tests',
     tests_require=test_requirements,
-    scripts=['scripts/hydra.py',
+    scripts=['scripts/hydra',
              'scripts/paired_ends_intersect.py',
              'scripts/run_bamqc.py'],
     entry_points={
