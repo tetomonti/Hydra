@@ -1,0 +1,45 @@
+package:
+  name: r       # lower case name of package, may contain '-' but no spaces
+  version: "3.1.1"    # version of package. Should use the PEP-386 verlib
+                      # conventions. Note that YAML will interpret
+                      # versions like 1.0 as floats, meaning that 1.0 will
+                      # be the same as 1. To avoid this, always put the
+                      # version in quotes, so that it will be interpreted
+                      # as a string.
+
+                      # The version cannot contain a dash '-' character.
+
+source:
+  fn: R-3.1.1.tar.gz
+  url: http://cran.r-project.org/src/base/R-3/R-3.1.1.tar.gz
+
+#  patches:
+#    - config.site.patch    # the patch file is expected to be found in the recipe
+
+build:
+  number: 0       # (defaults to 0)
+  string: monti_0       # (defaults to default conda build string plus the build
+                  # number)
+                  # The build string cannot contain a dash '-' character
+
+  rpaths:
+    - lib/
+    - lib/R/lib/
+    - lib64/R/lib/	
+
+  detect_binary_files_with_prefix: true # (defaults to false)
+
+requirements:
+  build:
+    - readline 
+
+  run:
+    - readline 
+
+test:
+  commands:
+    - R --help
+
+about:
+  home: http://www.r-project.org/
+  license: GPL2

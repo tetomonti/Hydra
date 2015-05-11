@@ -1,0 +1,67 @@
+package:
+  name: pysam
+  version: "0.7.7"
+
+source:
+  fn: pysam-0.7.7.tar.gz
+  url: https://pypi.python.org/packages/source/p/pysam/pysam-0.7.7.tar.gz
+  md5: eaf9f37cbccc5e2708754d045909c1a0
+#  patches:
+   # List any patch files here
+   # - fix.patch
+
+# build:
+  # preserve_egg_dir: True
+  # entry_points:
+    # Put any entry points (scripts to be generated automatically) here. The
+    # syntax is module:function.  For example
+    #
+    # - pysam = pysam:main
+    #
+    # Would create an entry point called pysam that calls pysam.main()
+
+
+  # If this is a new build for the same version, increment the build
+  # number. If you do not include this key, it defaults to 0.
+  # number: 1
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - cython >=0.17
+
+  run:
+    - python
+    - cython >=0.17
+
+test:
+  # Python imports
+  imports:
+    - pysam
+    - pysam.include
+    - pysam.include.samtools
+    - pysam.include.samtools.bcftools
+    - pysam.include.samtools.win32
+    - pysam.include.tabix
+
+  # commands:
+    # You can put test commands to be run here.  Use this to test that the
+    # entry points work.
+
+
+  # You can also put a file called run_test.py in the recipe that will be run
+  # at test time.
+
+  # requires:
+    # Put any additional test requirements here.  For example
+    # - nose
+
+about:
+  home: http://code.google.com/p/pysam/
+  license: MIT
+  summary: 'pysam'
+
+# See
+# http://docs.continuum.io/conda/build.html for
+# more information about meta.yaml
