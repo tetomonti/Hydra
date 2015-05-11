@@ -1,4 +1,4 @@
-"""Pipeline.py
+"""pipeline.py
 This script specifies the flow of the pipeline and indicates in which order
 the single modules are strung together. Since all modules are programmed fairly
 dumb, i.e. they do not know of modules that come before or after it enables

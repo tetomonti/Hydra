@@ -25,7 +25,7 @@ clean-pyc:
 	find . -name '*~' -exec rm -f {} +
 
 lint:
-	flake8 rnaseq_pipeline tests
+	flake8 hydra tests
 
 test:
 	python setup.py test
@@ -37,15 +37,15 @@ test:
 ## 'open' doesn't work correctly on SCC yet
 
 coverage:
-	coverage run --source rnaseq_pipeline setup.py test
+	coverage run --source hydra setup.py test
 	coverage report -m
 	coverage html
 #open htmlcov/index.html
 
 docs:
-	rm -f docs/rnaseq_pipeline.rst
+	rm -f docs/hydra.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ rnaseq_pipeline
+	sphinx-apidoc -o docs/ hydra
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 #open docs/_build/html/index.html
