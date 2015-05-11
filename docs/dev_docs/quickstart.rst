@@ -29,10 +29,10 @@ Use `conda` to install a basic developement environment::
   conda create \
     -p ./dev_env \
     --override-channels \
-    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    -c 'file:///restricted/projectnb/montilab-p/projects/pipeline_dev/conda_build_space' \
     -c 'defaults' \
     --yes \
-    rnaseq_pipeline
+    hydra
 
 Alternatively, you can just install the dependencies:
 
@@ -107,7 +107,7 @@ What just happend?
    instruction saves a bit of time. You can walk away from the computer,
    and when you get back, everything should just work.
 
-4. `rnqseq_pipeline` -- the package in question.
+4. `hydra` -- the package in question.
 
    The channel configured above (with `-c` option) has a package called
    `rnaseq_pipeline` that contains the python and R code for the
@@ -152,17 +152,7 @@ To get the current branch use::
 The source contains a "dev_requirements.txt" file that lists all the
 packages used in development. Install these using conda::
 
-  cd CBMgithub/tools/RNASeq_pipeline
   pip install -r dev_requirements.txt
-
-
-This used to be::
-
-  conda install \
-    --override-channels \
-    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
-    -c 'defaults' \
-    --file dev_requirements.txt
 
 .. warning::
 
@@ -201,7 +191,7 @@ Once you are done with your changes and installed them, try running one
 of the toy examples to make sure there were no unintended side effects::
 
    cd /restricted/projectnb/montilab-p/projects/pipeline_dev/unit_tests/human_paired_end
-   RNASeq_pipeline_prototype.py -p param.txt
+   hydra -p param.txt
 
 
 Once you're sure everything works, use git to commit them::

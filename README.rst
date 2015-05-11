@@ -34,6 +34,7 @@ Below are the tools you need to install before running the pipeline.
 
    .. code:: bash
 
+     module purge
      module load anaconda/2.2.0
 
 
@@ -43,9 +44,9 @@ Use `conda` to install a basic developement environment::
   
   conda create \
     -p ./dev_env \
-    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
+    -c 'file:///restricted/projectnb/montilab-p/projects/pipeline_dev/conda_build_space' \
     --yes \
-    rnaseq_pipeline
+    hydra
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
@@ -78,4 +79,4 @@ Once you are done with your changes and installed them, you can run the pipeline
 
 Example:
 
-   hydra.py -p param.txt
+   hydra -p param.txt
