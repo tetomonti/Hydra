@@ -472,9 +472,9 @@ def report(param):
         param['bamqc_report'] = open(param['working_dir']+'report/bamqc/bamqc.html', 'w')
         param['bamqc_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
                                     'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
-                                    '-strict.dtd"><head><title></title></head><body>\n')
-                          
+                                    '-strict.dtd"><head><title></title></head><body>\n')                         
         param['bamqc_report'].write('<center><h1>Bam QC Report</h1></center>')
+
         create_overview_table(param)
         param['bamqc_report'].write('<a href="bamqc/overview.txt">' +
                                     'QC results as tab delimited file</a><br><br><br>')

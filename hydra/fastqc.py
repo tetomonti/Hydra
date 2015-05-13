@@ -10,6 +10,7 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import pylab
+import hydra.helper
 import hydra.module_helper
 MODULE_HELPER = hydra.module_helper
 
@@ -59,7 +60,7 @@ def copy_files(param, input_files):
 
 
 
-def create_overview_table(param):
+def create_overview_table(param, out):
     """Function that creates an html overview table continaing the most important fastqc statistics
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -72,20 +73,20 @@ def create_overview_table(param):
 
     temp = ['Summary files']
     for stub in param['fastqc_stub']:
-        temp.append('<a href="fastqc/'+stub+
+        temp.append('<a href="'+stub+
                     '_fastqc/fastqc_data.txt">raw</a>')
     table.append(temp)
 
     #link to overview files
     temp = ['Full report']
     for stub in param['fastqc_stub']:
-        temp.append('<a href="fastqc/'+stub+
-                    '_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>')
+        temp.append('<a href="'+stub+
+                    '_fastqc/fastqc_report.html"><img src="../Icons/fastqc_icon.png"></a>')
     table.append(temp)
     #extract check marks
     table = table+extract_tables(param)
     #write the table as html
-    MODULE_HELPER.write_html_table(param, table, out=param['report'])
+    MODULE_HELPER.write_html_table(param, table, out)
 
 def extract_tables(param):
     """Extracts all relevant information for the overview table and writes it
@@ -100,9 +101,9 @@ def extract_tables(param):
     csv_file.close()
 
     #links to the icons
-    pass_icon = '<img src="Icons/tick.png">'
-    fail_icon = '<img src="Icons/error.png">'
-    warn_icon = '<img src="Icons/warning.png">'
+    pass_icon = '<img src="../Icons/tick.png">'
+    fail_icon = '<img src="../Icons/error.png">'
+    warn_icon = '<img src="../Icons/warning.png">'
 
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(param['fastqc_stub'])):
@@ -187,7 +188,7 @@ def read_raw_fastqc(param, output_files):
                          for vv in param['fast_qc_summary'][nam]])+'\n')
     filehandle.close()
 
-def plot_number_of_reads(param, output_files):
+def plot_number_of_reads(param, output_files, out):
     """Creates a plot with the number of reads per sample and plots it
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -232,14 +233,14 @@ def plot_number_of_reads(param, output_files):
     plt.tight_layout()
 
     #put it into the report
-    filename = 'report/fastqc/'+output_files+'total_reads.png'
+    filename = 'report/fastqc/'+output_files+'_total_reads.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="fastqc/'+
-                          output_files+
-                          'total_reads.png" '+
-                          'alt="total number of reads"><br><br>\n')
+    out.write('<img src="'+
+              output_files+
+              'total_reads.png" '+
+              'alt="total number of reads"><br><br>\n')
 
-def plot_gc_content(param, input_files):
+def plot_gc_content(param, input_files, out):
     """Creates a plot with the gc content per sample and plots it
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -277,11 +278,11 @@ def plot_gc_content(param, input_files):
     axis.set_ylim(0, 100)
 
     #put it into the report
-    filename = 'report/fastqc/'+input_files+'gc_content.png'
+    filename = 'report/fastqc/'+input_files+'_gc_content.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="fastqc/'+
-                          input_files+
-                          'gc_content.png" alt="GC content"><br><br>\n')
+    out.write('<img src="'+
+              input_files+
+              'gc_content.png" alt="GC content"><br><br>\n')
 
 
 def report(param, input_files='fastq_files', header='FastQC results'):
@@ -298,13 +299,30 @@ def report(param, input_files='fastq_files', header='FastQC results'):
     if len(param['fastqc_stub']) > 0:
         param['report'].write('<center><br><h2>'+header+'</h2>')
         read_raw_fastqc(param, input_files)
-        create_overview_table(param)
-        param['report'].write('<a href="fastqc/'+
-                              input_files+
-                              'overview.txt">Table as tab delimited file'+
-                              '</a><br><br><br>')
-        plot_number_of_reads(param, input_files)
-        plot_gc_content(param, input_files)
+
+
+        #separate report html for the fastqc results
+        report_file = 'fastqc/'+input_files+'_fastqc.html'
+        param['fastqc_report'] = open(param['working_dir']+'report/'+report_file, 'w')
+        param['fastqc_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                     'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                     '-strict.dtd"><head><title></title></head><body>\n')
+        param['fastqc_report'].write('<center><h1>' + header + '</h1></center>')
+
+        create_overview_table(param, param['fastqc_report'])
+        param['fastqc_report'].write('<a href="fastqc/'+
+                                     input_files+
+                                     'overview.txt">Table as tab delimited file'+
+                                     '</a><br><br><br>')
+        plot_number_of_reads(param, input_files, param['fastqc_report'])
+        plot_gc_content(param, input_files, param['fastqc_report'])
+
+
+        hydra.helper.report_finish(param['fastqc_report'])
+
+        #add the fastqc html to the report
+        param['report'].write('<a href="'+report_file+'">Full report</a><br>')
+
     else:
         param['report'].write('There were no results to show.')
 
