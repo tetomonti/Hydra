@@ -5,6 +5,7 @@ report html
 """
 import os
 import subprocess
+import hydra.helper
 import hydra.module_helper
 MODULE_HELPER = hydra.module_helper
 import numpy as np
@@ -60,15 +61,15 @@ def create_overview_table(param):
     #link to summary files
     temp = ['Summary files']
     for stub in param['bamqc_stub']:
-        temp.append(['<a href="bamqc/' + stub + '/output.txt">raw</a>'])
+        temp.append(['<a href="' + stub + '/output.txt">raw</a>'])
     table.append(temp)
 
     #link to overview files
     temp = ['Full report']
     for stub in param['bamqc_stub']:
-        temp.append('<a href="bamqc/' +
+        temp.append('<a href="' +
                     stub +
-                    '/sample_stats.html"><img src="Icons/fastqc_icon.png"></a></td>')
+                    '/sample_stats.html"><img src="../Icons/fastqc_icon.png"></a></td>')
     table.append(temp)
 
     #header
@@ -118,7 +119,7 @@ def create_overview_table(param):
                                               ntotal=num_s))
     MODULE_HELPER.write_html_table(param,
                                    table,
-                                   out=param['report'],
+                                   out=param['bamqc_report'],
                                    cell_width=65)
 
 def read_raw_bamqc(param):
@@ -227,8 +228,8 @@ def plot_alignment_overview(param):
     #put it into the report
     filename = 'report/bamqc/aligned_reads.png'
     pylab.savefig(param['working_dir'] + filename)
-    param['report'].write('<img src="bamqc/aligned_reads.png"' +
-                          ' alt="number of aligned reads"><br><br>\n')
+    param['bamqc_report'].write('<img src="aligned_reads.png"' +
+                                ' alt="number of aligned reads"><br><br>\n')
 
 def plot_spliced_reads(param):
     """Creates a plot that contains the statistic on the number of spliced reads
@@ -260,8 +261,8 @@ def plot_spliced_reads(param):
     #put it into the report
     filename = 'report/bamqc/spliced_reads.png'
     pylab.savefig(param['working_dir'] + filename)
-    param['report'].write('<img src="bamqc/spliced_reads.png" ' +
-                          'alt="number of spliced reads"><br><br>\n')
+    param['bamqc_report'].write('<img src="spliced_reads.png" ' +
+                                'alt="number of spliced reads"><br><br>\n')
 
 
 def plot_insert_reads(param):
@@ -293,8 +294,8 @@ def plot_insert_reads(param):
     #put it into the report
     filename = 'report/bamqc/insert_reads.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="bamqc/insert_reads.png" '+
-                          'alt="number of inserted reads"><br><br>\n')
+    param['bamqc_report'].write('<img src="insert_reads.png" '+
+                                'alt="number of inserted reads"><br><br>\n')
 
 def plot_delete_reads(param):
     """Creates a plot that contains the statistic on the number of reads that contain deletions
@@ -325,8 +326,8 @@ def plot_delete_reads(param):
     #put it into the report
     filename = 'report/bamqc/delete_reads.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="bamqc/delete_reads.png"' +
-                          ' alt="number of deleted reads"><br><br>\n')
+    param['bamqc_report'].write('<img src="delete_reads.png"' +
+                                ' alt="number of deleted reads"><br><br>\n')
 
 def plot_paired_singleton(param):
     """Creates a plot that contains the statistics on the number of paired,
@@ -379,8 +380,8 @@ def plot_paired_singleton(param):
     #put it into the report
     filename = 'report/bamqc/paired_reads.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="bamqc/paired_reads.png"' +
-                          ' alt="number of paired reads"><br><br>\n')
+    param['bamqc_report'].write('<img src="paired_reads.png"' +
+                                ' alt="number of paired reads"><br><br>\n')
 
 def plot_mismatches(param):
     """Creates a plot that split the reads by number of mismatches
@@ -453,11 +454,11 @@ def plot_mismatches(param):
     #put it into the report
     filename = 'report/bamqc/mismatches.png'
     pylab.savefig(param['working_dir']+filename)
-    param['report'].write('<img src="bamqc/mismatches.png" ' +
-                          'alt="number of mismatches"><br><br>\n')
+    param['bamqc_report'].write('<img src="mismatches.png" ' +
+                                'alt="number of mismatches"><br><br>\n')
 
 def report(param):
-    """This function creates a full html report for the bamQC and also \
+    """This function creates a full html report for the bamQC and also
     copies all relevant files
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -466,15 +467,27 @@ def report(param):
     copy_files(param)
     if len(param['bamqc_stub']) > 0:
         read_raw_bamqc(param)
+        
+        #create a separate bamqc report html
+        param['bamqc_report'] = open(param['working_dir']+'report/bamqc/bamqc.html', 'w')
+        param['bamqc_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                    'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                    '-strict.dtd"><head><title></title></head><body>\n')
+                          
+        param['bamqc_report'].write('<center><h1>Bam QC Report</h1></center>')
         create_overview_table(param)
-        param['report'].write('<a href="bamqc/overview.txt">' +
-                              'QC results as tab delimited file</a><br><br><br>')
+        param['bamqc_report'].write('<a href="bamqc/overview.txt">' +
+                                    'QC results as tab delimited file</a><br><br><br>')
         plot_alignment_overview(param)
         plot_mismatches(param)
         plot_paired_singleton(param)
         plot_spliced_reads(param)
         plot_insert_reads(param)
         plot_delete_reads(param)
+        hydra.helper.report_finish(param['bamqc_report'])        
+        
+        #add the bamqc html to the report        
+        param['report'].write('<a href="bamqc/bamqc.html">Full report</a><br>')
     else:
         param['report'].write('There were no results to show.')
 

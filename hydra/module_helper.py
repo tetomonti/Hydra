@@ -211,11 +211,11 @@ def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_b
     out.write(''.join(['<br>']*initial_breaks)+'\n')
     out.write(''.join(['<col width="'+str(cell_width)+'px"/>\n']*len(table[0])))
     #write header
-    param['report'].write('<thead><tr><th></th>'+
-                          ''.join(['<th>'+
-                                   rotate_word(stub.replace('-', '_'), deg)+
-                                   '</th>\n' for stub in table[0]])+
-                          '</tr></thead>\n')
+    out.write('<thead><tr><th></th>'+
+              ''.join(['<th>'+
+              rotate_word(stub.replace('-', '_'), deg)+
+                          '</th>\n' for stub in table[0]])+
+              '</tr></thead>\n')
 
     #write the pass and fail for each module
     for idx in range(1, len(table)):
@@ -226,7 +226,7 @@ def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_b
         else:
             for i in range(len(table[idx])):
                 out.write('<td>'+str(table[idx][i])+'</td>\n')
-        param['report'].write('</tr>\n')
+        out.write('</tr>\n')
 
     #close table
     out.write('</table><br>')

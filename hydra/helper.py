@@ -421,25 +421,25 @@ def copy_and_link(param, param_key, text):
 
 
 
-def report_finish(param):
+def report_finish(outhandle):
     """Writes the bottom of the html report
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    param['report'].write('<style>table.fixed { table-layout:fixed; } '+
-                          'table.fixed td { overflow: hidden; }#one-column'+
-                          '-emphasis{font-family:"Lucida Sans Unicode", '+
-                          '"Lucida Grande", Sans-Serif;font-size:12px;width:'+
-                          '480px;text-align:left;border-collapse:collapse;'+
-                          'margin:20px;}#one-column-emphasis th{font-size:'+
-                          '14px;font-weight:normal;color:#039;padding:12px'+
-                          ' 15px;}#one-column-emphasis td{color:#669;border'+
-                          '-top:1px solid #e8edff;padding:10px 15px;}.oce-'+
-                          'first{background:#d0dafd;border-right:10px solid'+
-                          ' transparent;border-left:10px solid transparent;}'+
-                          '#one-column-emphasis tr:hover td{color:#339;'+
-                          'background:#eff2ff;}</style></body>\n')
-    param['report'].close()
+    outhandle.write('<style>table.fixed { table-layout:fixed; } '+
+                    'table.fixed td { overflow: hidden; }#one-column'+
+                    '-emphasis{font-family:"Lucida Sans Unicode", '+
+                    '"Lucida Grande", Sans-Serif;font-size:12px;width:'+
+                    '480px;text-align:left;border-collapse:collapse;'+
+                    'margin:20px;}#one-column-emphasis th{font-size:'+
+                    '14px;font-weight:normal;color:#039;padding:12px'+
+                    ' 15px;}#one-column-emphasis td{color:#669;border'+
+                    '-top:1px solid #e8edff;padding:10px 15px;}.oce-'+
+                    'first{background:#d0dafd;border-right:10px solid'+
+                    ' transparent;border-left:10px solid transparent;}'+
+                    '#one-column-emphasis tr:hover td{color:#339;'+
+                    'background:#eff2ff;}</style></body>\n')
+    outhandle.close()
 
 def report_run_log(param):
     """Creates the rn log table for the final report indicating which modules

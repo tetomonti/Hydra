@@ -48,7 +48,7 @@ if __name__ == "__main__":
 ## reporting
     HELPER.report_start(param)
     PIPELINE.report_all(param)
-    HELPER.report_finish(param)
+    HELPER.report_finish(param['report'])
 
 
 
