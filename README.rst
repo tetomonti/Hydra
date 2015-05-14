@@ -29,8 +29,7 @@ Below are the tools you need to install before running the pipeline.
 
 .. note::
 
-   If you're using a module system and conda is available as part of the
-   `anaconda` module, you can install it with:
+   If you're using a module system such as on the shared computing cluster (SCC) at Boston University you can just load a preinstalled version:
 
    .. code:: bash
 
@@ -68,15 +67,19 @@ Within R install all necessary packages::
 
 
 
-**Running**
+Running the pipeline
+====================
 
-Activate the environment: follow the instructions provided by conda following the environment's
-creation::
+Activate the environment (follow the instructions provided by conda following the environment's
+creation)::
  
   source activate ./dev_env
   
-Once you are done with your changes and installed them, you can run the pipeline. 
+Then you can run the pipeline, while providing your parameter file.
 
-Example:
+Example::
 
    hydra -p param.txt
+
+
+A detailed description of the parameter file is provided here: _a link: docs/user_docs/parameters.rst and an example is located here :download:`here <parameters_example.txt>`.
