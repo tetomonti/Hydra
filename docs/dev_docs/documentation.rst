@@ -5,7 +5,7 @@
 Introduction
 ============
 
-To build the docs, from the root dirctory `CBMgithub/tools/RNASeq_pipeline`::
+To build the docs, from the root dirctory ::
 
   make docs
 

@@ -3,7 +3,7 @@
  User's Guide
 ==============
 
-"Pipeline name" is a semi-automated pipeline that runs a suite of tools required to perform analysis using high-throughput RNA Sequencing data. 
+Hydra is a fully-automated pipeline that runs a suite of tools required to perform analysis using high-throughput RNA sequencing data. 
 
 The pipeline takes list of user-specified parameters in the form of a parameter file (which also contains pointers to the pipeline scripts folder 
 and raw files to be run using the pipeline) and does a complete run, with added flexibility in how programs are utilized 
@@ -13,16 +13,6 @@ An html report is generated, summarizing the output/results from each step, with
 
 Table of Contents:
 
-.. toctree::
-   :maxdepth: 2
-
-   
-   parameters.rst
-   running.rst
-   output.rst
-
-
-
-`Description of the parameter file <parameters.rst>`__
-`How to run the pipeline <running.rst>`__
-`Pipeline output <output.rst>`__
+- `Description of the parameter file <parameters.rst>`__
+- `How to run the pipeline <running.rst>`__
+- `Pipeline output <output.rst>`__
