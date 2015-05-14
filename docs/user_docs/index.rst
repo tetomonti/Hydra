@@ -15,9 +15,14 @@ Table of Contents:
 
 .. toctree::
    :maxdepth: 2
+
    
    parameters.rst
    running.rst
    output.rst
 
 
+
+`Description of the parameter file <parameters.rst>`__
+`How to run the pipeline <running.rst>`__
+`Pipeline output <output.rst>`__

@@ -82,4 +82,12 @@ Example::
    hydra -p param.txt
 
 
-A detailed description of the parameter file is provided `here <docs/user_docs/parameters.rst>`__ and an example is located here :download:`here <parameters_example.txt>`.
+A detailed description of the parameter file is provided `here <docs/user_docs/parameters.rst>`__ and an example is located here `here <parameters_example.txt>`__ .
+
+
+Additional documentation
+========================
+
+A detailed user documentation is provided `here <docs/user_docs/index.rst>`__. For advanced users that are contributing to the development such as adding additional modules a documentation is provided `here <docs/dev_docs/index.rst>`__
+
+
