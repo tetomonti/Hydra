@@ -43,7 +43,7 @@ Use `conda` to install a basic developement environment::
   
   conda create \
     -p ./dev_env \
-    -c 'file:///restricted/projectnb/montilab-p/projects/pipeline_dev/conda_build_space' \
+    -c https://conda.binstar.org/montilab \
     --yes \
     hydra
 

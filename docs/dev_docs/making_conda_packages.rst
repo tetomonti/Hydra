@@ -5,6 +5,60 @@
 =====================
 
 
+Make sure the hydra environment is deactivated and a plain version of conda is loaded::
+
+   source deactivate <whereever_your_dev_env_is>
+   module purge
+   module load anaconda/2.2.0
+
+For the current pipeline you can easily build the pipeline and all required packages::
+ 
+   cd <Hydra_repository>/conda_packages
+   WORKSPACE = <WORKING_DIR>
+   export CONDA_BLD_PATH = $WORKSPACE/conda_build_space
+   conda build hydra-2.0.0
+
+This will build the hydra package and packages for all requirements. Next step you want to upload it to binstar.org so that everyone can access that package. For that we need to log into the binstar account first::
+
+   binstar login
+
+<in our case the user is: montilab>
+
+And upload all of the created packages to your account::
+
+   binstar upload $WORKSPACE/conda_build_space/linux-64/boost-1.51.0-py27.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/bowtie2-2.2.2-0.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/cufflinks-2.2.0-monti.tar.bz2 
+   binstar upload $WORKSPACE/conda_build_space/linux-64/cutadapt-1.2.1-py27_0.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/eigen-3.2.4-monti.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/fastqc-0.11.2-monti_0.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/htseq-0.6.1p1-monti.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/hydra-v2.0.0-monti_5.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/ncurses-5.9-4.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/pysam-0.7.7-monti.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/python-2.7.9-4.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/r-3.1.1-monti_0.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/readline-6.2-3.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/repodata.json.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/samtools-0.1.19-monti.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/star-2.4.0j-monti_1.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/subread-1.4.6-monti_0.tar.bz2
+   binstar upload $WORKSPACE/conda_build_space/linux-64/tophat-2.0.13-monti.tar.bz2
+
+
+With that you can use `conda` to install a basic environment to run the pipeline::
+  
+  conda create \
+    -p ./dev_env \
+    -c https://conda.binstar.org/montilab \
+    --yes \
+    hydra
+
+
+==========================================================
+ An example of building a Conda package on the star module
+==========================================================
+
 Conda packages are created with `conda build`, which has a basic tutorial
 `available online
 <http://conda.pydata.org/docs/build_tutorials/pkgs.html>`_ .
