@@ -131,7 +131,9 @@ def main():
 
 
     #wrap up and return the current workingfile
-    MODULE_HELPER.wrapup_module(param, [outdir+outfile])
+    MODULE_HELPER.wrapup_module(param,
+                                [outdir+outfile],
+                                remove_intermediate=True)
 
 
 

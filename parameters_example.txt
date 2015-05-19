@@ -19,6 +19,8 @@ paired	        =    TRUE
 clean_run       =    TRUE
 ask_before_deleting =    TRUE     #pipeline will ask before deleting any file. If you submit the pipeline as a batch job you want to set this to FALSE
 
+#remove intermediate files? (This option will remove all large intermediate files except for the bam files in order to save space)
+remove_intermediate  =    TRUE
 
 #should everything also be printed on the command line
 verbose         =    TRUE

@@ -80,5 +80,6 @@ def main():
                     outfile,
                     outfile2)
     hydra.module_helper.wrapup_module(param,
-                                                [outfile, outfile2])
+                                      [outfile, outfile2],
+                                      remove_intermediate=True)
 

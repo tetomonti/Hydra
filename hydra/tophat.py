@@ -109,7 +109,9 @@ def main():
             sys.exit(0)
 
     #wrap up and return the current workingfile
-    MODULE_HELPER.wrapup_module(param, [outdir+'accepted_hits.bam'])
+    MODULE_HELPER.wrapup_module(param, 
+                                [outdir+'accepted_hits.bam'],
+                                remove_intermediate=True)
 
 
 

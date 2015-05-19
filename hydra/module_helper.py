@@ -245,7 +245,19 @@ def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_b
     #close table
     out.write('</table><br>')
 
-def wrapup_module(param, new_working_file=[]):
+def is_in_raw_files(raw_files, current_file):
+    """Function to check whether the fiel we want to delete is a raw file
+
+    :Parameter raw_files: list of raw file loaction
+    :Parameter current_file: file that we want to delete
+    """
+    is_in_raw = False
+    for temp in raw_files:
+        if temp == current_file:
+            is_in_raw = True
+    return is_in_raw
+    
+def wrapup_module(param, new_working_file=[], remove_intermediate=False):
     """Function to wrap up a module run. Writes the ending flag which is used to
     identify if the module was completed correctly. Also closes the log file handle.
     And finally also sets the working file pointer to the output of the module
@@ -254,9 +266,26 @@ def wrapup_module(param, new_working_file=[]):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter new_working_file: pointer towards a potential new working file
     """
+ 
+    #remove intermediate files if specified
+    if (remove_intermediate):
+        #this is just a defensive check to make sure the raw files 
+        #cannot be touched even if the flag is specified wrongly and someone 
+        #changes the order the modules are run        
+        if not is_in_raw_files(param['raw_files'], param['working_file']):
+            os.remove(param['working_file'])
+        else:
+            param['file_handle'].write('WARNING: A module tried to delete a'+
+                                       ' raw file. SKIPPING the removal, please'+
+                                       ' fix the source code!')
+        if param['paired']:
+            if not is_in_raw_files(param['raw_files'], param['working_file']):
+                os.remove(param['working_file2'])
+
     #end process log
     param['file_handle'].write('ENDING '+param['current_flag']+' | ')
-    #if there was an actual output file specified
+
+   #if there was an actual output file specified
     if len(new_working_file) > 0:
         param['file_handle'].write(';'.join([w for w in new_working_file]))
     param['file_handle'].write('\n\n')

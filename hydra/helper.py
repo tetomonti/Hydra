@@ -84,6 +84,7 @@ def initialize_standard(param):
     check_parameter(param, key='paired', dtype=bool)
     check_parameter(param, key='clean_run', dtype=bool)
     check_parameter(param, key='ask_before_deleting', dtype=bool)
+    check_parameter(param, key='remove_intermediate', dtype=bool)
     check_parameter(param, key='verbose', dtype=bool)
     check_parameter(param, key='run_single_cpu', dtype=bool)
     check_parameter(param, key='raw_file_header', dtype=bool)
