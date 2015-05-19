@@ -45,8 +45,6 @@ def copy_files(param):
     param['bamqc_stub'] = [line for line in output.split('\n') if line != '']
 
     #use only the files that are in the stub
-
-
     temp = []
     for bqc_stub in param['bamqc_stub']:
         if bqc_stub in param['stub']:

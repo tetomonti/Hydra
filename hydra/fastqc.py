@@ -141,11 +141,18 @@ def extract_tables(param):
     return checks
 
 
+def check_and_condense_list(file_list):
+    confirmed = []     
+    for fil in file_list:
+        if os.path.exists(fil):
+            confirmed.append(fil)
+    return confirmed
+
 def read_raw_fastqc(param, output_files):
     """Reads raw fastqc outputs and processes it
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    :Parameter output_files: filenames to write teh summaries in
+    :Parameter output_files: filenames to write the summaries in
     """
     summary_files = []
     for idx in range(len(param['fastqc_stub'])):
@@ -154,53 +161,57 @@ def read_raw_fastqc(param, output_files):
                              '_fastqc'+
                              '/summary.txt')
 
-    fastqc = dict()
-    #add entries into fastqc dictionary
-    filehandle = open(summary_files[0])
-    fastqc = dict([(name.split('\t')[1].strip(), []) for name in filehandle.readlines()])
-    filehandle.close()
+    #check if the summary files actually exist
+    summary_files = check_and_condense_list(summary_files)
 
-    #fill fastqc dictionary with information from the summary files
-    for sum_file in summary_files:
-        filehandle = open(sum_file)
-        for name in filehandle.readlines():
-            fastqc[name.split('\t')[1].rstrip()].append(name.split('\t')[0].strip())
+    if len(summary_files) > 0:
+        fastqc = dict()
+        #add entries into fastqc dictionary
+        filehandle = open(summary_files[0])
+        fastqc = dict([(name.split('\t')[1].strip(), []) for name in filehandle.readlines()])
         filehandle.close()
 
-    key_list = fastqc.keys()
+        #fill fastqc dictionary with information from the summary files
+        for sum_file in summary_files:
+            filehandle = open(sum_file)
+            for name in filehandle.readlines():
+                fastqc[name.split('\t')[1].rstrip()].append(name.split('\t')[0].strip())
+            filehandle.close()
 
-    #fill fastqc dictionary with information from the data file
-    data_files = []
-    for idx in range(len(param['fastqc_stub'])):
-        data_files.append(param['fastqc_dir']+
-                          param['fastqc_stub'][idx]+
-                          '_fastqc/fastqc_data.txt')
+        key_list = fastqc.keys()
 
-    labels = ['Encoding',
-              'Total Sequences',
-              'Filtered Sequences',
-              'Sequence length',
-              '%GC']
+        #fill fastqc dictionary with information from the data file
+        data_files = []
+        for idx in range(len(param['fastqc_stub'])):
+            data_files.append(param['fastqc_dir']+
+                              param['fastqc_stub'][idx]+
+                              '_fastqc/fastqc_data.txt')
 
-    fastqc.update(dict([(l, []) for l in labels]))
-    key_list.extend(labels)
+        labels = ['Encoding',
+                  'Total Sequences',
+                  'Filtered Sequences',
+                  'Sequence length',
+                  '%GC']
 
-    for d_file in data_files:
-        filehandle = open(d_file)
-        for name in filehandle.readlines():
-            if name.split('\t')[0].strip() in fastqc.keys():
-                fastqc[name.split('\t')[0].strip()].append(name.split('\t')[1].rstrip())
+        fastqc.update(dict([(l, []) for l in labels]))
+        key_list.extend(labels)
+
+        for d_file in data_files:
+            filehandle = open(d_file)
+            for name in filehandle.readlines():
+                if name.split('\t')[0].strip() in fastqc.keys():
+                    fastqc[name.split('\t')[0].strip()].append(name.split('\t')[1].rstrip())
+            filehandle.close()
+
+        param['fast_qc_summary'] = fastqc
+
+        # write overview file
+        filehandle = open(param['fastqc_dir']+output_files+'overview.txt', 'w')
+        filehandle.write(' \t'+'\t'.join(param['fastqc_stub'])+'\n')
+        for nam in key_list:
+            filehandle.write(nam+'\t'+'\t'.join([str(vv) \
+                             for vv in param['fast_qc_summary'][nam]])+'\n')
         filehandle.close()
-
-    param['fast_qc_summary'] = fastqc
-
-    # write overview file
-    filehandle = open(param['fastqc_dir']+output_files+'overview.txt', 'w')
-    filehandle.write(' \t'+'\t'.join(param['fastqc_stub'])+'\n')
-    for nam in key_list:
-        filehandle.write(nam+'\t'+'\t'.join([str(vv) \
-                         for vv in param['fast_qc_summary'][nam]])+'\n')
-    filehandle.close()
 
 def plot_number_of_reads(param, output_files, out):
     """Creates a plot with the number of reads per sample and plots it
