@@ -68,6 +68,10 @@ def create_eset(count_file, pheno_file, param):
     HELPER.writeLog(error, param)
     param['report'].write('<br><a href="featureCount/featureCount_pca.html"' +
                           '>PCA on normalized samples</a>')
+    param['report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
+    param['report'].write('<img src="featureCount/featureCount_boxplot.png"' +
+                          ' alt="Boxplot of featureCount counts"><br><br>\n')
+
 
 
 

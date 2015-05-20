@@ -73,6 +73,10 @@ def report(param):
     HELPER.writeLog(output, param)
     HELPER.writeLog(error, param)
     param['report'].write('<a href="cufflinks/cufflinks_pca.html">PCA</a>')
+    param['report'].write('<br><h3>Boxplot of counts in log2 space</h3>')
+    param['report'].write('<img src="cufflinks/cufflinks_boxplot.png"' +
+                          ' alt="Boxplot of Cufflinks counts"><br><br>\n')
+
 
 
 

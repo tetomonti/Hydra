@@ -116,7 +116,7 @@ if ('clickme' %in% rownames(installed.packages())){
    }
    
    # do a PCA
-   all<-prcomp(t(exprs(eSet)))
+   all<-prcomp(t(log2(exprs(eSet)+1)))
    all<-all$x[,1:2]
    all<-all/apply(all,2,max)
    
@@ -145,7 +145,19 @@ if ('clickme' %in% rownames(installed.packages())){
 #Additional QC
 ###################################################################
 
+exp<-log2(exprs(eSet)+1)
+exp<-exp[order(apply(exp,1,mad),decreasing = T)[1:5000],]
 
+png(paste0(out_dir,'report/',stub,'/',stub,'_boxplot.png'),
+    height=800,
+    width=1024+10*ncol(exp))
+par(mar=c(10, 4.1, 4.1, 2.1))
+labels <-colnames(exp)
+boxplot(exp,col="lightgray",xaxt="n",xlab = "")
+axis(1, labels = FALSE)
+text(x =  seq_along(labels), y = par("usr")[3] - 1, srt = 90, adj = 1,
+     labels = labels, xpd = TRUE)
+invisible(dev.off())
 
 
 
