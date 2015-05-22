@@ -262,7 +262,7 @@ def plot_number_of_reads(param, output_files, out):
     pylab.savefig(param['working_dir']+filename)
     out.write('<img src="'+
               output_files+
-              'total_reads.png" '+
+              '_total_reads.png" '+
               'alt="total number of reads"><br><br>\n')
 
 def plot_gc_content(param, input_files, out):
@@ -307,7 +307,7 @@ def plot_gc_content(param, input_files, out):
     pylab.savefig(param['working_dir']+filename)
     out.write('<img src="'+
               input_files+
-              'gc_content.png" alt="GC content"><br><br>\n')
+              '_gc_content.png" alt="GC content"><br><br>\n')
 
 
 def report(param, input_files='fastq_files', header='FastQC results'):
