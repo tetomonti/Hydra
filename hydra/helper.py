@@ -457,20 +457,33 @@ def report_finish(outhandle):
     outhandle.close()
 
 def report_run_log(param):
-    """Creates the rn log table for the final report indicating which modules
+    """Creates the run log html for the final report indicating which modules
     were run successfully on which samples.
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     param['report'].write('<center><br><h2>Running Log</h2>')
 
+    #create a dedicated directory for the run-log
+    log_dir = param['working_dir']+'report/run_log/'
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
+
+    #start the report
+    report_file = 'run_log/run_log.html'
+    param['runlog_report'] = open(param['working_dir']+'report/'+report_file, 'w')
+    param['runlog_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                 '-strict.dtd"><head><title></title></head><body>\n')
+    param['runlog_report'].write('<center><h1>Run Log</h1></center>')
+
     #create a table
     table = []
     table.append([stub for stub in param['stub']])
 
     #links to the icons
-    pass_icon = '<img src="Icons/tick.png">'
-    fail_icon = '<img src="Icons/error.png">'
+    pass_icon = '<img src="../Icons/tick.png">'
+    fail_icon = '<img src="../Icons/error.png">'
 
     #create table
     for idx in range(len(param['run_log_headers'])):
@@ -483,7 +496,14 @@ def report_run_log(param):
         table.append(line)
 
     #write the table as html
-    module_helper.write_html_table(param, table, out=param['report'])
+    module_helper.write_html_table(param, table, out=param['runlog_report'])
+    report_finish(param['runlog_report'])
+
+    #add the fastqc html to the report
+    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
+
+
+
 
 def report_start(param):
     """Writes the header of the html report

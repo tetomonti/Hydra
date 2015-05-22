@@ -70,10 +70,10 @@ def create_eset(count_file, pheno_file, param):
                                      stderr=subprocess.PIPE).communicate()
     HELPER.writeLog(output, param)
     HELPER.writeLog(error, param)
-    param['report'].write('<br><a href="htseq/htseq_pca.html">PCA on normalized samples</a>')
-    param['report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
-    param['report'].write('<img src="htseq/htseq_boxplot.png"' +
-                          ' alt="Boxplot of HTSeq counts"><br><br>\n')
+    param['htseq_report'].write('<br><a href="htseq_pca.html">PCA on normalized samples</a>')
+    param['htseq_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
+    param['htseq_report'].write('<img src="htseq_boxplot.png"' +
+                                ' alt="Boxplot of HTSeq counts"><br><br>\n')
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -120,6 +120,38 @@ def process_stat_files(param):
     return table
 
 
+def create_sub_report(param, out_file):
+    """Separate report for all the htseq results in detail
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter out_file: report html filehandle
+    """
+
+    report_file = 'htseq/htseq.html'
+    param['htseq_report'] = open(param['working_dir']+'report/'+report_file, 'w')
+    param['htseq_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                '-strict.dtd"><head><title></title></head><body>\n')
+    param['htseq_report'].write('<center><h1>HTSeq Overview</h1></center>')
+    table = process_stat_files(param)
+    MODULE_HELPER.write_html_table(param,
+                                   table,
+                                   out=param['htseq_report'],
+                                   cell_width=80,
+                                   fcol_width=150,
+                                   deg=315)
+    #create an eSet:
+    create_eset(out_file,
+                param['pheno_file'],
+                param)
+    param['htseq_report'].write('<a href="htseq_stats.txt">'+
+                                'HTSeq statistics as tab delimited txt file</a>')
+    hydra.helper.report_finish(param['htseq_report'])
+
+    #add the fastqc html to the report
+    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
+
+
 
 def report(param):
     """Function that writes all HTSeq related statistics into the html report
@@ -130,20 +162,8 @@ def report(param):
     out_file = param['working_dir']+'deliverables/htseq_raw_counts.txt'
     #report only if there were actually results
     if os.path.exists(out_file):
-        param['report'].write('<center><br><br><br><br><h2>HTSeq statistics</h2>')
-        table = process_stat_files(param)
-        MODULE_HELPER.write_html_table(param,
-                                       table,
-                                       out=param['report'],
-                                       cell_width=80,
-                                       fcol_width=150,
-                                       deg=315)
-        param['report'].write('<a href="htseq/htseq_stats.txt">'+
-                              'HTSeq statistics as tab delimited txt file</a>')
-        #create an eSet:
-        create_eset(out_file,
-                    param['pheno_file'],
-                    param)
+        param['report'].write('<center><br><br><h2>HTSeq statistics</h2>')
+        create_sub_report(param, out_file)
 
 
 

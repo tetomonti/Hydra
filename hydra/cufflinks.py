@@ -38,6 +38,27 @@ def init(param):
     MODULE_HELPER.check_parameter(param, key='cufflinks_N', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_u', dtype=str)
 
+
+def create_sub_report(param):
+    #separate report html for the fastqc results
+    report_file = 'cufflinks/cufflinks.html'
+    param['cufflinks_report'] = open(param['working_dir']+'report/'+report_file, 'w')
+    param['cufflinks_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                 '-strict.dtd"><head><title></title></head><body>\n')
+    param['cufflinks_report'].write('<center><h1>Cufflinks Overview</h1></center>')
+
+    param['cufflinks_report'].write('<a href="cufflinks_pca.html">PCA</a>')
+    param['cufflinks_report'].write('<br><h3>Boxplot of counts in log2 space</h3>')
+    param['cufflinks_report'].write('<img src="cufflinks_boxplot.png"' +
+                                    ' alt="Boxplot of Cufflinks counts"><br><br>\n')
+    hydra.helper.report_finish(param['cufflinks_report'])
+
+    #add the fastqc html to the report
+    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
+
+
+
 def report(param):
     """This function runs PCA and writes the corresponding link in the html report
 
@@ -62,7 +83,7 @@ def report(param):
     call = call + ['-a', param['pheno_file']]
     call = call + ['-o', param['working_dir']]
     call = call + ['-s', 'cufflinks']
-    if param['paired']:    
+    if param['paired']:
         paired = 'TRUE'
     else:
         paired = 'FALSE'
@@ -72,12 +93,7 @@ def report(param):
                                      stderr=subprocess.PIPE).communicate()
     HELPER.writeLog(output, param)
     HELPER.writeLog(error, param)
-    param['report'].write('<a href="cufflinks/cufflinks_pca.html">PCA</a>')
-    param['report'].write('<br><h3>Boxplot of counts in log2 space</h3>')
-    param['report'].write('<img src="cufflinks/cufflinks_boxplot.png"' +
-                          ' alt="Boxplot of Cufflinks counts"><br><br>\n')
-
-
+    create_sub_report(param)
 
 
 def finalize(param, input_files='count_files'):
