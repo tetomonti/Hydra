@@ -80,6 +80,19 @@ def get_percentage(number1, number2, ntotal):
         percent[idx] = round(float(number1[idx])/float(number2[idx])*100, 2)
     return [str(round(pc, 1))+'%' for pc in percent]
 
+def divide(num1, num2, ntotal):
+    """helper function that returns percentages from 2 arrays
+
+    :Parameter number1: array of numerators
+    :Parameter number2: array of denominators
+    :Parameter ntotal: length of the arrays
+    :rtype: array with percentages as strings with ntotal length
+    """    
+    percent = [0.0]*ntotal    
+    for idx in range(ntotal):
+        percent[idx] = float(num1[idx])/float(num2[idx])*100
+    return percent
+
 def initialize_module():
     """Generic function that is executed by every module before it runs on a
     sample. Provides information on which file to work with, number of cores,
@@ -224,7 +237,7 @@ def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_b
               str(fcol_width)+'px"/>\n')
     out.write(''.join(['<br>']*initial_breaks)+'\n')
     out.write(''.join(['<col width="'+str(cell_width)+'px"/>\n']*len(table[0])))
-    #write header
+    #write headertable
     out.write('<thead><tr><th></th>'+
               ''.join(['<th>'+
               rotate_word(stub.replace('-', '_'), deg)+

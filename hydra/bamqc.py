@@ -469,22 +469,93 @@ def plot_mismatches(param):
     param['bamqc_report'].write('<img src="mismatches.png" ' +
                                 'alt="number of mismatches"><br><br>\n')
 
+
+def plot_overview(param):
+
+    #create a list with all relevant values
+    overview = []
+    num_s = len(param['bamqc_stub'])
+
+    #bring the data into required shape
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['reads_with_deletions'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['reads_with_inserts'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['spliced_reads'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['is_proper_pair'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['is_paired'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['is_singleton'],
+                                         param['bam_qc']['total_aligned_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['unique_aligned_reads'],
+                                         param['num_total_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['single_count_alignments'],
+                                         param['num_total_reads'],
+                                         num_s))
+
+    #make the first plot out of the first 2:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(9, 4)
+    bp = ax.boxplot(overview, patch_artist=True, vert=False)
+
+    #change coloring
+    for box in bp['boxes']:
+        box.set( color='#7570b3', linewidth=2)
+        box.set( facecolor = '#999999' )
+
+    #change caps
+    for cap in bp['caps']:
+        cap.set(color='#7570b3', linewidth=2)
+
+    #change outliers
+    for flier in bp['fliers']:
+        flier.set(marker='o', color='#ff0000', alpha=0.5)
+
+    ax.set_yticklabels(['Percent of reads with deletions',
+                        'Percent of reads with inserts',
+                        'Percent spliced reads',
+                        'Percent proper paired reads',
+                        'Percent paired end reads',
+                        'Percent single end reads',
+                        'Percent uniquely aligned',
+                        'Percent aligned'])
+                        
+    ax.set_xlim(-5,max(105,max(overview[7])+5))
+
+    #put it into the report
+    filename = 'report/bamqc/overview.png'
+    fig.savefig(param['working_dir']+filename,
+                bbox_inches='tight')
+    param['report'].write('<img src="bamqc/overview.png" ' +
+                          'alt="overview"><br><br>\n')
+
+
+
 def report(param):
     """This function creates a full html report for the bamQC and also
     copies all relevant files
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    param['report'].write('<center><br><br><br><br><h2>Bam QC results</h2>')
+    param['report'].write('<center><br><br><h2>Bam QC results</h2>')
     copy_files(param)
     if len(param['bamqc_stub']) > 0:
         read_raw_bamqc(param)
-        
+
         #create a separate bamqc report html
         param['bamqc_report'] = open(param['working_dir']+'report/bamqc/bamqc.html', 'w')
         param['bamqc_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
                                     'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
-                                    '-strict.dtd"><head><title></title></head><body>\n')                         
+                                    '-strict.dtd"><head><title></title></head><body>\n')
         param['bamqc_report'].write('<center><h1>Bam QC Report</h1></center>')
 
         create_overview_table(param)
@@ -496,13 +567,16 @@ def report(param):
         plot_spliced_reads(param)
         plot_insert_reads(param)
         plot_delete_reads(param)
-        hydra.helper.report_finish(param['bamqc_report'])        
-        
-        #add the bamqc html to the report        
+        hydra.helper.report_finish(param['bamqc_report'])
+
+        #add the bamqc html to the report
         param['report'].write('<a href="bamqc/bamqc.html">Full report</a><br>')
+        #add an overview plot for bamqc
+        plot_overview(param)
     else:
         param['report'].write('There were no results to show.')
 
+   
 
 def init(param):
     """Initialization function, that checks if the bamqc_script that is run

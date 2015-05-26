@@ -25,6 +25,9 @@ HELPER = hydra.helper
 from hydra.r_scripts import get_script_path
 import subprocess
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import pylab
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters
@@ -153,6 +156,59 @@ def create_sub_report(param, out_file):
 
 
 
+
+def plot_overview(param):
+
+    #extract table
+    overview = []
+
+    #total number of aligned reads
+    tot_reads = param['bam_qc']['total_aligned_reads']
+    overview.append(tot_reads)
+    labels = ['Total number of aligned reads']
+
+    htseq_file = param['working_dir']+'results/htseq/htseq_stats.txt'
+    filehandle = open(htseq_file)
+    for line in filehandle.readlines()[1:]:
+        cur_line = line.rstrip().split('\t')
+        labels.append(cur_line[0])
+        perc = (MODULE_HELPER.divide(cur_line[1:],
+                                     tot_reads,
+                                     len(cur_line)-1))
+        overview.append(perc)
+    filehandle.close()
+
+    #make the first plot out of the first 2:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(9, 4)
+    bp = ax.boxplot(overview, patch_artist=True, vert=False)
+
+    #change coloring
+    for box in bp['boxes']:
+        box.set( color='#7570b3', linewidth=2)
+        box.set( facecolor = '#999999' )
+
+    #change caps
+    for cap in bp['caps']:
+        cap.set(color='#7570b3', linewidth=2)
+
+    #change outliers
+    for flier in bp['fliers']:
+        flier.set(marker='o', color='#ff0000', alpha=0.5)
+
+    ax.set_yticklabels(labels)
+                        
+    ax.set_xlim(-5,105)
+
+    #put it into the report
+    filename = 'report/htseq/overview.png'
+    fig.savefig(param['working_dir']+filename,
+                bbox_inches='tight')
+    param['report'].write('<img src="htseq/overview.png" ' +
+                          'alt="overview"><br><br>\n')
+
+
+
 def report(param):
     """Function that writes all HTSeq related statistics into the html report
 
@@ -163,6 +219,7 @@ def report(param):
     #report only if there were actually results
     if os.path.exists(out_file):
         param['report'].write('<center><br><br><h2>HTSeq statistics</h2>')
+        plot_overview(param)
         create_sub_report(param, out_file)
 
 

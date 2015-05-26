@@ -95,7 +95,7 @@ def create_overview_table(param, out):
     temp = ['Full report']
     for stub in param['fastqc_stub']:
         temp.append('<a href="'+stub+
-                    '_fastqc/fastqc_report.html"><img src="../Icons/fastqc_icon.png"></a>')
+                    '_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>')
     table.append(temp)
     #extract check marks
     table = table+extract_tables(param)
@@ -115,9 +115,9 @@ def extract_tables(param):
     csv_file.close()
 
     #links to the icons
-    pass_icon = '<img src="../Icons/tick.png">'
-    fail_icon = '<img src="../Icons/error.png">'
-    warn_icon = '<img src="../Icons/warning.png">'
+    pass_icon = '<img src="Icons/tick.png">'
+    fail_icon = '<img src="Icons/error.png">'
+    warn_icon = '<img src="Icons/warning.png">'
 
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(param['fastqc_stub'])):
@@ -325,6 +325,11 @@ def report(param, input_files='fastq_files', header='FastQC results'):
         param['report'].write('<center><br><h2>'+header+'</h2>')
         read_raw_fastqc(param, input_files)
 
+        create_overview_table(param, param['report'])
+        param['report'].write('<a href="fastqc/'+
+                              input_files+
+                              'overview.txt">Table as tab delimited file'+
+                              '</a><br>')
 
         #separate report html for the fastqc results
         report_file = 'fastqc/'+input_files+'_fastqc.html'
@@ -334,11 +339,6 @@ def report(param, input_files='fastq_files', header='FastQC results'):
                                      '-strict.dtd"><head><title></title></head><body>\n')
         param['fastqc_report'].write('<center><h1>' + header + '</h1></center>')
 
-        create_overview_table(param, param['fastqc_report'])
-        param['fastqc_report'].write('<a href="fastqc/'+
-                                     input_files+
-                                     'overview.txt">Table as tab delimited file'+
-                                     '</a><br><br><br>')
         plot_number_of_reads(param, input_files, param['fastqc_report'])
         plot_gc_content(param, input_files, param['fastqc_report'])
 
