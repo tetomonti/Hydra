@@ -61,10 +61,21 @@ def run_cutadapt(param, infile, outfile, adapter):
     with open(outfile+'.txt', 'w') as filehandle:
         filehandle.write(output)
 
-    # Error handling
-    if (not os.path.exists(outfile)) or os.stat(outfile).st_size < 10000:
-        sys.exit(0)
 
+    # Error handling
+    if not os.path.exists(outfile):
+        param['file_handle'].write('ERROR: Could not find the output file')
+        sys.exit(0)
+    else:
+        #check if the file integrity is alright
+        call = ['gzip', '-t', outfile] 
+        output, error = subprocess.Popen(call,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE).communicate()
+        if 'unexpected end of file' in error:
+            param['file_handle'].write('ERROR: File integrity corrupted, please rerun')
+            sys.exit(0)
+            
 
 def main():
     """Main function that is run on each samples, which in turn calls the

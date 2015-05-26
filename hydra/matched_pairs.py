@@ -45,6 +45,7 @@ def run_match_pairs(param, infile, infile2, outfile, outfile2):
     call.append(outfile)
     call.append(outfile2)
 
+    param['file_handle'].write(' '.join(call))
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
@@ -56,10 +57,19 @@ def run_match_pairs(param, infile, infile2, outfile, outfile2):
         filehandle.write(output)
 
     # Error handling
-    if (not os.path.exists(outfile)) or os.stat(outfile).st_size < 1000:
+    if not os.path.exists(outfile2):
+        param['file_handle'].write('ERROR: Could not find both output files')
         sys.exit(0)
-
-
+    else:
+        #check if the file integrity is alright
+        call = ['gzip', '-t', outfile2] 
+        output, error = subprocess.Popen(call,
+                                         stdout=subprocess.PIPE,
+                                         stderr=subprocess.PIPE).communicate()
+        if 'unexpected end of file' in error:
+            param['file_handle'].write('ERROR: File integrity corrupted, please rerun')
+            sys.exit(0)
+            
 def main():
     """Main function that is run on each samples, which in turn calls the
     actual paired mate script that matches the mates
