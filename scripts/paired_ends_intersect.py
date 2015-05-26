@@ -15,6 +15,7 @@
 
 import sys
 import gzip
+import re
 
 from Bio.SeqIO.QualityIO import FastqGeneralIterator #Biopython 1.51 or later
 
@@ -29,10 +30,10 @@ OUTPUT_PAIRED_FORWARD_FILENAME = sys.argv[3]
 OUTPUT_PAIRED_REVERSE_FILENAME = sys.argv[4]
 
 def f_name(title):
-    return title.split()[0]
+    return re.sub('/.$', '',title.split()[0])
 
 def r_name(title):
-    return title.split()[0]
+    return re.sub('/.$', '',title.split()[0])
 
 print "Scanning reverse file to build list of names..."
 reverse_ids = set()
