@@ -43,11 +43,11 @@ stub<-chkPars('-s',keys,values)
 
 
 #actual values for testing purposes
-# out_dir='./'
-# counts_file<-'deliverables/cufflinks_counts_fpkm.txt'
-# annot_file<-'deliverables/sample_info.txt'
-# stub='cufflinks'
-# paired='TRUE'
+#out_dir='./'
+#counts_file<-'deliverables/cufflinks_counts_fpkm.txt'
+#annot_file<-'deliverables/sample_info.txt'
+#stub='cufflinks'
+#paired='FALSE'
 
 
 #read phenotype file
@@ -58,7 +58,7 @@ rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 #read the raw counts file
 counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
 counts<-counts[-1,]
-mat<-counts[,-(1:2)]
+mat<-as.matrix(counts[,-(1:2)])
 colnames(mat)<-gsub('[-\\.]','_',colnames(mat))
 mat<-apply(mat,2,as.numeric)
 data<-mat
@@ -87,7 +87,8 @@ plotCov<-function(idx,annot,all,stub,con){
 }
 
 #run PCA for all the samples
-if ('clickme' %in% rownames(installed.packages())){
+#only if clickme is installed and there is more than 1 sample
+if ('clickme' %in% rownames(installed.packages()) & ncol(data)>1){
    library(clickme)
    #if the clickme directory does not work create it
    dir.create(file.path(paste0(out_dir,'report/'), 'clickme'), showWarnings = FALSE)
@@ -129,8 +130,8 @@ if ('clickme' %in% rownames(installed.packages())){
 #Boxplots
 ###################################################################
 
-exp<-log2(data+1)
-exp<-exp[order(apply(exp,1,mad),decreasing = T)[1:5000],]
+exp<-as.matrix(log2(data+1))
+exp<-as.matrix(exp[order(apply(exp,1,mad),decreasing = T)[1:5000],])
 
 png(paste0(out_dir,'report/',stub,'/',stub,'_boxplot.png'),
     height=800,

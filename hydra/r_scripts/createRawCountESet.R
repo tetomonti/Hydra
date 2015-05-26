@@ -40,11 +40,11 @@ annot_file<-chkPars('-a',keys,values)
 paired<-chkPars('-p',keys,values)
 stub<-chkPars('-s',keys,values)
 
-#out_dir='./'
-#counts_file<-'deliverables/htseq_raw_counts.txt'
-#annot_file<-'deliverables/sample_info.txt'
-#stub='htseq'
-#paired='TRUE'
+out_dir='./'
+counts_file<-'deliverables/htseq_raw_counts.txt'
+annot_file<-'deliverables/sample_info.txt'
+stub='htseq'
+paired='TRUE'
 
 ###################################################################
 #Output raw files
@@ -56,7 +56,7 @@ rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 
 counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
 rownames(counts)<-counts[,1]
-counts<-counts[,-1]
+counts<-as.matrix(counts[,-1])
 colnames(counts)<-gsub('[-\\.]','_',colnames(counts))
 
 #create and save eSet
@@ -103,7 +103,8 @@ plotCov<-function(idx,annot,all,stub,con){
 }
 
 #run PCA for all the samples
-if ('clickme' %in% rownames(installed.packages())){
+#only if clickme is installed and there is more than 1 sample
+if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
    suppressMessages(library(clickme))
    #if the clickme directory does not work create it
    dir.create(file.path(paste0(out_dir,'report/'), 'clickme'), showWarnings = FALSE)
@@ -145,8 +146,8 @@ if ('clickme' %in% rownames(installed.packages())){
 #Additional QC
 ###################################################################
 
-exp<-log2(exprs(eSet)+1)
-exp<-exp[order(apply(exp,1,mad),decreasing = T)[1:5000],]
+exp<-as.matrix(log2(exprs(eSet)+1))
+exp<-as.matrix(exp[order(apply(exp,1,mad),decreasing = T)[1:5000],])
 
 png(paste0(out_dir,'report/',stub,'/',stub,'_boxplot.png'),
     height=800,
