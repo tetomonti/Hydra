@@ -152,7 +152,15 @@ To get the current branch use::
 The source contains a "dev_requirements.txt" file that lists all the
 packages used in development. Install these using conda::
 
-  pip install -r dev_requirements.txt
+  conda install -r dev_requirements.txt
+
+This will force you to downgrade the readline module however you can just install this single module again and you are good:
+
+  conda install \
+     --override-channels \
+     -c https://conda.binstar.org/montilab \
+     readline-6.2.3
+
 
 .. warning::
 
@@ -161,19 +169,6 @@ packages used in development. Install these using conda::
    it's the one in the development environment. If not, see
    `3. Activate the Environement`_ to setup the environment.
 
-.. note::
-
-   It might get annoying to constantly type
-
-           --override-channels \
-	   -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
-	   -c 'defaults' \
-
-   An alternative would be to modify your conda configuration file. Edit
-   the file `$HOME/.condarc` so that the 'channels:' section has the
-   `- 'file:///restricted/projectnb/montilab-p/conda_channel'` value as the
-   first value in the list. By default, '- defaults' is the only other value
-   there. 
 
 6. Make Your Edits and Install
 ==============================
