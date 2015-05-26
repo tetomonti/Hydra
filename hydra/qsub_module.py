@@ -166,7 +166,7 @@ class QsubClass():
 
         if self.machine == "scc":
             self.handle.write("source ~/.bashrc\n")
-            self.handle.write("#!bin/bash\n")
+            #self.handle.write("#!bin/bash\n")
             self.handle.write("\n")
 
         else:
