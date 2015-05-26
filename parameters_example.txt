@@ -18,6 +18,7 @@ paired	        =    TRUE
 #start pipeline from scratch or try to pick up at the last step that was performed successfully
 clean_run       =    TRUE
 ask_before_deleting =    TRUE     #pipeline will ask before deleting any file. If you submit the pipeline as a batch job you want to set this to FALSE
+run_failed_from_scratch = FALSE     #this function will rerun all samples that failed from scratch
 
 #remove intermediate files? (This option will remove all large intermediate files except for the bam files in order to save space)
 remove_intermediate  =    TRUE

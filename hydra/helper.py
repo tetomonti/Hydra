@@ -15,12 +15,13 @@
 """pipeline helper functions. Mixed bag of reading, writing, submission
 and checking functions all related to general pipeline functionality
 """
-import os
-import sys
-import shutil
 import json
-import subprocess
+import os
 import random
+import re
+import shutil
+import subprocess
+import sys
 from hydra.logs import writeLog
 from hydra import qsub_module
 from hydra import single_cpu_module
@@ -75,6 +76,59 @@ def initialize_qsub(param):
     """
     qsub_module.initialize_qsub(param)
 
+def clean_up(param):
+    """Remove all old results
+
+    :Parameter param: parameter object
+    """
+
+    #check before deleting any previous results
+    if param['ask_before_deleting']:
+        answer = raw_input('Are you sure you want to delete '+
+                           'all existing results? (yes/no): ')
+    else:
+        answer = 'yes'
+
+    if answer == 'yes':
+        if os.path.exists(param['working_dir']+'results/'):
+            shutil.rmtree(param['working_dir']+'results/')
+        if os.path.exists(param['working_dir']+'report/'):
+            shutil.rmtree(param['working_dir']+'report/')
+        if os.path.exists(param['working_dir']+'deliverables/'):
+            shutil.rmtree(param['working_dir']+'deliverables/')
+    else:
+        print ('Stopping... If you want to resume, '+
+               'please adjust the parameter file.')
+        exit(0)
+
+
+def clean_failed(param):
+    """Remove log files of the samples that failed in the last step, this will
+    force them to be rerun from scratch
+
+    :Parameter param: parameter object
+    """
+    filehandle = open(param['working_dir']+'results/main.log', 'r')
+    error_samples = ''
+    for line in filehandle:
+        line = line.strip()
+        if 'error in samples' in line:
+            error_samples = line
+        #making sure there wasn't a completely successful run after that error
+        if 'Initializing successful!' in line:
+            error_samples = ''
+
+    if error_samples is not '':
+        error_samples = re.sub('error in samples ','',error_samples)
+        error_samples.split(';')
+
+        #delete all log files
+        for sample in error_samples:
+            logfile = param['working_dir']+'/results/log/'+sample+'.log'
+            if not os.path.exists(logfile):
+                os.remove(logfile)
+
+
 def initialize_standard(param):
     """checks default pipeline parameters and create working directories
 
@@ -85,6 +139,7 @@ def initialize_standard(param):
     check_parameter(param, key='clean_run', dtype=bool)
     check_parameter(param, key='ask_before_deleting', dtype=bool)
     check_parameter(param, key='remove_intermediate', dtype=bool)
+    check_parameter(param, key='run_failed_from_scratch', dtype=bool)
     check_parameter(param, key='verbose', dtype=bool)
     check_parameter(param, key='run_single_cpu', dtype=bool)
     check_parameter(param, key='raw_file_header', dtype=bool)
@@ -105,25 +160,10 @@ def initialize_standard(param):
     #if directory exists and the pipeline
     #should be run from scratch delete the directory
     if param['clean_run']:
+        clean_up(param)
 
-        #check before deleting any previous results
-        if param['ask_before_deleting']:
-            answer = raw_input('Are you sure you want to delete '+
-                               'all existing results? (yes/no): ')
-        else:
-            answer = 'yes'
-
-        if answer == 'yes':
-            if os.path.exists(param['working_dir']+'results/'):
-                shutil.rmtree(param['working_dir']+'results/')
-            if os.path.exists(param['working_dir']+'report/'):
-                shutil.rmtree(param['working_dir']+'report/')
-            if os.path.exists(param['working_dir']+'deliverables/'):
-                shutil.rmtree(param['working_dir']+'deliverables/')
-        else:
-            print ('Stopping... If you want to resume, '+
-                   'please adjust the parameter file.')
-            exit(0)
+    if param['run_failed_from_scratch']:
+        clean_failed(param)
 
     #if results or report directory do not exist create them
     if not os.path.exists(param['working_dir']+'results/'):
