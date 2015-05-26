@@ -84,11 +84,6 @@ def process_stat_files(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    #if there is no htseq directory in the report make one
-    htseq_dir = param['working_dir']+'report/htseq/'
-    if not os.path.exists(htseq_dir):
-        os.makedirs(htseq_dir)
-
     #get the files that are actually in the output directory
     call = ['cp', '-R']
     call.append(param['working_dir']+'results/htseq/')
@@ -158,6 +153,11 @@ def create_sub_report(param, out_file):
 
 
 def plot_overview(param):
+
+    #if there is no htseq directory in the report make one
+    htseq_dir = param['working_dir']+'report/htseq/'
+    if not os.path.exists(htseq_dir):
+        os.makedirs(htseq_dir)
 
     #extract table
     overview = []

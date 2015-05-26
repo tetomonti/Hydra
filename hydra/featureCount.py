@@ -81,9 +81,6 @@ def process_stat_files(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    featurecount_dir = param['working_dir']+'report/featureCount/'
-    if not os.path.exists(featurecount_dir):
-        os.makedirs(featurecount_dir)
 
     #get the files that are actually in the output directory
     call = ['cp', '-R']
@@ -159,7 +156,10 @@ def report(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-
+    featurecount_dir = param['working_dir']+'report/featureCount/'
+    if not os.path.exists(featurecount_dir):
+        os.makedirs(featurecount_dir)
+        
     #report only if there were actually results
     out_file = param['working_dir']+'deliverables/featureCount_raw_counts.txt'
     if os.path.exists(out_file):
