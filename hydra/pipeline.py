@@ -89,7 +89,7 @@ def run_all(param):
                                   input_files='fastq_files',
                                   output_files='bam_files',
                                   cores=param['qsub_num_processors'])
-            if param['aligner'] == 'star':
+            elif param['aligner'] == 'star':
                 #running the aligner
                 HELPER.submit_job(param,
                                   'run_star',
@@ -108,13 +108,13 @@ def run_all(param):
                           input_files='bam_files')
 
         #Getting the counts:
-        if param['run_cufflinks']:
+        if param['run_cufflinks'] & (not param['paired']):
             HELPER.submit_job(param,
                               'run_cufflinks',
                               input_files='bam_files',
                               output_files='count_files')
             hydra.cufflinks.finalize(param,
-                                               input_files='count_files')
+                                     input_files='count_files')
 
         if param['run_htseq']:
             HELPER.submit_job(param,
@@ -122,7 +122,7 @@ def run_all(param):
                               input_files='bam_files',
                               output_files='count_files')
             hydra.htseq.finalize(param,
-                                           input_files='count_files')
+                                 input_files='count_files')
 
         if param['run_featureCount']:
             HELPER.submit_job(param,
@@ -130,7 +130,7 @@ def run_all(param):
                               input_files='bam_files',
                               output_files='count_files')
             hydra.featureCount.finalize(param,
-                                                  input_files='count_files')
+                                        input_files='count_files')
 
 def report_all(param):
     """this function calls the reporting functions of every module
@@ -145,7 +145,7 @@ def report_all(param):
                                       input_files='fastq_files',
                                       header='FastQC results after preprocessing')
     hydra.bamqc.report(param)
-    if param['run_cufflinks']:
+    if param['run_cufflinks'] & (not param['paired']):
         hydra.cufflinks.report(param)
     if param['run_htseq']:
         hydra.htseq.report(param)
