@@ -20,9 +20,8 @@ finish.
 import os
 import time
 import subprocess
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
-from hydra.logs import writeLog
+from hydra_pkg import module_helper as MODULE_HELPER
+from hydra_pkg.logs import writeLog
 
 def initialize_qsub(param):
     """ Init function that initializes all qsub parameters

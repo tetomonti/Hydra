@@ -22,11 +22,11 @@ import re
 import shutil
 import subprocess
 import sys
-from hydra.logs import writeLog
-from hydra import qsub_module
-from hydra import single_cpu_module
-from hydra import module_helper
-from hydra import RNASEQ_PIPELINE_DIR
+from hydra_pkg.logs import writeLog
+from hydra_pkg import qsub_module
+from hydra_pkg import single_cpu_module
+from hydra_pkg import RNASEQ_PIPELINE_DIR
+
 
 
 ###############################################################################
@@ -45,12 +45,29 @@ def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=Fal
     :Parameter optional: indicates a parameter is optional, if it doesn't exits
                          it will be created
     """
-    module_helper.check_parameter(param=param,
-                                  key=key,
-                                  dtype=dtype,
-                                  allowed=allowed,
-                                  checkfile=checkfile,
-                                  optional=optional)
+    if optional and key not in param:
+        param[key] = ''
+    else:
+        #check if key is present
+        if key not in param:
+            print 'Parameter '+key+' is missing in the parameter file.'
+            sys.exit(0)
+
+        #cast to correct data type
+        if dtype == bool:
+            param[key] = param[key] in ['True', 'TRUE', 'true', 'T', '1']
+        else:
+            param[key] = dtype(param[key])
+
+        #check if the value for the key is allowed
+        if len(allowed) > 0 and param[key] not in allowed:
+            print 'Parameter '+key+' can only be one of the following: ' + allowed
+            sys.exit(0)
+
+        #if file or directory check if it exists
+        if checkfile and not os.path.exists(param[key]):
+            print 'The file in '+key+' = ', param[key], ' does not exist'
+            sys.exit(0)
 
 def initialize_logfiles(param):
     """Function that creates the log files
@@ -81,25 +98,30 @@ def clean_up(param):
 
     :Parameter param: parameter object
     """
+    #this is only relevant if the directories actually exist
+    res_dir = os.path.exists(param['working_dir']+'results/')
+    rep_dir = os.path.exists(param['working_dir']+'report/')
+    del_dir = os.path.exists(param['working_dir']+'delivarables/')
+    
+    if res_dir | rep_dir | del_dir:
+        #check before deleting any previous results
+        if param['ask_before_deleting']:
+            answer = raw_input('Are you sure you want to delete '+
+                               'all existing results? (yes/no): ')
+        else:
+            answer = 'yes'
 
-    #check before deleting any previous results
-    if param['ask_before_deleting']:
-        answer = raw_input('Are you sure you want to delete '+
-                           'all existing results? (yes/no): ')
-    else:
-        answer = 'yes'
-
-    if answer == 'yes':
-        if os.path.exists(param['working_dir']+'results/'):
-            shutil.rmtree(param['working_dir']+'results/')
-        if os.path.exists(param['working_dir']+'report/'):
-            shutil.rmtree(param['working_dir']+'report/')
-        if os.path.exists(param['working_dir']+'deliverables/'):
-            shutil.rmtree(param['working_dir']+'deliverables/')
-    else:
-        print ('Stopping... If you want to resume, '+
-               'please adjust the parameter file.')
-        exit(0)
+        if answer == 'yes':
+            if os.path.exists(param['working_dir']+'results/'):
+                shutil.rmtree(param['working_dir']+'results/')
+            if os.path.exists(param['working_dir']+'report/'):
+                shutil.rmtree(param['working_dir']+'report/')
+            if os.path.exists(param['working_dir']+'deliverables/'):
+                shutil.rmtree(param['working_dir']+'deliverables/')
+        else:
+            print ('Stopping... If you want to resume, '+
+                   'please adjust the parameter file.')
+            exit(0)
 
 
 def clean_failed(param):
@@ -108,25 +130,24 @@ def clean_failed(param):
 
     :Parameter param: parameter object
     """
-    filehandle = open(param['working_dir']+'results/main.log', 'r')
-    error_samples = ''
-    for line in filehandle:
-        line = line.strip()
-        if 'error in samples' in line:
-            error_samples = line
-        #making sure there wasn't a completely successful run after that error
-        if 'Initializing successful!' in line:
-            error_samples = ''
-
-    if error_samples is not '':
-        error_samples = re.sub('error in samples ','',error_samples)
-        error_samples.split(';')
-
-        #delete all log files
-        for sample in error_samples:
-            logfile = param['working_dir']+'/results/log/'+sample+'.log'
-            if not os.path.exists(logfile):
-                os.remove(logfile)
+    mainlog = param['working_dir']+'results/main.log'
+    if os.path.exists(mainlog):
+        filehandle = open(mainlog, 'r')
+        error_samples = ''
+        for line in filehandle:
+            line = line.strip()
+            if 'error in samples' in line:
+                error_samples = line
+        if error_samples is not '':
+            error_samples = re.sub('error in samples ','',error_samples)
+            error_samples = error_samples.split(';')
+            #delete all log files
+            for sample in error_samples:
+                logfile = param['working_dir']+'results/log/'+sample+'.log'
+                if os.path.exists(logfile):
+                    os.remove(logfile)
+            #and finally delete the mainlog
+            os.remove(mainlog)
 
 
 def initialize_standard(param):
@@ -536,13 +557,11 @@ def report_run_log(param):
         table.append(line)
 
     #write the table as html
-    module_helper.write_html_table(param, table, out=param['runlog_report'])
+    write_html_table(param, table, out=param['runlog_report'])
     report_finish(param['runlog_report'])
 
     #add the fastqc html to the report
     param['report'].write('<a href="'+report_file+'">Full report</a><br>')
-
-
 
 
 def report_start(param):
@@ -570,5 +589,57 @@ def report_start(param):
     #report the run log in a table and show which samples passed/failed
     report_run_log(param)
 
+def rotate_word(word, deg=270):
+    """Creates the html code to display a word rotated (by default 270 degrees).
+    Of note is that this works in all standard browsers
 
+    :Parameter word: the word that should be printed
+    :Parameter deg: the degree of the rotation
+    """
+    return('<div style="float: center;position: relative;-moz-transform: '+
+           'rotate(270deg);  /* FF3.5+ */-o-transform: rotate(270deg);'+
+           '  /* Opera 10.5 */ -webkit-transform: rotate('+str(deg)+
+           'deg);  /* Saf3.1+, Chrome */ filter:  progid:DXImageTransform.'+
+           'Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */ -ms-filter: '+
+           'progid:DXImageTransform.Microsoft.BasicImage(rotation=3);' +
+           ' /* IE8 */">' +word+'</div>')
+
+
+def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_breaks=8, deg=315):
+    """HTML table writing function that takes a table and writes it nicely out
+    as an html table
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter table: table to output
+    :Parameter out: output file handle
+    :Parameter fcol_width: width of the first column
+    :Parameter cell_width: width of each cell, except first column
+    :Parameter initial_breaks: spaces before the column
+    :Parameter deg: rotation of the text in the header line
+    """
+
+    out.write('<table id="one-column-emphasis" class="fixed"><col width="'+
+              str(fcol_width)+'px"/>\n')
+    out.write(''.join(['<br>']*initial_breaks)+'\n')
+    out.write(''.join(['<col width="'+str(cell_width)+'px"/>\n']*len(table[0])))
+    #write headertable
+    out.write('<thead><tr><th></th>'+
+              ''.join(['<th>'+
+              rotate_word(stub.replace('-', '_'), deg)+
+                          '</th>\n' for stub in table[0]])+
+              '</tr></thead>\n')
+
+    #write the pass and fail for each module
+    for idx in range(1, len(table)):
+        out.write('<tr>')
+        if len(table[idx]) == 1:
+            out.write('<th colspan="'+str(1+len(table[0]))+
+                      '">'+table[idx][0]+'</th>\n')
+        else:
+            for i in range(len(table[idx])):
+                out.write('<td>'+str(table[idx][i])+'</td>\n')
+        out.write('</tr>\n')
+
+    #close table
+    out.write('</table><br>')
 

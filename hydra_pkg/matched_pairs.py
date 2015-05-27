@@ -14,7 +14,7 @@
 
 """Wrapper to run the matched pairs script on all samples
 """
-import hydra.module_helper
+from hydra_pkg import module_helper as MODULE_HELPER
 import os
 import sys
 import subprocess
@@ -24,9 +24,9 @@ def init(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    hydra.module_helper.check_parameter(param,
-                                                  key='match_pairs_exec',
-                                                  dtype=str)
+    MODULE_HELPER.check_parameter(param,
+                                  key='match_pairs_exec',
+                                  dtype=str)
 
 
 def run_match_pairs(param, infile, infile2, outfile, outfile2):
@@ -74,7 +74,7 @@ def main():
     """Main function that is run on each samples, which in turn calls the
     actual paired mate script that matches the mates
     """
-    param = hydra.module_helper.initialize_module()
+    param = MODULE_HELPER.initialize_module()
 
     #run match pairs
     outfile = (param['module_dir']+
@@ -89,7 +89,7 @@ def main():
                     'working_file2',
                     outfile,
                     outfile2)
-    hydra.module_helper.wrapup_module(param,
-                                      [outfile, outfile2],
-                                      remove_intermediate=True)
+    MODULE_HELPER.wrapup_module(param,
+                                [outfile, outfile2],
+                                remove_intermediate=True)
 

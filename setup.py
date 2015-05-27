@@ -3,7 +3,7 @@
 
 
 try:
-    from setuptools import setup
+    from setuptools import setup, find_packages
 except ImportError:
     from distutils.core import setup
 
@@ -26,11 +26,7 @@ setup(
     author='Monti Lab',
     author_email='smonti@bu.edu',
     url='https://github.com/montilab/Hydra',
-    packages=[
-        'hydra',
-    ],
-    package_dir={'hydra':
-                 'hydra'},
+    packages=find_packages('hydra_pkg'),
     include_package_data=True,
     install_requires=requirements,
     license="BSD",
@@ -39,7 +35,7 @@ setup(
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: BSD License',
+        'License :: OSI Approved :: Apache License',
         'Natural Language :: English',
         'Programming Language :: Python :: 2.7',
     ],
@@ -50,14 +46,14 @@ setup(
              'scripts/run_bamqc.py'],
     entry_points={
         'console_scripts': [
-            'run_bamqc=hydra.bamqc:main',
-            'run_cufflinks=hydra.cufflinks:main',
-            'run_cutadapt=hydra.cutadapt:main',
-            'run_fastqc=hydra.fastqc:main',
-            'run_featureCount=hydra.featureCount:main',
-            'run_htseq=hydra.htseq:main',
-            'run_matched_pairs=hydra.matched_pairs:main',
-            'run_tophat=hydra.tophat:main',
-            'run_star=hydra.star:main']
+            'run_bamqc=hydra_pkg.bamqc:main',
+            'run_cufflinks=hydra_pkg.cufflinks:main',
+            'run_cutadapt=hydra_pkg.cutadapt:main',
+            'run_fastqc=hydra_pkg.fastqc:main',
+            'run_featureCount=hydra_pkg.featureCount:main',
+            'run_htseq=hydra_pkg.htseq:main',
+            'run_matched_pairs=hydra_pkg.matched_pairs:main',
+            'run_tophat=hydra_pkg.tophat:main',
+            'run_star=hydra_pkg.star:main']
     }
 )

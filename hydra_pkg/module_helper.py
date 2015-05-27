@@ -17,8 +17,12 @@ Contains all helper functions that are relevant for the wrappers that run
 an external tool on each samples.
 """
 
+import hydra_pkg.helper
 import os
 import sys
+import matplotlib.pyplot as plt
+import subprocess
+from hydra_pkg.r_scripts import get_script_path
 
 def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=False):
     """generic function that checks if a parameter was in the parameter file,
@@ -34,30 +38,12 @@ def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=Fal
     :Parameter optional: indicates a parameter is optional, if it doesn't exits
                          it will be created
     """
-
-    if optional and key not in param:
-        param[key] = ''
-    else:
-        #check if key is present
-        if key not in param:
-            print 'Parameter '+key+' is missing in the parameter file.'
-            sys.exit(0)
-
-        #cast to correct data type
-        if dtype == bool:
-            param[key] = param[key] in ['True', 'TRUE', 'true', 'T', '1']
-        else:
-            param[key] = dtype(param[key])
-
-        #check if the value for the key is allowed
-        if len(allowed) > 0 and param[key] not in allowed:
-            print 'Parameter '+key+' can only be one of the following: ' + allowed
-            sys.exit(0)
-
-        #if file or directory check if it exists
-        if checkfile and not os.path.exists(param[key]):
-            print 'The file in '+key+' = ', param[key], ' does not exist'
-            sys.exit(0)
+    hydra_pkg.helper.check_parameter(param=param,
+                                     key=key,
+                                     dtype=dtype,
+                                     allowed=allowed,
+                                     checkfile=checkfile,
+                                     optional=optional)
 
 
 def get_percentage(number1, number2, ntotal):
@@ -205,59 +191,6 @@ def output_sample_info(param):
     output_phenotype(param, param['pheno_file'])
 
 
-def rotate_word(word, deg=270):
-    """Creates the html code to display a word rotated (by default 270 degrees).
-    Of note is that this works in all standard browsers
-
-    :Parameter word: the word that should be printed
-    :Parameter deg: the degree of the rotation
-    """
-    return('<div style="float: center;position: relative;-moz-transform: '+
-           'rotate(270deg);  /* FF3.5+ */-o-transform: rotate(270deg);'+
-           '  /* Opera 10.5 */ -webkit-transform: rotate('+str(deg)+
-           'deg);  /* Saf3.1+, Chrome */ filter:  progid:DXImageTransform.'+
-           'Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */ -ms-filter: '+
-           'progid:DXImageTransform.Microsoft.BasicImage(rotation=3);' +
-           ' /* IE8 */">' +word+'</div>')
-
-def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_breaks=8, deg=315):
-    """HTML table writing function that takes a table and writes it nicely out
-    as an html table
-
-    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    :Parameter table: table to output
-    :Parameter out: output file handle
-    :Parameter fcol_width: width of the first column
-    :Parameter cell_width: width of each cell, except first column
-    :Parameter initial_breaks: spaces before the column
-    :Parameter deg: rotation of the text in the header line
-    """
-
-    out.write('<table id="one-column-emphasis" class="fixed"><col width="'+
-              str(fcol_width)+'px"/>\n')
-    out.write(''.join(['<br>']*initial_breaks)+'\n')
-    out.write(''.join(['<col width="'+str(cell_width)+'px"/>\n']*len(table[0])))
-    #write headertable
-    out.write('<thead><tr><th></th>'+
-              ''.join(['<th>'+
-              rotate_word(stub.replace('-', '_'), deg)+
-                          '</th>\n' for stub in table[0]])+
-              '</tr></thead>\n')
-
-    #write the pass and fail for each module
-    for idx in range(1, len(table)):
-        out.write('<tr>')
-        if len(table[idx]) == 1:
-            out.write('<th colspan="'+str(1+len(table[0]))+
-                      '">'+table[idx][0]+'</th>\n')
-        else:
-            for i in range(len(table[idx])):
-                out.write('<td>'+str(table[idx][i])+'</td>\n')
-        out.write('</tr>\n')
-
-    #close table
-    out.write('</table><br>')
-
 def is_in_raw_files(raw_files, current_file):
     """Function to check whether the fiel we want to delete is a raw file
 
@@ -303,3 +236,129 @@ def wrapup_module(param, new_working_file=[], remove_intermediate=False):
         param['file_handle'].write(';'.join([w for w in new_working_file]))
     param['file_handle'].write('\n\n')
     param['file_handle'].close()
+    
+    
+def plot_count_overview(param, stub):
+    """Function that plot the overview boxplots for featureCounts and HTSeq
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter stub: stub that indicates which module we are working with
+    """
+    
+    #extract table
+    overview = []
+    labels = []
+ 
+    #total number of aligned reads:
+    tot_reads = param['bam_qc']['total_aligned_reads']
+
+    #if we have paired end reads we need to divide by 2 to get fragments rather than reads
+    if param['paired']:
+        tot_reads = [reads / 2 for reads in tot_reads]
+
+    #read in stats file
+    stats_file = param['working_dir']+'results/'+stub+'/'+stub+'_stats.txt'
+    filehandle = open(stats_file)
+    for line in filehandle.readlines()[1:]:
+        cur_line = line.rstrip().split('\t')
+        labels.append(cur_line[0])
+        perc = (divide(cur_line[1:],
+                tot_reads,
+                len(cur_line)-1))
+        overview.append(perc)
+    filehandle.close()
+
+    #make the first plot out of the first 2:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(9, len(labels) / 2 + 0.5)
+    bp = ax.boxplot(overview, patch_artist=True, vert=False)
+
+    #change coloring
+    for box in bp['boxes']:
+        box.set( color='#7570b3', linewidth=2)
+        box.set( facecolor = '#999999' )
+
+    #change caps
+    for cap in bp['caps']:
+        cap.set(color='#7570b3', linewidth=2)
+
+    #change outliers
+    for flier in bp['fliers']:
+        flier.set(marker='o', color='#ff0000', alpha=0.5)
+
+    ax.set_yticklabels(labels) 
+    ax.set_xlim(-5,105)
+
+    #put it into the report
+    filename = param['working_dir']+'report/'+stub+'/overview.png'
+    fig.savefig(filename, bbox_inches='tight')
+    param['report'].write('<img src="'+stub+'/overview.png" ' +
+                          'alt="overview"><br><br>\n')
+
+
+
+
+def create_eset(count_file, pheno_file, param, stub):
+    """Wrapper that calls an R script which creates a Bioconductor ExpressionSet
+
+    :Parameter count_file: location of the count file
+    :Parameter pheno_file: location of the phenotype file
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter stub: stub indicating the module we are working with    
+    """
+    hydra_pkg.helper.writeLog('Creating ESet ... \n', param)
+    #create a Bioconductor ExpresionSet
+    call = [param['Rscript_exec']]
+    call.append(get_script_path('createRawCountESet.R'))
+    call = call + ['-c', count_file]
+    call = call + ['-a', pheno_file]
+    call = call + ['-o', param['working_dir']]
+    call = call + ['-s', stub]
+    if param['paired']:
+        paired = 'TRUE'
+    else:
+        paired = 'FALSE'
+    call = call + ['-p', paired]
+    output, error = subprocess.Popen(call,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE).communicate()
+    hydra_pkg.helper.writeLog(output, param)
+    hydra_pkg.helper.writeLog(error, param)
+    param['module_report'].write('<br><a href="' + stub + '_pca.html">PCA on normalized samples</a>')
+    param['module_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
+    param['module_report'].write('<img src="' + stub + '_boxplot.png"' +
+                                ' alt="Boxplot of ' + stub +' counts"><br><br>\n')
+                                
+                                
+def create_sub_report(param, out_file, table, stub, title):
+    """Separate report for all the htseq/featureCount results in detail
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter out_file: report html filehandle
+    :Parameter stub: module stub    
+    """
+
+    report_file = stub + '/'+  stub + '.html'
+    param['module_report'] = open(param['working_dir']+'report/'+report_file, 'w')
+    param['module_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
+                                'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
+                                '-strict.dtd"><head><title></title></head><body>\n')
+    param['module_report'].write('<center><h1>' + title + 'Overview</h1></center>')
+    hydra_pkg.helper.write_html_table(param,
+                                      table,
+                                      out=param['module_report'],
+                                      cell_width=80,
+                                      fcol_width=150,
+                                      deg=315)
+    param['module_report'].write('<a href="' + stub +'_stats.txt">' + title +
+                                ' statistics as tab delimited txt file</a>')
+    #create an eSet:
+    create_eset(out_file,
+                param['pheno_file'],
+                param,
+                stub)
+    hydra_pkg.helper.report_finish(param['module_report'])
+
+    #add the fastqc html to the report
+    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
+

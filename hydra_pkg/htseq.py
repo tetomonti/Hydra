@@ -18,16 +18,10 @@ a wrapper that that runs tophat using those parameters on a single sample.
 In addition it also contains functions to extract and write statistics and
 a wrapper that calls an R script
 """
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
-import hydra.helper
-HELPER = hydra.helper
-from hydra.r_scripts import get_script_path
+from hydra_pkg import module_helper as MODULE_HELPER
+from hydra_pkg import helper as HELPER
 import subprocess
 import os
-import numpy as np
-import matplotlib.pyplot as plt
-import pylab
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters
@@ -48,35 +42,6 @@ def init(param):
     MODULE_HELPER.check_parameter(param, key='HTSeq_gft', dtype=str, checkfile=True)
     MODULE_HELPER.check_parameter(param, key='Rscript_exec', dtype=str)
 
-def create_eset(count_file, pheno_file, param):
-    """Wrapper that calls an R script which creates a Bioconductor ExpressionSet
-
-    :Parameter count_file: location of the count file
-    :Parameter pheno_file: location of the phenotype file
-    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    """
-    HELPER.writeLog('Creating ESet ... \n', param)
-    #create a Bioconductor ExpresionSet
-    call = [param['Rscript_exec']]
-    call.append(get_script_path('createRawCountESet.R'))
-    call = call + ['-c', count_file]
-    call = call + ['-a', pheno_file]
-    call = call + ['-o', param['working_dir']]
-    call = call + ['-s', 'htseq']
-    if param['paired']:
-        paired = 'TRUE'
-    else:
-        paired = 'FALSE'
-    call = call + ['-p', paired]
-    output, error = subprocess.Popen(call,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE).communicate()
-    HELPER.writeLog(output, param)
-    HELPER.writeLog(error, param)
-    param['htseq_report'].write('<br><a href="htseq_pca.html">PCA on normalized samples</a>')
-    param['htseq_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
-    param['htseq_report'].write('<img src="htseq_boxplot.png"' +
-                                ' alt="Boxplot of HTSeq counts"><br><br>\n')
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -118,109 +83,25 @@ def process_stat_files(param):
     return table
 
 
-def create_sub_report(param, out_file):
-    """Separate report for all the htseq results in detail
-
-    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    :Parameter out_file: report html filehandle
-    """
-
-    report_file = 'htseq/htseq.html'
-    param['htseq_report'] = open(param['working_dir']+'report/'+report_file, 'w')
-    param['htseq_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
-                                'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
-                                '-strict.dtd"><head><title></title></head><body>\n')
-    param['htseq_report'].write('<center><h1>HTSeq Overview</h1></center>')
-    table = process_stat_files(param)
-    MODULE_HELPER.write_html_table(param,
-                                   table,
-                                   out=param['htseq_report'],
-                                   cell_width=80,
-                                   fcol_width=150,
-                                   deg=315)
-    #create an eSet:
-    create_eset(out_file,
-                param['pheno_file'],
-                param)
-    param['htseq_report'].write('<a href="htseq_stats.txt">'+
-                                'HTSeq statistics as tab delimited txt file</a>')
-    hydra.helper.report_finish(param['htseq_report'])
-
-    #add the fastqc html to the report
-    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
-
-
-
-
-def plot_overview(param):
-
-    #if there is no htseq directory in the report make one
-    htseq_dir = param['working_dir']+'report/htseq/'
-    if not os.path.exists(htseq_dir):
-        os.makedirs(htseq_dir)
-
-    #extract table
-    overview = []
-
-    #total number of aligned reads
-    tot_reads = param['bam_qc']['total_aligned_reads']
-    overview.append(tot_reads)
-    labels = ['Total number of aligned reads']
-
-    htseq_file = param['working_dir']+'results/htseq/htseq_stats.txt'
-    filehandle = open(htseq_file)
-    for line in filehandle.readlines()[1:]:
-        cur_line = line.rstrip().split('\t')
-        labels.append(cur_line[0])
-        perc = (MODULE_HELPER.divide(cur_line[1:],
-                                     tot_reads,
-                                     len(cur_line)-1))
-        overview.append(perc)
-    filehandle.close()
-
-    #make the first plot out of the first 2:
-    fig, ax = plt.subplots()
-    fig.set_size_inches(9, 4)
-    bp = ax.boxplot(overview, patch_artist=True, vert=False)
-
-    #change coloring
-    for box in bp['boxes']:
-        box.set( color='#7570b3', linewidth=2)
-        box.set( facecolor = '#999999' )
-
-    #change caps
-    for cap in bp['caps']:
-        cap.set(color='#7570b3', linewidth=2)
-
-    #change outliers
-    for flier in bp['fliers']:
-        flier.set(marker='o', color='#ff0000', alpha=0.5)
-
-    ax.set_yticklabels(labels)
-                        
-    ax.set_xlim(-5,105)
-
-    #put it into the report
-    filename = 'report/htseq/overview.png'
-    fig.savefig(param['working_dir']+filename,
-                bbox_inches='tight')
-    param['report'].write('<img src="htseq/overview.png" ' +
-                          'alt="overview"><br><br>\n')
-
-
 
 def report(param):
     """Function that writes all HTSeq related statistics into the html report
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+    #if there is no htseq directory in the report make one
+    htseq_dir = param['working_dir']+'report/htseq/'
+    if not os.path.exists(htseq_dir):
+        os.makedirs(htseq_dir)
 
     out_file = param['working_dir']+'deliverables/htseq_raw_counts.txt'
     #report only if there were actually results
     if os.path.exists(out_file):
         param['report'].write('<center><br><br><h2>HTSeq statistics</h2>')
-        plot_overview(param)
-        create_sub_report(param, out_file)
+        table = process_stat_files(param)
+        MODULE_HELPER.create_sub_report(param, out_file, table, 'htseq', 'HTSeq')
+        MODULE_HELPER.plot_count_overview(param, 'htseq')
+        
 
 
 

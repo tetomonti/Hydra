@@ -16,8 +16,7 @@
 This module contains functions for running the cutadapt tool
 """
 
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
+import hydra_pkg.module_helper as MODULE_HELPER
 import os
 import sys
 import subprocess

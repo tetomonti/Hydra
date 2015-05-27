@@ -25,10 +25,8 @@ if __name__ == "__main__":
     import matplotlib
     matplotlib.use('Agg')
     import sys
-    import hydra.pipeline
-    PIPELINE = hydra.pipeline
-    import hydra.helper
-    HELPER = hydra.helper
+    import hydra_pkg.pipeline as PIPELINE
+    import hydra_pkg.helper as HELPER
 
     list_args = sys.argv[1:]
 

@@ -24,17 +24,17 @@ In addition to the workflow, all module specific parameters are initialized here
 before the pipeline starts running and the all module specific reporting functions
 are executed as well.
 """
-import hydra.helper
-HELPER = hydra.helper
-import hydra.fastqc
-import hydra.tophat
-import hydra.bamqc
-import hydra.cufflinks
-import hydra.matched_pairs
-import hydra.cutadapt
-import hydra.htseq
-import hydra.featureCount
-import hydra.star
+import hydra_pkg.helper
+HELPER = hydra_pkg.helper
+import hydra_pkg.fastqc
+import hydra_pkg.tophat
+import hydra_pkg.bamqc
+import hydra_pkg.cufflinks
+import hydra_pkg.matched_pairs
+import hydra_pkg.cutadapt
+import hydra_pkg.htseq
+import hydra_pkg.featureCount
+import hydra_pkg.star
 
 import sys
 
@@ -44,15 +44,15 @@ def initialize_all(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    hydra.cutadapt.init(param)
-    hydra.matched_pairs.init(param)
-    hydra.fastqc.init(param)
-    hydra.tophat.init(param)
-    hydra.bamqc.init(param)
-    hydra.cufflinks.init(param)
-    hydra.htseq.init(param)
-    hydra.featureCount.init(param)
-    hydra.star.init(param)
+    hydra_pkg.cutadapt.init(param)
+    hydra_pkg.matched_pairs.init(param)
+    hydra_pkg.fastqc.init(param)
+    hydra_pkg.tophat.init(param)
+    hydra_pkg.bamqc.init(param)
+    hydra_pkg.cufflinks.init(param)
+    hydra_pkg.htseq.init(param)
+    hydra_pkg.featureCount.init(param)
+    hydra_pkg.star.init(param)
 
 def run_all(param):
     """this function defines the workflow of the pipeline
@@ -113,24 +113,24 @@ def run_all(param):
                               'run_cufflinks',
                               input_files='bam_files',
                               output_files='count_files')
-            hydra.cufflinks.finalize(param,
-                                     input_files='count_files')
+            hydra_pkg.cufflinks.finalize(param,
+                                         input_files='count_files')
 
         if param['run_htseq']:
             HELPER.submit_job(param,
                               'run_htseq',
                               input_files='bam_files',
                               output_files='count_files')
-            hydra.htseq.finalize(param,
-                                 input_files='count_files')
+            hydra_pkg.htseq.finalize(param,
+                                     input_files='count_files')
 
         if param['run_featureCount']:
             HELPER.submit_job(param,
                               'run_featureCount',
                               input_files='bam_files',
                               output_files='count_files')
-            hydra.featureCount.finalize(param,
-                                        input_files='count_files')
+            hydra_pkg.featureCount.finalize(param,
+                                            input_files='count_files')
 
 def report_all(param):
     """this function calls the reporting functions of every module
@@ -138,19 +138,19 @@ def report_all(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     if param['aligner'] != 'skip':
-        hydra.fastqc.report(param,
-                                      input_files='raw_files',
-                                      header='FastQC results on the raw data')
-        hydra.fastqc.report(param,
-                                      input_files='fastq_files',
-                                      header='FastQC results after preprocessing')
-    hydra.bamqc.report(param)
+        hydra_pkg.fastqc.report(param,
+                                input_files='raw_files',
+                                header='FastQC results on the raw data')
+        hydra_pkg.fastqc.report(param,
+                                input_files='fastq_files',
+                                header='FastQC results after preprocessing')
+    hydra_pkg.bamqc.report(param)
     if param['run_cufflinks'] & (not param['paired']):
-        hydra.cufflinks.report(param)
+        hydra_pkg.cufflinks.report(param)
     if param['run_htseq']:
-        hydra.htseq.report(param)
+        hydra_pkg.htseq.report(param)
     if param['run_featureCount']:
-        hydra.featureCount.report(param)
+        hydra_pkg.featureCount.report(param)
 
 
 

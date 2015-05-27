@@ -18,12 +18,11 @@ a wrapper that that runs cufflinks using those parameters on a single sample,
 as well as functions for reporting the results
 """
 
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
-import hydra.helper
-HELPER = hydra.helper
-from hydra.r_scripts import get_script_path
-import os, subprocess
+from hydra_pkg import module_helper as MODULE_HELPER
+from hydra_pkg import helper as HELPER
+from hydra_pkg.r_scripts import get_script_path
+import os
+import subprocess
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters
@@ -52,7 +51,7 @@ def create_sub_report(param):
     param['cufflinks_report'].write('<br><h3>Boxplot of counts in log2 space</h3>')
     param['cufflinks_report'].write('<img src="cufflinks_boxplot.png"' +
                                     ' alt="Boxplot of Cufflinks counts"><br><br>\n')
-    hydra.helper.report_finish(param['cufflinks_report'])
+    HELPER.report_finish(param['cufflinks_report'])
 
     #add the fastqc html to the report
     param['report'].write('<a href="'+report_file+'">Full report</a><br>')

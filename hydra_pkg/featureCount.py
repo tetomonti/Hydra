@@ -19,13 +19,11 @@ In addition it also contains functions to extract and write statistics and
 a wrapper that calls an R script
 """
 
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
-import hydra.helper
-HELPER = hydra.helper
-from hydra.r_scripts import get_script_path
+from hydra_pkg import module_helper as MODULE_HELPER
+from hydra_pkg import helper as HELPER
 import subprocess
 import os
+
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters
@@ -39,41 +37,6 @@ def init(param):
     MODULE_HELPER.check_parameter(param, key='featureCount_gft', dtype=str, checkfile=True)
     MODULE_HELPER.check_parameter(param, key='featureCount_by_meta', dtype=bool)
     MODULE_HELPER.check_parameter(param, key='Rscript_exec', dtype=str)
-
-def create_eset(count_file, pheno_file, param):
-    """Wrapper that calls an R script which creates a Bioconductor ExpressionSet
-
-    :Parameter count_file: location of the count file
-    :Parameter pheno_file: location of the phenotype file
-    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    """
-
-    HELPER.writeLog('Creating ESet ... \n', param)
-    #create a Bioconductor ExpresionSet
-    call = [param['Rscript_exec']]
-    call.append(get_script_path('createRawCountESet.R'))
-    call = call + ['-c', count_file]
-    call = call + ['-a', pheno_file]
-    call = call + ['-o', param['working_dir']]
-    call = call + ['-s', 'featureCount']
-    if param['paired']:
-        paired = 'TRUE'
-    else:
-        paired = 'FALSE'
-    call = call + ['-p', paired]
-    output, error = subprocess.Popen(call,
-                                     stdout=subprocess.PIPE,
-                                     stderr=subprocess.PIPE).communicate()
-    HELPER.writeLog(output, param)
-    HELPER.writeLog(error, param)
-    param['feature_report'].write('<br><a href="featureCount_pca.html"' +
-                                  '>PCA on normalized samples</a>')
-    param['feature_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
-    param['feature_report'].write('<img src="featureCount_boxplot.png"' +
-                                  ' alt="Boxplot of featureCount counts"><br><br>\n')
-
-
-
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -117,40 +80,7 @@ def process_stat_files(param):
     return table
 
 
-
-def create_sub_report(param, out_file):
-    """Separate report for all the featureCount results in detail
-
-    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
-    :Parameter out_file: report html filehandle
-    """    
-    
-    report_file = 'featureCount/featureCount.html'
-    param['feature_report'] = open(param['working_dir']+'report/'+report_file, 'w')
-    param['feature_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
-                                'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
-                                '-strict.dtd"><head><title></title></head><body>\n')
-    param['feature_report'].write('<center><h1>HTseq Overview</h1></center>')
-    table = process_stat_files(param)
-    MODULE_HELPER.write_html_table(param,
-                                   table,
-                                   out=param['feature_report'],
-                                   cell_width=80,
-                                   fcol_width=150,
-                                   deg=315)
-    #create an eSet:
-    create_eset(out_file,
-                param['pheno_file'],
-                param)
-    param['feature_report'].write('<a href="featureCount_stats.txt">'+
-                              'featureCount statistics as tab delimited txt file</a>')
-    hydra.helper.report_finish(param['feature_report'])
-
-    #add the fastqc html to the report
-    param['report'].write('<a href="'+report_file+'">Full report</a><br>')
-    
-    
-    
+  
 def report(param):
     """Function that writes all HTSeq related statistics into the html report
 
@@ -163,8 +93,10 @@ def report(param):
     #report only if there were actually results
     out_file = param['working_dir']+'deliverables/featureCount_raw_counts.txt'
     if os.path.exists(out_file):
-        param['report'].write('<center><br><br><h2>featureCount statistics</h2>')
-        create_sub_report(param, out_file)                                    
+        param['report'].write('<center><br><br><h2>FeatureCount statistics</h2>')
+        table = process_stat_files(param)
+        MODULE_HELPER.create_sub_report(param, out_file, table, 'featureCount', 'FeatureCount')                                
+        MODULE_HELPER.plot_count_overview(param, 'featureCount')
                                        
                                        
 def finalize(param, input_files='count_files'):

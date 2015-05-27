@@ -19,9 +19,8 @@ report html
 """
 import os
 import subprocess
-import hydra.helper
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
+from hydra_pkg import helper as HELPER
+from hydra_pkg import module_helper as MODULE_HELPER
 import numpy as np
 import matplotlib.pyplot as plt
 import pylab
@@ -129,10 +128,10 @@ def create_overview_table(param):
                  MODULE_HELPER.get_percentage(number1=param['bam_qc']['reads_with_deletions'],
                                               number2=param['bam_qc']['total_aligned_reads'],
                                               ntotal=num_s))
-    MODULE_HELPER.write_html_table(param,
-                                   table,
-                                   out=param['bamqc_report'],
-                                   cell_width=65)
+    HELPER.write_html_table(param,
+                            table,
+                            out=param['bamqc_report'],
+                            cell_width=65)
 
 def read_raw_bamqc(param):
     """Reads the raw output from the bamqc run of a single bamqc run
@@ -504,7 +503,7 @@ def plot_overview(param):
 
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
-    fig.set_size_inches(9, 4)
+    fig.set_size_inches(9, len(overview) / 2 + 0.5)
     bp = ax.boxplot(overview, patch_artist=True, vert=False)
 
     #change coloring
@@ -529,7 +528,7 @@ def plot_overview(param):
                         'Percent uniquely aligned',
                         'Percent aligned'])
                         
-    ax.set_xlim(-5,max(105,max(overview[7])+5))
+    ax.set_xlim(-5,105)
 
     #put it into the report
     filename = 'report/bamqc/overview.png'
@@ -538,6 +537,37 @@ def plot_overview(param):
     param['report'].write('<img src="bamqc/overview.png" ' +
                           'alt="overview"><br><br>\n')
 
+def plot_total_number_reads(param):
+
+    #total number of aligned reads
+    overview = [param['bam_qc']['total_aligned_reads']]
+
+    #make the first plot out of the first 2:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(9, 1.2)
+    bp = ax.boxplot(overview, patch_artist=True, vert=False)
+
+    #change coloring
+    for box in bp['boxes']:
+        box.set( color='#7570b3', linewidth=2)
+        box.set( facecolor = '#999999' )
+
+    #change caps
+    for cap in bp['caps']:
+        cap.set(color='#7570b3', linewidth=2)
+
+    #change outliers
+    for flier in bp['fliers']:
+        flier.set(marker='o', color='#ff0000', alpha=0.5)
+
+    ax.set_yticklabels(['Total number of aligned reads'])
+    ax.set_xlim(-5,max(overview[0]) * 1.05)
+
+    #put it into the report
+    filename = param['working_dir']+'report/bamqc/total_reads.png'
+    fig.savefig(filename, bbox_inches='tight')
+    param['report'].write('<img src="bamqc/total_reads.png" ' +
+                          'alt="overview"><br><br>\n')
 
 
 def report(param):
@@ -557,22 +587,24 @@ def report(param):
                                     'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                     '-strict.dtd"><head><title></title></head><body>\n')
         param['bamqc_report'].write('<center><h1>Bam QC Report</h1></center>')
-
-        create_overview_table(param)
         param['bamqc_report'].write('<a href="bamqc/overview.txt">' +
                                     'QC results as tab delimited file</a><br><br><br>')
+        create_overview_table(param)
         plot_alignment_overview(param)
         plot_mismatches(param)
         plot_paired_singleton(param)
         plot_spliced_reads(param)
         plot_insert_reads(param)
         plot_delete_reads(param)
-        hydra.helper.report_finish(param['bamqc_report'])
+        HELPER.report_finish(param['bamqc_report'])
 
         #add the bamqc html to the report
         param['report'].write('<a href="bamqc/bamqc.html">Full report</a><br>')
-        #add an overview plot for bamqc
+
+        #Overview plots in the main report
+        plot_total_number_reads(param)
         plot_overview(param)
+
     else:
         param['report'].write('There were no results to show.')
 

@@ -8,5 +8,5 @@ recursive-exclude * *.py[co]
 
 recursive-include docs *.rst conf.py Makefile make.bat
 
-include hydra/r_scripts/*.R
-include hydra/Icons/*.png
+include hydra_pkg/r_scripts/*.R
+include hydra_pkg/Icons/*.png

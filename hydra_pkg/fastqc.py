@@ -24,10 +24,8 @@ import csv
 import numpy as np
 import matplotlib.pyplot as plt
 import pylab
-import hydra.helper
-import hydra.module_helper
-MODULE_HELPER = hydra.module_helper
-
+from hydra_pkg import helper as HELPER
+from hydra_pkg import module_helper as MODULE_HELPER
 
 
 def copy_files(param, input_files):
@@ -100,7 +98,7 @@ def create_overview_table(param, out):
     #extract check marks
     table = table+extract_tables(param)
     #write the table as html
-    MODULE_HELPER.write_html_table(param, table, out)
+    HELPER.write_html_table(param, table, out)
 
 def extract_tables(param):
     """Extracts all relevant information for the overview table and writes it
@@ -343,7 +341,7 @@ def report(param, input_files='fastq_files', header='FastQC results'):
         plot_gc_content(param, input_files, param['fastqc_report'])
 
 
-        hydra.helper.report_finish(param['fastqc_report'])
+        HELPER.report_finish(param['fastqc_report'])
 
         #add the fastqc html to the report
         param['report'].write('<a href="'+report_file+'">Full report</a><br>')
