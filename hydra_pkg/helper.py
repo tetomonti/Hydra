@@ -91,7 +91,14 @@ def initialize_qsub(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    qsub_module.initialize_qsub(param)
+    check_parameter(param, key='qsub_email', dtype=str)
+    check_parameter(param, key='qsub_send_email', dtype=bool)
+    check_parameter(param, key='qsub_memory', dtype=str)
+    check_parameter(param, key='qsub_PROJECT', dtype=str)
+    check_parameter(param, key='qsub_MACHINE', dtype=str)
+    check_parameter(param, key='qsub_RUNTIME_LIMIT', dtype=str)
+    check_parameter(param, key='qsub_wait_time', dtype=int)
+    check_parameter(param, key='qsub_num_processors', dtype=str)
 
 def clean_up(param):
     """Remove all old results

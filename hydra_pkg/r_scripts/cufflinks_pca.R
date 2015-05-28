@@ -95,9 +95,9 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(data)>1){
       
    #remove the raw file names
    if (paired == 'TRUE'){
-      annot<-annot[,-(1:2)]
+      annot<-as.matrix(annot[,-(1:2)])
    }else{
-      annot<-annot[,-1]
+      annot<-as.matrix(annot[,-1])
    }
    
    # do a PCA

@@ -3,7 +3,7 @@
 
 
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup
 except ImportError:
     from distutils.core import setup
 
@@ -26,7 +26,7 @@ setup(
     author='Monti Lab',
     author_email='smonti@bu.edu',
     url='https://github.com/montilab/Hydra',
-    packages=find_packages('hydra_pkg'),
+    packages=['hydra_pkg'],
     include_package_data=True,
     install_requires=requirements,
     license="BSD",

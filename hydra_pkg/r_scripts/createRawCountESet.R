@@ -12,6 +12,16 @@
 #See the License for the specific language governing permissions and
 #limitations under the License.
 
+
+############
+#these are test parameters
+#out_dir='./'
+#counts_file<-'deliverables/htseq_raw_counts.txt'
+#annot_file<-'deliverables/sample_info.txt'
+#stub='htseq'
+#paired='TRUE'
+
+
 ###################################################################
 #Parameter handling
 ###################################################################
@@ -40,11 +50,6 @@ annot_file<-chkPars('-a',keys,values)
 paired<-chkPars('-p',keys,values)
 stub<-chkPars('-s',keys,values)
 
-out_dir='./'
-counts_file<-'deliverables/htseq_raw_counts.txt'
-annot_file<-'deliverables/sample_info.txt'
-stub='htseq'
-paired='TRUE'
 
 ###################################################################
 #Output raw files
@@ -111,13 +116,13 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
    
    #remove the raw file names
    if (paired == 'TRUE'){
-      annot<-annot[,-(1:2)]
+      annot<-as.matrix(annot[,-(1:2)])
    }else{
-      annot<-annot[,-1]
+      annot<-as.matrix(annot[,-1])
    }
    
    # do a PCA
-   all<-prcomp(t(log2(exprs(eSet)+1)))
+   all<-prcomp(t(exprs(eSet)))
    all<-all$x[,1:2]
    all<-all/apply(all,2,max)
    
@@ -146,7 +151,7 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
 #Additional QC
 ###################################################################
 
-exp<-as.matrix(log2(exprs(eSet)+1))
+exp<-as.matrix(exprs(eSet))
 exp<-as.matrix(exp[order(apply(exp,1,mad),decreasing = T)[1:5000],])
 
 png(paste0(out_dir,'report/',stub,'/',stub,'_boxplot.png'),

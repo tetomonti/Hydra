@@ -20,7 +20,6 @@ finish.
 import os
 import time
 import subprocess
-from hydra_pkg import module_helper as MODULE_HELPER
 from hydra_pkg.logs import writeLog
 
 def initialize_qsub(param):
@@ -28,14 +27,6 @@ def initialize_qsub(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
-    MODULE_HELPER.check_parameter(param, key='qsub_email', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='qsub_send_email', dtype=bool)
-    MODULE_HELPER.check_parameter(param, key='qsub_memory', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='qsub_PROJECT', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='qsub_MACHINE', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='qsub_RUNTIME_LIMIT', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='qsub_wait_time', dtype=int)
-    MODULE_HELPER.check_parameter(param, key='qsub_num_processors', dtype=str)
 
 
 def wait_for_qsub(param, job_id):

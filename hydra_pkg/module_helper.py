@@ -17,11 +17,14 @@ Contains all helper functions that are relevant for the wrappers that run
 an external tool on each samples.
 """
 
-import hydra_pkg.helper
+import hydra_pkg.helper as HELPER
 import os
 import sys
 import matplotlib.pyplot as plt
 import subprocess
+import getopt
+import json
+import re
 from hydra_pkg.r_scripts import get_script_path
 
 def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=False):
@@ -38,12 +41,12 @@ def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=Fal
     :Parameter optional: indicates a parameter is optional, if it doesn't exits
                          it will be created
     """
-    hydra_pkg.helper.check_parameter(param=param,
-                                     key=key,
-                                     dtype=dtype,
-                                     allowed=allowed,
-                                     checkfile=checkfile,
-                                     optional=optional)
+    HELPER.check_parameter(param=param,
+                           key=key,
+                           dtype=dtype,
+                           allowed=allowed,
+                           checkfile=checkfile,
+                           optional=optional)
 
 
 def get_percentage(number1, number2, ntotal):
@@ -86,10 +89,6 @@ def initialize_module():
     the pipeline is run in resume mode, so it skips the entire module run
     if this step has been completed successfully.
     """
-
-    #Import modules
-    import getopt
-    import json
 
     working_dir = './'
     #Check arguments
@@ -261,7 +260,7 @@ def plot_count_overview(param, stub):
     filehandle = open(stats_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        labels.append(cur_line[0])
+        labels.append(re.sub(r'_',' ',cur_line[0]))
         perc = (divide(cur_line[1:],
                 tot_reads,
                 len(cur_line)-1))
@@ -306,7 +305,7 @@ def create_eset(count_file, pheno_file, param, stub):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter stub: stub indicating the module we are working with    
     """
-    hydra_pkg.helper.writeLog('Creating ESet ... \n', param)
+    HELPER.writeLog('Creating ESet ... \n', param)
     #create a Bioconductor ExpresionSet
     call = [param['Rscript_exec']]
     call.append(get_script_path('createRawCountESet.R'))
@@ -322,8 +321,8 @@ def create_eset(count_file, pheno_file, param, stub):
     output, error = subprocess.Popen(call,
                                      stdout=subprocess.PIPE,
                                      stderr=subprocess.PIPE).communicate()
-    hydra_pkg.helper.writeLog(output, param)
-    hydra_pkg.helper.writeLog(error, param)
+    HELPER.writeLog(output, param)
+    HELPER.writeLog(error, param)
     param['module_report'].write('<br><a href="' + stub + '_pca.html">PCA on normalized samples</a>')
     param['module_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
     param['module_report'].write('<img src="' + stub + '_boxplot.png"' +
@@ -344,7 +343,7 @@ def create_sub_report(param, out_file, table, stub, title):
                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                 '-strict.dtd"><head><title></title></head><body>\n')
     param['module_report'].write('<center><h1>' + title + 'Overview</h1></center>')
-    hydra_pkg.helper.write_html_table(param,
+    HELPER.write_html_table(param,
                                       table,
                                       out=param['module_report'],
                                       cell_width=80,
@@ -357,7 +356,7 @@ def create_sub_report(param, out_file, table, stub, title):
                 param['pheno_file'],
                 param,
                 stub)
-    hydra_pkg.helper.report_finish(param['module_report'])
+    HELPER.report_finish(param['module_report'])
 
     #add the fastqc html to the report
     param['report'].write('<a href="'+report_file+'">Full report</a><br>')

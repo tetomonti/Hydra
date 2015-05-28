@@ -51,8 +51,8 @@ test:
      - python 2.7*
 
    commands:
-    - python2.7 -c "import hydra"
-    - python2.7 -c "import hydra.pipeline"
+    - python2.7 -c "import hydra_pkg"
+    - python2.7 -c "import hydra_pkg.pipeline"
     - hydra -h
 
 about:

@@ -108,7 +108,7 @@ def run_all(param):
                           input_files='bam_files')
 
         #Getting the counts:
-        if param['run_cufflinks'] & (not param['paired']):
+        if param['run_cufflinks'] & param['paired']:
             HELPER.submit_job(param,
                               'run_cufflinks',
                               input_files='bam_files',
@@ -145,7 +145,7 @@ def report_all(param):
                                 input_files='fastq_files',
                                 header='FastQC results after preprocessing')
     hydra_pkg.bamqc.report(param)
-    if param['run_cufflinks'] & (not param['paired']):
+    if param['run_cufflinks'] & param['paired']:
         hydra_pkg.cufflinks.report(param)
     if param['run_htseq']:
         hydra_pkg.htseq.report(param)

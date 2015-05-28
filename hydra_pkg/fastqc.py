@@ -92,7 +92,7 @@ def create_overview_table(param, out):
     #link to overview files
     temp = ['Full report']
     for stub in param['fastqc_stub']:
-        temp.append('<a href="'+stub+
+        temp.append('<a href="fastqc/'+stub+
                     '_fastqc/fastqc_report.html"><img src="Icons/fastqc_icon.png"></a>')
     table.append(temp)
     #extract check marks
