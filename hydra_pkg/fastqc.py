@@ -80,12 +80,12 @@ def create_overview_table(param, out):
     #create a table
     table = []
     #put in headers
-    table.append([stub for stub in param['fastqc_stub']])
+    table.append([stub.split('/')[0] for stub in param['fastqc_stub']])
     #link to summary files
 
     temp = ['Summary files']
     for stub in param['fastqc_stub']:
-        temp.append('<a href="'+stub+
+        temp.append('<a href="fastqc/'+stub+
                     '_fastqc/fastqc_data.txt">raw</a>')
     table.append(temp)
 
@@ -98,7 +98,7 @@ def create_overview_table(param, out):
     #extract check marks
     table = table+extract_tables(param)
     #write the table as html
-    HELPER.write_html_table(param, table, out)
+    HELPER.write_html_table(param, table, out, cell_width=30)
 
 def extract_tables(param):
     """Extracts all relevant information for the overview table and writes it
@@ -249,8 +249,8 @@ def plot_number_of_reads(param, output_files, out):
                 alpha=opacity,
                 color='b')
     plt.xlabel('Samples')
-    plt.ylabel('Total number of reads')
-    plt.title('Total number of reads across samples')
+    plt.ylabel('Number of reads')
+    plt.title('Total number of reads')
     ticks = param['fastqc_stub']
     plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.tight_layout()
