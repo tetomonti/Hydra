@@ -64,17 +64,18 @@ def process_stat_files(param):
     filehandle.close()
 
     #total number of aligned reads
-    tot_reads = (['Total number of aligned reads']+
-                 param['bam_qc']['total_aligned_reads'])
+    tot_reads = (['Number of uniquely aligned reads']+
+                 param['bam_qc']['unique_aligned_reads'])
     table.append(tot_reads)
 
     filehandle = open(featurecount_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        perc = ([cur_line[0]]+
-                MODULE_HELPER.get_percentage(cur_line[1:],
-                                             tot_reads[1:],
-                                             len(cur_line)-1))
+        if cur_line[0] != 'Unassigned_MultiMapping':
+            perc = ([cur_line[0]]+
+                    MODULE_HELPER.get_percentage(cur_line[1:],
+                                                 tot_reads[1:],
+                                                 len(cur_line)-1))
         table.append(perc)
     filehandle.close()
     return table
@@ -96,7 +97,7 @@ def report(param):
         param['report'].write('<center><br><br><h2>FeatureCount statistics</h2>')
         table = process_stat_files(param)
         MODULE_HELPER.create_sub_report(param, out_file, table, 'featureCount', 'FeatureCount')                                
-        MODULE_HELPER.plot_count_overview(param, 'featureCount')
+        MODULE_HELPER.plot_count_overview(param, 'featureCount', table)
                                        
                                        
 def finalize(param, input_files='count_files'):

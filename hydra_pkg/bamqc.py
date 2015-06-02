@@ -375,8 +375,8 @@ def plot_paired_singleton(param):
     rects3 = plt.bar(index, single, bar_width, alpha=opacity, color='g')
 
     plt.xlabel('Samples')
-    plt.ylabel('Number of single / paired reads')
-    plt.title('Number of single/paired/proper paired reads across samples')
+    plt.ylabel('Number of single / paired / proper paired reads')
+    plt.title('Number of reads by type')
     ticks = param['bamqc_stub']
     plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.legend((rects1[0],
@@ -540,11 +540,12 @@ def plot_overview(param):
 def plot_total_number_reads(param):
 
     #total number of aligned reads
-    overview = [param['bam_qc']['total_aligned_reads']]
-
+    overview = [param['bam_qc']['total_aligned_reads'], 
+                param['num_total_reads']]
+    
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
-    fig.set_size_inches(9, 1.2)
+    fig.set_size_inches(9, 2)
     bp = ax.boxplot(overview, patch_artist=True, vert=False)
 
     #change coloring
@@ -560,7 +561,7 @@ def plot_total_number_reads(param):
     for flier in bp['fliers']:
         flier.set(marker='o', color='#ff0000', alpha=0.5)
 
-    ax.set_yticklabels(['Total number of aligned reads'])
+    ax.set_yticklabels(['Number of alignments','Number of reads'])
     ax.set_xlim(-5,max(overview[0]) * 1.05)
 
     #put it into the report
@@ -587,7 +588,7 @@ def report(param):
                                     'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                     '-strict.dtd"><head><title></title></head><body>\n')
         param['bamqc_report'].write('<center><h1>Bam QC Report</h1></center>')
-        param['bamqc_report'].write('<a href="bamqc/overview.txt">' +
+        param['bamqc_report'].write('<a href="overview.txt">' +
                                     'QC results as tab delimited file</a><br><br><br>')
         create_overview_table(param)
         plot_alignment_overview(param)

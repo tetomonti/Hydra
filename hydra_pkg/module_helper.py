@@ -67,11 +67,10 @@ def get_percentage(number1, number2, ntotal):
     
     for idx in range(ntotal):
         percent[idx] = round(float(number1[idx])/float(number2[idx])*100, 2)
-    return [str(round(pc, 1))+'%' for pc in percent]
+    return percent
 
 def divide(num1, num2, ntotal):
     """helper function that returns percentages from 2 arrays
-
     :Parameter number1: array of numerators
     :Parameter number2: array of denominators
     :Parameter ntotal: length of the arrays
@@ -237,7 +236,7 @@ def wrapup_module(param, new_working_file=[], remove_intermediate=False):
     param['file_handle'].close()
     
     
-def plot_count_overview(param, stub):
+def plot_count_overview(param, stub, table):
     """Function that plot the overview boxplots for featureCounts and HTSeq
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -245,28 +244,10 @@ def plot_count_overview(param, stub):
     """
     
     #extract table
-    overview = []
-    labels = []
+    table = table[1:]
+    overview = [[float(tb) for tb in tab[1:]] for tab in table]
+    labels = [tab[0] for tab in table]
  
-    #total number of aligned reads:
-    tot_reads = param['bam_qc']['total_aligned_reads']
-
-    #if we have paired end reads we need to divide by 2 to get fragments rather than reads
-    if param['paired']:
-        tot_reads = [reads / 2 for reads in tot_reads]
-
-    #read in stats file
-    stats_file = param['working_dir']+'results/'+stub+'/'+stub+'_stats.txt'
-    filehandle = open(stats_file)
-    for line in filehandle.readlines()[1:]:
-        cur_line = line.rstrip().split('\t')
-        labels.append(re.sub(r'_',' ',cur_line[0]))
-        perc = (divide(cur_line[1:],
-                tot_reads,
-                len(cur_line)-1))
-        overview.append(perc)
-    filehandle.close()
-
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
     fig.set_size_inches(9, len(labels) / 2 + 0.5)
@@ -293,6 +274,7 @@ def plot_count_overview(param, stub):
     fig.savefig(filename, bbox_inches='tight')
     param['report'].write('<img src="'+stub+'/overview.png" ' +
                           'alt="overview"><br><br>\n')
+    param['report'].write('(Percentages based on uniquely aligned reads.)\n')
 
 
 
@@ -344,11 +326,11 @@ def create_sub_report(param, out_file, table, stub, title):
                                 '-strict.dtd"><head><title></title></head><body>\n')
     param['module_report'].write('<center><h1>' + title + 'Overview</h1>')
     HELPER.write_html_table(param,
-                                      table,
-                                      out=param['module_report'],
-                                      cell_width=80,
-                                      fcol_width=150,
-                                      deg=315)
+                            table,
+                            out=param['module_report'],
+                            cell_width=80,
+                            fcol_width=150,
+                            deg=315)
     param['module_report'].write('<a href="' + stub +'_stats.txt">' + title +
                                 ' statistics as tab delimited txt file</a>')
     #create an eSet:

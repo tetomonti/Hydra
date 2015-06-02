@@ -67,19 +67,25 @@ def process_stat_files(param):
     filehandle.close()
 
     #total number of aligned reads
-    tot_reads = ['Total number of aligned reads']+param['bam_qc']['total_aligned_reads']
+    tot_reads = ['Number of uniquely aligned reads']+param['bam_qc']['unique_aligned_reads']
     table.append(tot_reads)
 
+    counter = [0] * len(param['bam_qc']['unique_aligned_reads'])
     filehandle = open(htseq_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        perc = ([cur_line[0]]+
-                MODULE_HELPER.get_percentage(cur_line[1:],
-                                             tot_reads[1:],
-                                             len(cur_line)-1))
-        table.append(perc)
-
+        if cur_line[0] != '__alignment_not_unique':
+            counter = [ct + int(cr) for ct, cr in zip(counter, cur_line[1:])]
+            perc = ([cur_line[0]]+
+                    MODULE_HELPER.get_percentage(cur_line[1:],
+                                                 tot_reads[1:],
+                                                 len(cur_line)-1))
+            table.append(perc)
     filehandle.close()
+    perc = ['feature'] + MODULE_HELPER.get_percentage(counter,
+                                                      tot_reads[1:],
+                                                      len(counter))     
+    table.append(perc)
     return table
 
 
@@ -100,7 +106,7 @@ def report(param):
         param['report'].write('<center><br><br><h2>HTSeq statistics</h2>')
         table = process_stat_files(param)
         MODULE_HELPER.create_sub_report(param, out_file, table, 'htseq', 'HTSeq')
-        MODULE_HELPER.plot_count_overview(param, 'htseq')
+        MODULE_HELPER.plot_count_overview(param, 'htseq', table)
         
 
 

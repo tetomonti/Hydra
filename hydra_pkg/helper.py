@@ -517,7 +517,7 @@ def report_finish(outhandle):
                     'margin:20px;}#one-column-emphasis th{font-size:'+
                     '14px;font-weight:normal;color:#039;padding:12px'+
                     ' 15px;}#one-column-emphasis td{color:#669;border'+
-                    '-top:1px solid #e8edff;padding:10px 15px;}.oce-'+
+                    '-top:1px solid #e8edff;padding:5px 5px;}.oce-'+
                     'first{background:#d0dafd;border-right:10px solid'+
                     ' transparent;border-left:10px solid transparent;}'+
                     '#one-column-emphasis tr:hover td{color:#339;'+
@@ -581,7 +581,7 @@ def report_start(param):
     param['report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
                           'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                           '-strict.dtd"><head><title></title></head><body>\n')
-    param['report'].write('<center><br><h1>RNASeq Report</h1>')
+    param['report'].write('<center><br><h1>Hydra Report</h1>')
     copy_and_link(param, 'parameter_file', 'Parameter file')
     copy_and_link(param, 'raw_filenames', 'Raw files')
 
@@ -612,7 +612,7 @@ def rotate_word(word, deg=270):
            ' /* IE8 */">' +word+'</div>')
 
 
-def write_html_table(param, table, out, fcol_width=200, cell_width=50, initial_breaks=8, deg=315):
+def write_html_table(param, table, out, fcol_width=250, cell_width=50, initial_breaks=5, deg=315):
     """HTML table writing function that takes a table and writes it nicely out
     as an html table
 
