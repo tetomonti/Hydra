@@ -20,8 +20,9 @@ a wrapper that calls an R script
 """
 from hydra_pkg import module_helper as MODULE_HELPER
 from hydra_pkg import helper as HELPER
-import subprocess
 import os
+import re
+import subprocess
 
 def init(param):
     """Initialization function that checks the all relevant tophat parameters
@@ -67,24 +68,24 @@ def process_stat_files(param):
     filehandle.close()
 
     #total number of aligned reads
-    tot_reads = ['Number of uniquely aligned reads']+param['bam_qc']['unique_aligned_reads']
-    table.append(tot_reads)
+    tot_reads = param['bam_qc']['unique_aligned_reads']
 
     counter = [0] * len(param['bam_qc']['unique_aligned_reads'])
     filehandle = open(htseq_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        if cur_line[0] != '__alignment_not_unique':
+        cur_line[0] = re.sub(r'_',' ',cur_line[0])
+        if cur_line[0] != '  alignment not unique':
             counter = [ct + int(cr) for ct, cr in zip(counter, cur_line[1:])]
             perc = ([cur_line[0]]+
                     MODULE_HELPER.get_percentage(cur_line[1:],
-                                                 tot_reads[1:],
+                                                 tot_reads,
                                                  len(cur_line)-1))
             table.append(perc)
     filehandle.close()
     perc = ['feature'] + MODULE_HELPER.get_percentage(counter,
-                                                      tot_reads[1:],
-                                                      len(counter))     
+                                                      tot_reads,
+                                                      len(counter))
     table.append(perc)
     return table
 
@@ -107,8 +108,6 @@ def report(param):
         table = process_stat_files(param)
         MODULE_HELPER.create_sub_report(param, out_file, table, 'htseq', 'HTSeq')
         MODULE_HELPER.plot_count_overview(param, 'htseq', table)
-        
-
 
 
 def finalize(param, input_files='count_files'):

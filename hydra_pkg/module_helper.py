@@ -246,7 +246,7 @@ def plot_count_overview(param, stub, table):
     #extract table
     table = table[1:]
     overview = [[float(tb) for tb in tab[1:]] for tab in table]
-    labels = [tab[0] for tab in table]
+    labels = [re.sub(r'_',' ',tab[0]) for tab in table]
  
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
@@ -325,14 +325,22 @@ def create_sub_report(param, out_file, table, stub, title):
                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                 '-strict.dtd"><head><title></title></head><body>\n')
     param['module_report'].write('<center><h1>' + title + 'Overview</h1>')
+    
+    #before writing the table add  uniquely aligned reads
+    tot_reads = ['Number of uniquely aligned reads']+param['bam_qc']['unique_aligned_reads']
+    table.append(tot_reads)
+    
     HELPER.write_html_table(param,
                             table,
                             out=param['module_report'],
                             cell_width=80,
-                            fcol_width=150,
+                            fcol_width=200,
                             deg=315)
     param['module_report'].write('<a href="' + stub +'_stats.txt">' + title +
                                 ' statistics as tab delimited txt file</a>')
+
+    table.pop()
+
     #create an eSet:
     create_eset(out_file,
                 param['pheno_file'],

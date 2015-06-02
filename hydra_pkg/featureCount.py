@@ -21,8 +21,10 @@ a wrapper that calls an R script
 
 from hydra_pkg import module_helper as MODULE_HELPER
 from hydra_pkg import helper as HELPER
-import subprocess
 import os
+import re
+import subprocess
+
 
 
 def init(param):
@@ -64,17 +66,16 @@ def process_stat_files(param):
     filehandle.close()
 
     #total number of aligned reads
-    tot_reads = (['Number of uniquely aligned reads']+
-                 param['bam_qc']['unique_aligned_reads'])
-    table.append(tot_reads)
+    tot_reads = param['bam_qc']['unique_aligned_reads']
 
     filehandle = open(featurecount_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
-        if cur_line[0] != 'Unassigned_MultiMapping':
+        cur_line[0] = re.sub(r'_',' ',cur_line[0])
+        if cur_line[0] != 'Unassigned MultiMapping':
             perc = ([cur_line[0]]+
                     MODULE_HELPER.get_percentage(cur_line[1:],
-                                                 tot_reads[1:],
+                                                 tot_reads,
                                                  len(cur_line)-1))
         table.append(perc)
     filehandle.close()
@@ -98,8 +99,8 @@ def report(param):
         table = process_stat_files(param)
         MODULE_HELPER.create_sub_report(param, out_file, table, 'featureCount', 'FeatureCount')                                
         MODULE_HELPER.plot_count_overview(param, 'featureCount', table)
-                                       
-                                       
+
+
 def finalize(param, input_files='count_files'):
     """This function is run after featureCount is run on each sample. It collects all results
     and puts them into a file
