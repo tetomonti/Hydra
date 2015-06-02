@@ -152,7 +152,7 @@ Rscript_exec  =  Rscript
 ############################################################################################################################################
 #featureCount
 ############################################################################################################################################
-featureCount_exec     = /restricted/projectnb/montilab-p/personal/liye/shared/tools/Subread/subread-1.4.6-Linux-x86_64/bin/featureCounts
+featureCount_exec     = featureCounts
 featureCount_gft      = /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Annotation/Archives/archive-2014-05-23-16-03-55/Genes/genes.gtf
 featureCount_s        = 0      #stranded? (0 (unstranded), 1 (stranded) and 2(reversely stranded)); 0 by default
 featureCount_t        = exon   #Feature level over which read summarization will be performed. 'exon' by default
