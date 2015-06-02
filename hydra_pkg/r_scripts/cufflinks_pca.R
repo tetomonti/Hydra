@@ -88,42 +88,40 @@ plotCov<-function(idx,annot,all,stub,con){
 
 #run PCA for all the samples
 #only if clickme is installed and there is more than 1 sample
-if ('clickme' %in% rownames(installed.packages()) & ncol(data)>1){
-   library(clickme)
-   #if the clickme directory does not work create it
-   dir.create(file.path(paste0(out_dir,'report/'), 'clickme'), showWarnings = FALSE)
-      
-   #remove the raw file names
-   if (paired == 'TRUE'){
-      annot<-as.matrix(annot[,-(1:2)])
-   }else{
-      annot<-as.matrix(annot[,-1])
-   }
-   
-   # do a PCA
-   all<-prcomp(t(log2(data+1)))
-   all<-all$x[,1:2]
-   all<-all/apply(all,2,max)
-
-   #plot the pca   
-   con<-file(paste0(out_dir,'report/',stub,'/',stub,'_pca.html'),open='w')
-   
-   #always plot the sample names, just in case
-   plotCov(1,annot,all,stub,con)
-   annot<-annot[,-1]
-   
-   #and then plot all covariates that have more than 1 and equal or less than 10 levels/classes
-   no_levels<-apply(annot,2,function(x)length(unique(x)))
-   valid_indices<-(1:ncol(annot))[no_levels>1 & no_levels<=10]
-   
-   #only if there is actually something to plot
-   if (length(valid_indices)>0){   
-      sapply(valid_indices,plotCov,annot,all,stub,con)
-   }
-   
-   #close the html file
-   close(con) 
+if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
+  suppressMessages(library(clickme))
+  #if the clickme directory does not work create it
+  dir.create(file.path(paste0(out_dir,'report/'), 'clickme'), showWarnings = FALSE)
+  
+  header <- colnames(annot)
+  #remove the raw file names
+  if (paired == 'TRUE'){
+    annot<-as.matrix(annot[,-(1:2)])
+    colnames(annot)<-header[-(1:2)]
+  }else{
+    annot<-as.matrix(annot[,-1])
+    colnames(annot)<-header[-1]
+  }
+  
+  # do a PCA
+  all<-prcomp(t(exprs(eSet)))
+  all<-all$x[,1:2]
+  all<-all/apply(all,2,max)
+  
+  #plot the pca   
+  con<-file(paste0(out_dir,'report/',stub,'/',stub,'_pca.html'),open='w')
+  
+  #and then plot all covariates that have more than 1 and equal or less than 10 levels/classes
+  no_levels<-apply(annot,2,function(x)length(unique(x)))[-1]
+  valid_indices<-c(1,(1:ncol(annot))[no_levels>1 & no_levels<=10])
+  
+  #only if there is actually something to plot
+  sapply(valid_indices,plotCov,annot,all,stub,con)
+  
+  #close the html file
+  close(con) 
 }
+
 
 
 ###################################################################
