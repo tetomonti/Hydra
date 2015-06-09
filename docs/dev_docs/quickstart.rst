@@ -13,108 +13,44 @@ Below are all the steps you need to make changes to the pipeline.
 
 .. note::
 
-   If you're using SCC (BU's cluster), conda is available as part of the
-   `anaconda` module
+   If you're using a module system such as on the shared computing cluster (SCC) at Boston University you can just load a preinstalled version:
 
    .. code:: bash
 
+     module purge
      module load anaconda/2.2.0
 
 
 2. Create Dev Environment
 =========================
-
 Use `conda` to install a basic developement environment::
   
   conda create \
     -p ./dev_env \
-    --override-channels \
-    -c 'file:///restricted/projectnb/montilab-p/projects/pipeline_dev/conda_build_space' \
-    -c 'defaults' \
+    -c https://conda.binstar.org/montilab \
     --yes \
     hydra
 
-Alternatively, you can just install the dependencies:
+This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
-  conda create \
-    -p ./dev_env \
-    --override-channels \
-    -c 'file:///restricted/projectnb/montilab-p/conda_channel' \
-    -c 'defaults' \
-    --yes \
-    samtools \
-    bowtie2 \
-    cufflinks \
-    cutadapt \
-    fastqc \
-    htseq \
-    pysam \
-    r=3.0.0 \
-    subread \
-    tophat \
-    matplotlib \
-    numpy \
-    python=2.7*
+3. Install all necessary R packages
+===================================
+Activate the environment so you have access to the R version that the pipeline uses::
+ 
+  source activate ./dev_env
 
- And then you can install the package from source (see below).
+Start R::
 
+  R
 
-What just happend?
-------------------
+Within R install all necessary packages::
 
-1. `-p ./dev_env` -- use `./dev_env` as the installation path.
+  source("http://bioconductor.org/biocLite.R")
+  biocLite(c("Biobase",'edgeR'),ask=F)
+  install.packages(c("devtools","knitr", "yaml", "rjson"), repos='http://cran.us.r-project.org')
+  devtools::install_github("clickme", "nachocab")
 
-   This will create a `./dev_env/bin`, `./dev_env/lib`, etc directories to
-   store all the files needed to run the programs you install using
-   `conda`.
-
-   .. warning::
-
-      If you try to run this command in a very long-named directory, then
-      the command will fail. How long is too long? Well the total "bin"
-      directory path must be less than 128 characters long. If that's a
-      problem, then you can use the `-n` option instead of `-p` option,
-      which will install the named environment in a centrally located
-      space, typically a subdirectory of your home directory. So::
-
-	conda create -n dev_env \
-	# everything else is the same
-
-2. The three lines:
-   
-   `--override-channels`
-   
-   `-c 'file:///restricted/projectnb/montilab-p/conda_channel'`
-   
-   `-c 'defaults'`
-
-   mean use a custom list of "channels".
-
-   When `conda` downloads the files needed to install your programs, it
-   looks in certain predefined locations. The `-c` flag adds a location to
-   this search path, and it's the way to add custon packages to
-   install. The Monti lab has a custom channel on SCC, which you've
-   included in the search path with the above instruction. The
-   `--override-channels` flag says ignore the predifined list, which has
-   the `'defaults'` channel as the first option when looking for a package.
-   It's important that the Monti lab's channels is first on the list, so we
-   use this flag to reset the list, and then we use two `-c` options to
-   control the order of the list.
-
-3. `--yes` -- say "yes" to all posed questions.
-
-   `conda` checks in with you before it actually does anything, and this
-   instruction saves a bit of time. You can walk away from the computer,
-   and when you get back, everything should just work.
-
-4. `hydra` -- the package in question.
-
-   The channel configured above (with `-c` option) has a package called
-   `rnaseq_pipeline` that contains the python and R code for the
-   pipeline. This package was created with :doc:`conda build
-   <making_conda_packages>`.
-
-3. Activate the Environment
+4. Activate the Environment
 ============================
 
 Follow the instructions provided by conda following the environment's
@@ -131,22 +67,22 @@ current session, including python, bowtie2, etc.
    You need to do this each time (login session) you want to use this
    installation of the pipeline.
 
-4. Get the Source
+5. Get the Source
 =================
 
 Use git to clone the repository (using the group's repo or your own github
 copy)::
 
-  git clone https://github.com/montilab/CBMgithub.git
+  git clone https://github.com/montilab/Hydra.git
 
 
 To get the current branch use::
 
-  git clone https://user@github.com/montilab/CBMgithub.git -b v2.0.0
+  git clone https://user@github.com/montilab/Hydra.git -b v2.0.0
 
 
 
-5. Install Developer Tools
+6. Install Developer Tools
 ==========================
 
 The source contains a "dev_requirements.txt" file that lists all the
@@ -154,7 +90,7 @@ packages used in development. Install these using conda::
 
   conda install -r dev_requirements.txt
 
-This will force you to downgrade the readline module however you can just install this single module again and you are good:
+This will force you to downgrade the readline module however you can just install this single module again::
 
   conda install \
      --override-channels \
@@ -167,19 +103,19 @@ This will force you to downgrade the readline module however you can just instal
    Make sure you're installing into the correct environment. `which
    python` will print the path to the python being used, and make sure
    it's the one in the development environment. If not, see
-   `3. Activate the Environement`_ to setup the environment.
+   `4. Activate the Environement`_ to setup the environment.
 
 
-6. Make Your Edits and Install
+7. Make Your Edits and Install
 ==============================
 
 Once you've made your edits, you can install them as you would any
-standard python package::
+standard python package, by switching to the repository::
 
   python setup.py install
 
 
-7. Test whether your changes broke the pipeline
+8. Test whether your changes broke the pipeline
 ===============================================
 
 Once you are done with your changes and installed them, try running one 

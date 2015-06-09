@@ -14,5 +14,4 @@ An html report is generated, summarizing the output/results from each step, with
 Table of Contents:
 
 - `Description of the parameter file <parameters.rst>`__
-- `How to run the pipeline <running.rst>`__
 - `Pipeline output <output.rst>`__

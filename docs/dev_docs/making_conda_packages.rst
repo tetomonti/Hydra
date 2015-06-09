@@ -11,11 +11,14 @@ Make sure the hydra environment is deactivated and a plain version of conda is l
    module purge
    module load anaconda/2.2.0
 
-For the current pipeline you can easily build the pipeline and all required packages::
+For the current pipeline you can easily build the pipeline and all required packages (careful - no spaces)
+
+
+.. code:: bash
  
    cd <Hydra_repository>/conda_packages
-   WORKSPACE = <WORKING_DIR>
-   export CONDA_BLD_PATH = $WORKSPACE/conda_build_space
+   WORKSPACE=<WORKING_DIR>
+   export CONDA_BLD_PATH=$WORKSPACE/conda_build_space
    conda build hydra-2.0.0
 
 This will build the hydra package and packages for all requirements. Next step you want to upload it to binstar.org so that everyone can access that package. For that we need to log into the binstar account first::
@@ -72,10 +75,12 @@ Making a "star" Package
    On SCC, you want to set the following environment variable to have your
    package automatically stored in a common location.
 
+.. code:: bash
        export CONDA_BLD_PATH=`/restricted/projectnb/montilab-p/conda_packages/conda_build_space`
 
-   Also, to access conda on scc, load the anaconda module
+Also, to access conda on scc, load the anaconda module
 
+.. code:: bash
        module load anaconda/2.2.0
 
 

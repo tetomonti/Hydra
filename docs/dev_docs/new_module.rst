@@ -265,6 +265,7 @@ The function call is provided as list so we need to link that list using spaces:
     param['file_handle'].write('CALL: '+' '.join(call)+'\n')
 
 
+
 We use subprocess to run the actual function call. This can be more sophisticated and include piping. 
 For a more sophisticated example of this look into htseq.py.
 
@@ -338,13 +339,13 @@ To begin with we need to import the star module at the top of the script:
 
 .. code:: bash
 
-	import rnaseq_pipeline.star
+	import hydra_pkg.star
 
 Then add star parameter initialization into the initialize_all:
 
 .. code:: bash
 
-	rnaseq_pipeline.star.init(param)
+	hydra_pkg.star.init(param)
 
 
 And finally we need to add the star module call. There is a submission function that makes our lives easier:
@@ -378,7 +379,7 @@ Where:
                                   input_files='fastq_files',
                                   output_files='bam_files',
                                   cores=param['qsub_num_processors'])
-            if param['aligner'] == 'star':
+            elif param['aligner'] == 'star':
                 #running the aligner
                 HELPER.submit_job(param,
                                   'run_star',
@@ -397,14 +398,8 @@ In addition to the submit job function you can also write into the main log file
 -------------------------
 
 Once all the changes are done you can simply install and test them. For that you need the developer tools, 
-if they are not already installed you can go into your github repository and install it using conda:
+if they are not already installed you can see `here <quickstart.rst>`__ how to install them:
 
-.. code:: bash
-
-	cd CBMgithub/tools/RNASeq_pipeline
-	conda install --file dev_requirements.txt
-	
-And once these are installed you can simply install the pipeline:
 
 .. code:: bash
 
