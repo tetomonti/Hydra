@@ -315,7 +315,7 @@ def create_sub_report(param, out_file, table, stub, title):
     param['module_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                 '-strict.dtd"><head><title></title></head><body>\n')
-    param['module_report'].write('<center><h1>' + title + 'Overview</h1>')
+    param['module_report'].write('<center><h1>' + title + 'Overview</h1><br><br><br>')
     HELPER.write_html_table(param,
                             table,
                             out=param['module_report'],

@@ -41,12 +41,14 @@ def copy_files(param):
     output, _ = subprocess.Popen(call,
                                  stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE).communicate()
-    param['bamqc_stub'] = [line for line in output.split('\n') if line != '']
 
-    #use only the files that are in the stub
+
+    present_files = [line for line in output.split('\n') if line != '']
+
+    #use only the stubs that are actually present
     temp = []
-    for bqc_stub in param['bamqc_stub']:
-        if bqc_stub in param['stub']:
+    for bqc_stub in param['stub']:
+        if bqc_stub in present_files:
             temp.append(bqc_stub)
     param['bamqc_stub'] = temp
 
@@ -205,7 +207,7 @@ def plot_alignments(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     rects1 = plt.bar(index,
                      total,
@@ -262,7 +264,7 @@ def plot_spliced_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -297,7 +299,7 @@ def plot_insert_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -331,7 +333,7 @@ def plot_delete_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -367,7 +369,7 @@ def plot_paired_singleton(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     rects1 = plt.bar(index,
                      paired,
@@ -442,7 +444,7 @@ def plot_mismatches(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 50
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
     opacity = 0.4
     rects1 = plt.bar(index, mm0, bar_width,
                      alpha=opacity, color='b')

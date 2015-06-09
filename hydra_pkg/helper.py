@@ -606,7 +606,7 @@ def rotate_word(word, deg='315'):
     :Parameter word: the word that should be printed
     :Parameter deg: the degree of the rotation
     """
-    return('<div style="float: center;position: relative; '+
+    return('<div style="float: center;position: relative;  bottom: 10px;'+
            '-ms-transform: rotate('+str(deg)+'deg); -webkit-transform:'+
            'rotate('+str(deg)+'deg);-moz-transform:  rotate('+str(deg)+'deg);-o-transform: '+
            'rotate('+str(deg)+'deg);writing-mode: rl-tb;/">' +str(word)+'</div>')

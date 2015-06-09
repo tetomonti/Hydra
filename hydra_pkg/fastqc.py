@@ -59,7 +59,6 @@ def copy_files(param, input_files):
     fqc_dir = param['working_dir']+'results/fastqc/'
     param['fastqc_stub'] = [fn for fn in param['fastqc_stub'] if os.path.exists(fqc_dir+fn)]
 
-
     #copy the unpacked directories if we actually want to show the report
     if param['include_full_fastqc_report']:
         for fastqc_file in param['fastqc_stub']:
@@ -83,10 +82,8 @@ def create_overview_table(param, out):
     table = []
     #put in headers
     table.append([stub.split('/')[0] for stub in param['fastqc_stub']])
+
     #link to summary files
-
-    
-
     if param['include_full_fastqc_report']:
         temp = ['Summary files']
         for stub in param['fastqc_stub']:
@@ -111,8 +108,10 @@ def extract_tables(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+    
+    fqc_dir = param['working_dir']+'results/fastqc/'
     #get the rownames
-    csv_file = open(param['fastqc_dir']+param['fastqc_stub'][0]+'_fastqc/summary.txt')
+    csv_file = open(fqc_dir+param['fastqc_stub'][0]+'_fastqc/summary.txt')
     csv_reader = csv.reader(csv_file, delimiter='\t')
     #get the rownames
     checks = [[row[1]] for row in csv_reader]
@@ -125,14 +124,13 @@ def extract_tables(param):
 
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(param['fastqc_stub'])):
-        csv_file = open(param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/summary.txt')
+        csv_file = open(fqc_dir+param['fastqc_stub'][idx]+'_fastqc/summary.txt')
         overview_file = param['fastqc_stub'][idx]+'_fastqc/fastqc_report.html#M'
         csv_reader = csv.reader(csv_file, delimiter='\t')
 
         i = 0
         for row in csv_reader:
             cell = '<a href="'+overview_file+str(i)+'">'
-            
             if row[0] == 'PASS':
                 cell = cell+pass_icon
             if row[0] == 'FAIL':
@@ -224,9 +222,11 @@ def plot_number_of_reads(param, output_files, out):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter output_files: filenames to save th plot in
     """
+
+    fqc_dir = param['working_dir']+'results/fastqc/'
     summary_files = []
     for idx in range(len(param['fastqc_stub'])):
-        summary_files.append(param['fastqc_dir']+
+        summary_files.append(fqc_dir+
                              param['fastqc_stub'][idx]+
                              '_fastqc/fastqc_data.txt')
     #print summary_files
@@ -249,7 +249,7 @@ def plot_number_of_reads(param, output_files, out):
     fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(num_total_reads))
-    bar_width = fig_width / float(len(param['fastqc_stub'])) * 0.9
+    bar_width = fig_width / float(len(param['fastqc_stub'])) * 10
     opacity = 0.4
     _ = plt.bar(index,
                 num_total_reads,
@@ -281,8 +281,9 @@ def plot_gc_content(param, input_files, out):
     """
     #extract number of reads, these are needed not only here but also for the bamqc
     summary_files = []
+    fqc_dir = param['working_dir']+'results/fastqc/'
     for idx in range(len(param['fastqc_stub'])):
-        summary_files.append(param['fastqc_dir']+
+        summary_files.append(fqc_dir+
                              param['fastqc_stub'][idx]+
                              '_fastqc/fastqc_data.txt')
 
@@ -296,7 +297,7 @@ def plot_gc_content(param, input_files, out):
     fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(gc_content))
-    bar_width = fig_width / float(len(param['fastqc_stub'])) * 0.9
+    bar_width = fig_width / float(len(param['fastqc_stub'])) * 10
     opacity = 0.4
     _ = plt.bar(index,
                 gc_content,
@@ -342,11 +343,11 @@ def report(param, input_files='fastq_files', header='FastQC results'):
         param['fastqc_report'].write('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 '+
                                      'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                      '-strict.dtd"><head><title></title></head><body>\n')
-        param['fastqc_report'].write('<center><h1>' + header + '</h1></center>')
+        param['fastqc_report'].write('<center><h1>' + header + '</h1>')
         param['fastqc_report'].write('<a href="fastqc/'+
                                      input_files+
                                      'overview.txt">Table as tab delimited file'+
-                                     '</a><br>')
+                                     '</a></center><br><br><br><br><br><br>')
 
         create_overview_table(param, param['fastqc_report'])
         plot_number_of_reads(param, input_files, param['fastqc_report'])
@@ -369,7 +370,7 @@ def init(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     MODULE_HELPER.check_parameter(param, key='fastqc_exec', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='include_full_fastqc_report', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='include_full_fastqc_report', dtype=bool)
     
     
 def run_fastqc(filename, param):
