@@ -128,7 +128,7 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
   # do a PCA
   all<-prcomp(t(exprs(eSet)))
   y<-cov(all$x)
-  variances<-c(y[1,1]/sum(diag(y)),y[1,1]/sum(diag(y))) * 100
+  variances<-c(y[1,1]/sum(diag(y)),y[2,2]/sum(diag(y))) * 100
   variances<-round(variances,digits=2)
   all<-all$x[,1:2]
   all<-all/apply(all,2,max)
