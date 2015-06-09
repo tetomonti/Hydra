@@ -29,13 +29,19 @@ def init(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     MODULE_HELPER.check_parameter(param, key='cufflinks_exec', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_G', dtype=str, checkfile=True)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_b', dtype=str, checkfile=True)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_library_type', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_compatible_hits', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_total_hits', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_N', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_u', dtype=str)
+
+    #deriving the stranded parameter
+    if param['stranded'] == 'reverse':
+        param['cufflinks_library_type'] = 'fr-secondstrand'
+    elif param['stranded'] == 'yes':
+        param['cufflinks_library_type'] = 'fr-firststrand'
+    else:
+        param['cufflinks_library_type'] = 'fr-unstranded'
+
 
 
 def create_sub_report(param):
@@ -165,7 +171,7 @@ def main():
     call.append(param['cufflinks_library_type'])
     call = call + ['-o' + outdir]
     call = call + ['-p' + param['num_processors']]
-    call = call + ['-G' + param['cufflinks_G']]
+    call = call + ['-G' + param['genome_annotation_gft']]
     call.append(param['working_file'])
 
     param['file_handle'].write('CALL: '+' '.join(call)+'\n')

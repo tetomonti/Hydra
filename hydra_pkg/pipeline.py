@@ -47,12 +47,16 @@ def initialize_all(param):
     hydra_pkg.cutadapt.init(param)
     hydra_pkg.matched_pairs.init(param)
     hydra_pkg.fastqc.init(param)
-    hydra_pkg.tophat.init(param)
     hydra_pkg.bamqc.init(param)
     hydra_pkg.cufflinks.init(param)
     hydra_pkg.htseq.init(param)
     hydra_pkg.featureCount.init(param)
-    hydra_pkg.star.init(param)
+
+    if param['aligner'] == 'tophat':
+        hydra_pkg.tophat.init(param)
+    elif param['aligner'] == 'star':    
+        hydra_pkg.star.init(param)
+
 
 def run_all(param):
     """this function defines the workflow of the pipeline

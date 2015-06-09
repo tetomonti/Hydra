@@ -31,7 +31,6 @@ def init(param):
     """
     MODULE_HELPER.check_parameter(param, key='HTSeq_exec', dtype=str)
     MODULE_HELPER.check_parameter(param, key='sam_exec', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='HTSeq_s', dtype=str)
     MODULE_HELPER.check_parameter(param, key='HTSeq_t', dtype=str)
     MODULE_HELPER.check_parameter(param,
                                   key='HTSeq_m',
@@ -40,7 +39,6 @@ def init(param):
                                            'intersection-strict',
                                            'intersection-nonempty'])
     MODULE_HELPER.check_parameter(param, key='HTSeq_id', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='HTSeq_gft', dtype=str, checkfile=True)
     MODULE_HELPER.check_parameter(param, key='Rscript_exec', dtype=str)
 
 
@@ -185,11 +183,11 @@ def main():
     #build htseq-count call:
     call1 = [param['sam_exec'], 'view', param['working_file']]
     call2 = [param['HTSeq_exec']]
-    call2 = call2 + ['-s', param['HTSeq_s']]
+    call2 = call2 + ['-s', param['stranded']]
     call2 = call2 + ['-t', param['HTSeq_t']]
     call2 = call2 + ['-i', param['HTSeq_id']]
     call2 = call2 + ['-m', param['HTSeq_m']]
-    call2 = call2 + ['-', param['HTSeq_gft']]
+    call2 = call2 + ['-', param['genome_annotation_gft']]
 
     #function calls
     param['file_handle'].write('Pipe CALL 1: '+' '.join(call1)+'\n')

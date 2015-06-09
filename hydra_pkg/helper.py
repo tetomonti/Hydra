@@ -91,6 +91,9 @@ def initialize_qsub(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+    check_parameter(param, key='genome_annotation_gft', dtype=str, checkfile=True)    
+    check_parameter(param, key='genome', dtype=str, checkfile=True)
+    check_parameter(param, key='stranded', allowed=['no', 'yes', 'reversed'], dtype=str)    
     check_parameter(param, key='qsub_email', dtype=str)
     check_parameter(param, key='qsub_send_email', dtype=bool)
     check_parameter(param, key='qsub_memory', dtype=str)

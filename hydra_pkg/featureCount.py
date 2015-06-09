@@ -33,12 +33,18 @@ def init(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     MODULE_HELPER.check_parameter(param, key='featureCount_exec', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='featureCount_s', dtype=str)
     MODULE_HELPER.check_parameter(param, key='featureCount_t', dtype=str)
     MODULE_HELPER.check_parameter(param, key='featureCount_id', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='featureCount_gft', dtype=str, checkfile=True)
     MODULE_HELPER.check_parameter(param, key='featureCount_by_meta', dtype=bool)
     MODULE_HELPER.check_parameter(param, key='Rscript_exec', dtype=str)
+
+    #deriving the stranded parameter
+    if param['stranded'] == 'reverse':
+        param['featureCount_s'] = 2
+    elif param['stranded'] == 'yes':
+        param['featureCount_s'] = 1
+    else:
+        param['featureCount_s'] = 0
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -234,7 +240,7 @@ def main():
     call = call + ['-t', param['featureCount_t']]
     call = call + ['-s', param['featureCount_s']]
     call = call + ['-g', param['featureCount_id']]
-    call = call + ['-a', param['featureCount_gft']]
+    call = call + ['-a', param['genome_annotation_gft']]
     call = call + ['-o', outfile]
     call.append(param['working_file'])
 
