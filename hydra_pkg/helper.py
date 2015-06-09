@@ -599,20 +599,17 @@ def report_start(param):
     #report the run log in a table and show which samples passed/failed
     report_run_log(param)
 
-def rotate_word(word, deg=270):
+def rotate_word(word, deg='315'):
     """Creates the html code to display a word rotated (by default 270 degrees).
     Of note is that this works in all standard browsers
 
     :Parameter word: the word that should be printed
     :Parameter deg: the degree of the rotation
     """
-    return('<div style="float: center;position: relative;-moz-transform: '+
-           'rotate(270deg);  /* FF3.5+ */-o-transform: rotate(270deg);'+
-           '  /* Opera 10.5 */ -webkit-transform: rotate('+str(deg)+
-           'deg);  /* Saf3.1+, Chrome */ filter:  progid:DXImageTransform.'+
-           'Microsoft.BasicImage(rotation=3);  /* IE6,IE7 */ -ms-filter: '+
-           'progid:DXImageTransform.Microsoft.BasicImage(rotation=3);' +
-           ' /* IE8 */">' +word+'</div>')
+    return('<div style="float: center;position: relative; '+
+           '-ms-transform: rotate('+str(deg)+'deg); -webkit-transform:'+
+           'rotate('+str(deg)+'deg);-moz-transform:  rotate('+str(deg)+'deg);-o-transform: '+
+           'rotate('+str(deg)+'deg);writing-mode: rl-tb;/">' +str(word)+'</div>')
 
 
 def write_html_table(param, table, out, fcol_width=250, cell_width=50, initial_breaks=5, deg=315):

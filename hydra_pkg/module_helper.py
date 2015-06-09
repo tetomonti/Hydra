@@ -298,7 +298,7 @@ def create_eset(count_file, pheno_file, param, stub):
     HELPER.writeLog(output, param)
     HELPER.writeLog(error, param)
     param['module_report'].write('<br><a href="' + stub + '_pca.html">PCA on normalized samples</a>')
-    param['module_report'].write('<br><center><h3>Boxplot of counts in log2 space</h3>')
+    param['module_report'].write('<br><center><h3>Boxplot of counts in CPM space</h3>')
     param['module_report'].write('<img src="' + stub + '_boxplot.png"' +
                                 ' alt="Boxplot of ' + stub +' counts"><br><br>\n')
                                 

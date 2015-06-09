@@ -40,11 +40,11 @@ def init(param):
 
     #deriving the stranded parameter
     if param['stranded'] == 'reverse':
-        param['featureCount_s'] = 2
+        param['featureCount_s'] = '2'
     elif param['stranded'] == 'yes':
-        param['featureCount_s'] = 1
+        param['featureCount_s'] = '1'
     else:
-        param['featureCount_s'] = 0
+        param['featureCount_s'] = '0'
 
 def process_stat_files(param):
     """Copies all relevant files into the report directory and also extracts
@@ -73,18 +73,24 @@ def process_stat_files(param):
 
     #total number of aligned reads
     tot_reads = param['bam_qc']['unique_aligned_reads']
-
+    counter = [0] * len(param['bam_qc']['unique_aligned_reads'])
+    
     filehandle = open(featurecount_file)
     for line in filehandle.readlines()[1:]:
         cur_line = line.rstrip().split('\t')
         cur_line[0] = re.sub(r'_',' ',cur_line[0])
-        if cur_line[0] != 'Unassigned MultiMapping':
+        if cur_line[0] not in ['Unassigned MultiMapping','Assigned']:
+            counter = [ct + int(cr) for ct, cr in zip(counter, cur_line[1:])]
             perc = ([cur_line[0]]+
                     MODULE_HELPER.get_percentage(cur_line[1:],
                                                  tot_reads,
                                                  len(cur_line)-1))
             table.append(perc)
     filehandle.close()
+    assigned = [tot_reads[idx] - counter[idx] for idx in range(len(tot_reads))]
+    perc = ['Assigned'] + MODULE_HELPER.get_percentage(assigned,
+                                                      tot_reads,
+                                                      len(counter))
     return table
 
 

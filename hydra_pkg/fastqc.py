@@ -59,14 +59,16 @@ def copy_files(param, input_files):
     fqc_dir = param['working_dir']+'results/fastqc/'
     param['fastqc_stub'] = [fn for fn in param['fastqc_stub'] if os.path.exists(fqc_dir+fn)]
 
-    #copy the unpacked directories
-    for fastqc_file in param['fastqc_stub']:
-        call = ['cp', '-R']
-        call.append(fqc_dir + fastqc_file+'/')
-        call.append(param['fastqc_dir']+fastqc_file.split('/')[0])
-        output, error = subprocess.Popen(call,
-                                stdout=subprocess.PIPE,
-                                stderr=subprocess.PIPE).communicate()
+
+    #copy the unpacked directories if we actually want to show the report
+    if param['include_full_fastqc_report']:
+        for fastqc_file in param['fastqc_stub']:
+            call = ['cp', '-R']
+            call.append(fqc_dir + fastqc_file+'/')
+            call.append(param['fastqc_dir']+fastqc_file.split('/')[0])
+            output, error = subprocess.Popen(call,
+                                             stdout=subprocess.PIPE,
+                                             stderr=subprocess.PIPE).communicate()
     #cut off the suffix
     param['fastqc_stub'] = [fn.replace('_fastqc', '') for fn in param['fastqc_stub']]
 
@@ -83,13 +85,15 @@ def create_overview_table(param, out):
     table.append([stub.split('/')[0] for stub in param['fastqc_stub']])
     #link to summary files
 
-    temp = ['Summary files']
-    for stub in param['fastqc_stub']:
-        temp.append('<a href="'+stub+
-                    '_fastqc/fastqc_data.txt">raw</a>')
-    table.append(temp)
+    
 
     if param['include_full_fastqc_report']:
+        temp = ['Summary files']
+        for stub in param['fastqc_stub']:
+            temp.append('<a href="'+stub+
+                        '_fastqc/fastqc_data.txt">raw</a>')
+        table.append(temp)
+
         #link to overview files
         temp = ['Full report']
         for stub in param['fastqc_stub']:
@@ -122,12 +126,13 @@ def extract_tables(param):
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(param['fastqc_stub'])):
         csv_file = open(param['fastqc_dir']+param['fastqc_stub'][idx]+'_fastqc/summary.txt')
-        overview_file = 'fastqc/'+param['fastqc_stub'][idx]+'_fastqc/fastqc_report.html#M'
+        overview_file = param['fastqc_stub'][idx]+'_fastqc/fastqc_report.html#M'
         csv_reader = csv.reader(csv_file, delimiter='\t')
 
         i = 0
         for row in csv_reader:
             cell = '<a href="'+overview_file+str(i)+'">'
+            
             if row[0] == 'PASS':
                 cell = cell+pass_icon
             if row[0] == 'FAIL':
@@ -330,10 +335,6 @@ def report(param, input_files='fastq_files', header='FastQC results'):
         param['report'].write('<center><br><h2>'+header+'</h2>')
         read_raw_fastqc(param, input_files)
 
-        param['report'].write('<a href="fastqc/'+
-                              input_files+
-                              'overview.txt">Table as tab delimited file'+
-                              '</a><br>')
 
         #separate report html for the fastqc results
         report_file = 'fastqc/'+input_files+'_fastqc.html'
@@ -342,7 +343,10 @@ def report(param, input_files='fastq_files', header='FastQC results'):
                                      'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                      '-strict.dtd"><head><title></title></head><body>\n')
         param['fastqc_report'].write('<center><h1>' + header + '</h1></center>')
-
+        param['fastqc_report'].write('<a href="fastqc/'+
+                                     input_files+
+                                     'overview.txt">Table as tab delimited file'+
+                                     '</a><br>')
 
         create_overview_table(param, param['fastqc_report'])
         plot_number_of_reads(param, input_files, param['fastqc_report'])
