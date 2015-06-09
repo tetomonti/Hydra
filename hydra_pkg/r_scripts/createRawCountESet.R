@@ -15,11 +15,11 @@
 
 ############
 #these are test parameters
-#out_dir='./'
-#counts_file<-'deliverables/htseq_raw_counts.txt'
-#annot_file<-'deliverables/sample_info.txt'
-#stub='htseq'
-#paired='TRUE'
+out_dir='./'
+counts_file<-'deliverables/htseq_raw_counts.txt'
+annot_file<-'deliverables/sample_info.txt'
+stub='htseq'
+paired='TRUE'
 
 
 ###################################################################
@@ -89,7 +89,7 @@ saveRDS(eSet,file=paste0(out_dir,'deliverables/',stub,'_normalized_counts.RDS'))
 ###################################################################
 
 #function to create a 
-plotCov<-function(idx,annot,all,stub,con){
+plotCov<-function(idx,variances,annot,all,stub,con){
    current_filename <- paste0(stub,'_',colnames(annot)[idx])
    code<-clickme("points", 
                  all[,1],
@@ -97,8 +97,8 @@ plotCov<-function(idx,annot,all,stub,con){
                  color_groups=annot[,idx],
                  names = rownames(all),
                  title = colnames(annot)[idx],
-                 xlab = "PCA 1", 
-                 ylab = "PCA 2",
+                 x_title = paste0("PCA 1 (",variances[1],"%)"), 
+                 y_title = paste0("PCA 2 (",variances[2],"%)"),
                  file_path = paste0(out_dir,'report/clickme/',current_filename,'.html'))
    write(paste0('<iframe width="1100" height="850" src="',
                 '../clickme/',
@@ -127,6 +127,9 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
   
   # do a PCA
   all<-prcomp(t(exprs(eSet)))
+  y<-cov(all$x)
+  variances<-c(y[1,1]/sum(diag(y)),y[1,1]/sum(diag(y))) * 100
+  variances<-round(variances,digits=2)
   all<-all$x[,1:2]
   all<-all/apply(all,2,max)
   
@@ -134,11 +137,15 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(eSet)>1){
   con<-file(paste0(out_dir,'report/',stub,'/',stub,'_pca.html'),open='w')
   
   #and then plot all covariates that have more than 1 and equal or less than 10 levels/classes
-  no_levels<-apply(annot,2,function(x)length(unique(x)))[-1]
-  valid_indices<-c(1,(1:ncol(annot))[no_levels>1 & no_levels<=10])
-  
+  no_levels<-apply(annot,2,function(x)length(unique(x)))
+
+  valid_indices<-(1:ncol(annot))[no_levels>1 & no_levels<=10]
+  if (length(valid_indices) == 0){
+     valid_indices <- 1
+  }  
+
   #only if there is actually something to plot
-  sapply(valid_indices,plotCov,annot,all,stub,con)
+  sapply(valid_indices,plotCov,variances,annot,all,stub,con)
   
   #close the html file
   close(con) 

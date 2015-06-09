@@ -185,7 +185,7 @@ def read_raw_bamqc(param):
                          '\t'.join([str(vv) for vv in par])+'\n')
     filehandle.close()
 
-def plot_alignment_overview(param):
+def plot_alignments(param):
     """Creates a plot that contains the statistic on the number of aligned reads
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -201,10 +201,11 @@ def plot_alignment_overview(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     rects1 = plt.bar(index,
                      total,
@@ -228,12 +229,13 @@ def plot_alignment_overview(param):
     plt.ylabel('Total (aligned) reads')
     plt.title('Number of reads across samples')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.legend((rects1[0],
                 rects2[0],
                 rects3[0]),
                ('Total reads', 'Aligned reads', 'Uniquely aligned'),
                loc='lower left')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -256,17 +258,19 @@ def plot_spliced_reads(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
     plt.ylabel('Percentage of spliced reads of all aligned reads')
     plt.title('Percentage of spliced reads across samples')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -289,17 +293,19 @@ def plot_insert_reads(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
     plt.ylabel('Percent of reads with inserst of all aligned reads')
     plt.title('Percent of reads with inserts across samples')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -321,17 +327,19 @@ def plot_delete_reads(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
     plt.ylabel('Percent of reads with deletions of all aligned reads')
     plt.title('Percent of reads with deletion across samples')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -355,10 +363,11 @@ def plot_paired_singleton(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     rects1 = plt.bar(index,
                      paired,
@@ -378,7 +387,6 @@ def plot_paired_singleton(param):
     plt.ylabel('Number of single / paired / proper paired reads')
     plt.title('Number of reads by type')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.legend((rects1[0],
                 rects2[0],
                 rects3[0]),
@@ -386,6 +394,8 @@ def plot_paired_singleton(param):
                 'Proper paired reads',
                 'Single end reads'),
                loc='lower left')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -428,10 +438,11 @@ def plot_mismatches(param):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(5 + len(param['bamqc_stub']) * 0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 5 + len(param['bamqc_stub']) * 0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['bamqc_stub'])) * 0.9
     opacity = 0.4
     rects1 = plt.bar(index, mm0, bar_width,
                      alpha=opacity, color='b')
@@ -448,7 +459,6 @@ def plot_mismatches(param):
     plt.ylabel('Mismatches')
     plt.title('Number of mismatches across samples')
     ticks = param['bamqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
     plt.legend((rects1[0],
                 rects2[0],
                 rects3[0],
@@ -460,6 +470,8 @@ def plot_mismatches(param):
                 '3 mismatches',
                 '4+ mismatches'),
                loc='lower left')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -467,6 +479,52 @@ def plot_mismatches(param):
     pylab.savefig(param['working_dir']+filename)
     param['bamqc_report'].write('<img src="mismatches.png" ' +
                                 'alt="number of mismatches"><br><br>\n')
+
+def plot_overview_alignments(param):
+
+    #create a list with all relevant values
+    overview = []
+    num_s = len(param['bamqc_stub'])
+
+    #bring the data into required shape
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['unique_aligned_reads'],
+                                         param['num_total_reads'],
+                                         num_s))
+    overview.append(MODULE_HELPER.divide(param['bam_qc']['single_count_alignments'],
+                                         param['num_total_reads'],
+                                         num_s))
+
+    #make the first plot out of the first 2:
+    fig, ax = plt.subplots()
+    fig.set_size_inches(9, 1.5)
+    bp = ax.boxplot(overview, patch_artist=True, vert=False)
+
+    #change coloring
+    for box in bp['boxes']:
+        box.set( color='#7570b3', linewidth=2)
+        box.set( facecolor = '#999999' )
+
+    #change caps
+    for cap in bp['caps']:
+        cap.set(color='#7570b3', linewidth=2)
+
+    #change outliers
+    for flier in bp['fliers']:
+        flier.set(marker='o', color='#ff0000', alpha=0.5)
+
+    ax.set_yticklabels(['Percent uniquely aligned',
+                        'Percent aligned'])
+                        
+    ax.set_xlim(-5,105)
+
+    #put it into the report
+    filename = 'report/bamqc/overview_alignment.png'
+    fig.savefig(param['working_dir']+filename,
+                bbox_inches='tight')
+    param['report'].write('Percentages based on number of reads<br>')
+    param['report'].write('<img src="bamqc/overview_alignment.png" ' +
+                          'alt="overview"><br><br>\n')
+
 
 
 def plot_overview(param):
@@ -493,12 +551,6 @@ def plot_overview(param):
                                          num_s))
     overview.append(MODULE_HELPER.divide(param['bam_qc']['is_singleton'],
                                          param['bam_qc']['total_aligned_reads'],
-                                         num_s))
-    overview.append(MODULE_HELPER.divide(param['bam_qc']['unique_aligned_reads'],
-                                         param['num_total_reads'],
-                                         num_s))
-    overview.append(MODULE_HELPER.divide(param['bam_qc']['single_count_alignments'],
-                                         param['num_total_reads'],
                                          num_s))
 
     #make the first plot out of the first 2:
@@ -534,6 +586,7 @@ def plot_overview(param):
     filename = 'report/bamqc/overview.png'
     fig.savefig(param['working_dir']+filename,
                 bbox_inches='tight')
+    param['report'].write('Percentages based on number of alignments <br>')
     param['report'].write('<img src="bamqc/overview.png" ' +
                           'alt="overview"><br><br>\n')
 
@@ -545,7 +598,7 @@ def plot_total_number_reads(param):
     
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
-    fig.set_size_inches(9, 2)
+    fig.set_size_inches(9, 1.5)
     bp = ax.boxplot(overview, patch_artist=True, vert=False)
 
     #change coloring
@@ -562,7 +615,7 @@ def plot_total_number_reads(param):
         flier.set(marker='o', color='#ff0000', alpha=0.5)
 
     ax.set_yticklabels(['Number of alignments','Number of reads'])
-    ax.set_xlim(-5,max(overview[0]) * 1.05)
+    ax.set_xlim(-5,max(max(overview[0]),max(overview[0])) * 1.05)
 
     #put it into the report
     filename = param['working_dir']+'report/bamqc/total_reads.png'
@@ -591,7 +644,7 @@ def report(param):
         param['bamqc_report'].write('<a href="overview.txt">' +
                                     'QC results as tab delimited file</a><br><br><br>')
         create_overview_table(param)
-        plot_alignment_overview(param)
+        plot_alignments(param)
         plot_mismatches(param)
         plot_paired_singleton(param)
         plot_spliced_reads(param)
@@ -604,6 +657,7 @@ def report(param):
 
         #Overview plots in the main report
         plot_total_number_reads(param)
+        plot_overview_alignments(param)
         plot_overview(param)
 
     else:

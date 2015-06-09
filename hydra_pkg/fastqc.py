@@ -239,9 +239,10 @@ def plot_number_of_reads(param, output_files, out):
 
     #create plot
     fig, _ = plt.subplots()
-    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(num_total_reads))
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['fastqc_stub'])) * 0.9
     opacity = 0.4
     _ = plt.bar(index,
                 num_total_reads,
@@ -252,7 +253,9 @@ def plot_number_of_reads(param, output_files, out):
     plt.ylabel('Number of reads')
     plt.title('Total number of reads')
     ticks = param['fastqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
+    
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
 
     #put it into the report
@@ -283,9 +286,10 @@ def plot_gc_content(param, input_files, out):
 
     #create plot
     fig, axis = plt.subplots()
-    fig.set_size_inches(3+len(param['fastqc_stub'])*0.4, 8)
+    fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
+    fig.set_size_inches(fig_width, 8)
     index = np.arange(len(gc_content))
-    bar_width = 0.8
+    bar_width = fig_width / float(len(param['fastqc_stub'])) * 0.9
     opacity = 0.4
     _ = plt.bar(index,
                 gc_content,
@@ -296,7 +300,8 @@ def plot_gc_content(param, input_files, out):
     plt.ylabel('%GC content')
     plt.title('GC content across samples')
     ticks = param['fastqc_stub']
-    plt.xticks(index + bar_width, ticks, rotation='vertical')
+    if fig_width != MODULE_HELPER.get_max_image_width():
+        plt.xticks(index + bar_width / 2, ticks, rotation='vertical')
     plt.tight_layout()
     axis.set_ylim(0, 100)
 

@@ -50,10 +50,13 @@ def process_stat_files(param):
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+    if not os.path.exists(param['working_dir']+'report/htseq/'):
+        os.makedirs(param['working_dir']+'report/htseq/')
+
     #get the files that are actually in the output directory
     call = ['cp', '-R']
-    call.append(param['working_dir']+'results/htseq/')
-    call.append(param['working_dir']+'report/')
+    call.append(param['working_dir']+'results/htseq/htseq_stats.txt')
+    call.append(param['working_dir']+'report/htseq')
     _, _ = subprocess.Popen(call,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE).communicate()
@@ -83,7 +86,8 @@ def process_stat_files(param):
                                                  len(cur_line)-1))
             table.append(perc)
     filehandle.close()
-    perc = ['feature'] + MODULE_HELPER.get_percentage(counter,
+    assigned = [tot_reads[idx] - counter[idx] for idx in range(len(tot_reads))]
+    perc = ['feature'] + MODULE_HELPER.get_percentage(assigned,
                                                       tot_reads,
                                                       len(counter))
     table.append(perc)

@@ -77,7 +77,7 @@ def process_stat_files(param):
                     MODULE_HELPER.get_percentage(cur_line[1:],
                                                  tot_reads,
                                                  len(cur_line)-1))
-        table.append(perc)
+            table.append(perc)
     filehandle.close()
     return table
 
@@ -246,7 +246,7 @@ def main():
     param['file_handle'].write(error)
     param['file_handle'].write(output)
 
-    if not os.path.exists(outfile):
+    if not os.path.exists(outfile+'.summary'):
         param['file_handle'].write('featureCount run failed \n')
         sys.exit(0)
 

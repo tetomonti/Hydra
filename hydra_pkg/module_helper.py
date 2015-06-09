@@ -18,20 +18,19 @@ an external tool on each samples.
 """
 
 import hydra_pkg.helper as HELPER
-import os
-import sys
-import matplotlib.pyplot as plt
-import subprocess
+from hydra_pkg.r_scripts import get_script_path
 import getopt
 import json
-import re
-from hydra_pkg.r_scripts import get_script_path
+import matplotlib.pyplot as plt
+import os
+import subprocess
+import sys
+
 
 def check_parameter(param, key, dtype, allowed=[], checkfile=False, optional=False):
     """generic function that checks if a parameter was in the parameter file,
     casts to the right data type and if the parameter is a file/ directory
     checks if it actually exists
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter key: key for the entry in the dictionary that we want to check
     :Parameter dType: data type that the value is cast to
@@ -53,7 +52,6 @@ def get_percentage(number1, number2, ntotal):
     """generic function that checks if a parameter was in the parameter file,
     casts to the right data type and if the parameter is a file/directory
     checks if it actually exists
-
     :Parameter number1: array of numerators
     :Parameter number2: array of denominators
     :Parameter ntotal: length of the arrays
@@ -156,7 +154,6 @@ def initialize_module():
 
 def output_phenotype(param, pheno_file):
     """Writes out a phenotype file
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter pheno_file: filename of the output file
     """
@@ -182,7 +179,6 @@ def output_phenotype(param, pheno_file):
 def output_sample_info(param):
     """Writes a phenotype file of the samples that actually made it through HTSeq
     into the report directory
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     param['pheno_file'] = param['working_dir']+'deliverables/sample_info.txt'
@@ -191,7 +187,6 @@ def output_sample_info(param):
 
 def is_in_raw_files(raw_files, current_file):
     """Function to check whether the fiel we want to delete is a raw file
-
     :Parameter raw_files: list of raw file loaction
     :Parameter current_file: file that we want to delete
     """
@@ -206,7 +201,6 @@ def wrapup_module(param, new_working_file=[], remove_intermediate=False):
     identify if the module was completed correctly. Also closes the log file handle.
     And finally also sets the working file pointer to the output of the module
     if the module has output files that are used in the next step.
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter new_working_file: pointer towards a potential new working file
     """
@@ -238,7 +232,6 @@ def wrapup_module(param, new_working_file=[], remove_intermediate=False):
     
 def plot_count_overview(param, stub, table):
     """Function that plot the overview boxplots for featureCounts and HTSeq
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter stub: stub that indicates which module we are working with
     """
@@ -246,7 +239,7 @@ def plot_count_overview(param, stub, table):
     #extract table
     table = table[1:]
     overview = [[float(tb) for tb in tab[1:]] for tab in table]
-    labels = [re.sub(r'_',' ',tab[0]) for tab in table]
+    labels = [tab[0] for tab in table]
  
     #make the first plot out of the first 2:
     fig, ax = plt.subplots()
@@ -281,7 +274,6 @@ def plot_count_overview(param, stub, table):
 
 def create_eset(count_file, pheno_file, param, stub):
     """Wrapper that calls an R script which creates a Bioconductor ExpressionSet
-
     :Parameter count_file: location of the count file
     :Parameter pheno_file: location of the phenotype file
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
@@ -313,7 +305,6 @@ def create_eset(count_file, pheno_file, param, stub):
                                 
 def create_sub_report(param, out_file, table, stub, title):
     """Separate report for all the htseq/featureCount results in detail
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter out_file: report html filehandle
     :Parameter stub: module stub    
@@ -325,22 +316,14 @@ def create_sub_report(param, out_file, table, stub, title):
                                 'Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1'+
                                 '-strict.dtd"><head><title></title></head><body>\n')
     param['module_report'].write('<center><h1>' + title + 'Overview</h1>')
-    
-    #before writing the table add  uniquely aligned reads
-    tot_reads = ['Number of uniquely aligned reads']+param['bam_qc']['unique_aligned_reads']
-    table.append(tot_reads)
-    
     HELPER.write_html_table(param,
                             table,
                             out=param['module_report'],
                             cell_width=80,
-                            fcol_width=200,
+                            fcol_width=150,
                             deg=315)
     param['module_report'].write('<a href="' + stub +'_stats.txt">' + title +
                                 ' statistics as tab delimited txt file</a>')
-
-    table.pop()
-
     #create an eSet:
     create_eset(out_file,
                 param['pheno_file'],
@@ -351,3 +334,6 @@ def create_sub_report(param, out_file, table, stub, title):
     #add the fastqc html to the report
     param['report'].write('<a href="'+report_file+'">Full report</a><br>')
 
+
+def get_max_image_width(dpi=100):
+    return(50)
