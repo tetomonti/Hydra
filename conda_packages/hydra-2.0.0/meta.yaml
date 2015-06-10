@@ -33,7 +33,7 @@ requirements:
     - samtools 0.1.19
     - bowtie2 2.2.2
     - cufflinks 2.2.0
-    - cutadapt 1.2.1
+    - cutadapt 1.8.1
     - fastqc 0.11.2
     - htseq 0.6.1p1
     - pysam 0.7.7
