@@ -15,7 +15,7 @@
 
 
 """
-Usage: hydra.py -p parameter_file.txt
+Usage: hydra-rnaseq -p parameter_file.txt
 -p parameter file				*[No default value]
 """
 

@@ -41,7 +41,7 @@ setup(
     ],
     test_suite='tests',
     tests_require=test_requirements,
-    scripts=['scripts/hydra',
+    scripts=['scripts/hydra-rnaseq',
              'scripts/paired_ends_intersect.py',
              'scripts/run_bamqc.py'],
     entry_points={
