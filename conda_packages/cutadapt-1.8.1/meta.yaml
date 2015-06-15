@@ -11,15 +11,16 @@ source:
 
 
 build:
-
+  number: 0       # (defaults to 0)
+  string: monti_0  
   detect_binary_files_with_prefix: true 
 
 requirements:
   build:
-    - python 2.7*
+    - python 2.7.9
 
   run:
-    - python 2.7*
+    - python 2.7.9
 
 #test:
    # Python imports

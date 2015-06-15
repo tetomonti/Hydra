@@ -14,8 +14,8 @@ source:
    git_tag: 'v2.0.0'
 
 build:
-  number: 5       # (defaults to 0)
-  string: monti_5       # (defaults to default conda build string plus the build
+  number: 6       # (defaults to 0)
+  string: monti_6       # (defaults to default conda build string plus the build
                   # number)
                   # The build string cannot contain a dash '-' character
 
@@ -28,6 +28,8 @@ requirements:
     - matplotlib
     - numpy
     - biopython
+    - mock
+    - nose
     
    run:
     - samtools 0.1.19
@@ -42,9 +44,11 @@ requirements:
     - tophat 2.0.13
     - python 2.7*
     - matplotlib
+    - mock
+    - nose
     - numpy
     - biopython
-    - star 2.4.0j
+    - star 2.4.1d
 
 test:
    requires:
