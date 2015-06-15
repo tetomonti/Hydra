@@ -187,6 +187,14 @@ def read_raw_bamqc(param):
                          '\t'.join([str(vv) for vv in par])+'\n')
     filehandle.close()
 
+
+def get_bar_width(fig_width, param):
+    #calculates the bar plot width
+    bar_width = 0.8 
+    if len(param['bamqc_stub']) > 20:
+        bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    return bar_width
+
 def plot_alignments(param):
     """Creates a plot that contains the statistic on the number of aligned reads
 
@@ -207,7 +215,7 @@ def plot_alignments(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     rects1 = plt.bar(index,
                      total,
@@ -264,7 +272,7 @@ def plot_spliced_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -299,7 +307,7 @@ def plot_insert_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -333,7 +341,7 @@ def plot_delete_reads(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     _ = plt.bar(index, percent, bar_width, alpha=opacity, color='b')
     plt.xlabel('Samples')
@@ -369,7 +377,7 @@ def plot_paired_singleton(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     rects1 = plt.bar(index,
                      paired,
@@ -444,7 +452,7 @@ def plot_mismatches(param):
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(param['bamqc_stub']))
 
-    bar_width = fig_width / float(len(param['bamqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     rects1 = plt.bar(index, mm0, bar_width,
                      alpha=opacity, color='b')
