@@ -45,7 +45,6 @@ def initialize_all(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     hydra_pkg.cutadapt.init(param)
-    hydra_pkg.matched_pairs.init(param)
     hydra_pkg.fastqc.init(param)
     hydra_pkg.bamqc.init(param)
     hydra_pkg.cufflinks.init(param)
@@ -75,14 +74,13 @@ def run_all(param):
                           'run_cutadapt',
                           input_files='raw_files',
                           output_files='fastq_files')
-        if param['paired']:
-            HELPER.submit_job(param,
-                              'run_matched_pairs',
-                              input_files='fastq_files',
-                              output_files='fastq_files')
         HELPER.submit_job(param,
                           'run_fastqc',
                           input_files='fastq_files')
+        #if indicated remove samples that failed the QC
+        if param['remove_failed']:
+            hydra_pkg.fastqc.remove_failed(param, 
+                                           input_files='fastq_files')
 
         #do alignment if it's not just a fastqc run
         if not param['QC_and_trim_only']:

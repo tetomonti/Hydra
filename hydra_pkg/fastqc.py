@@ -29,7 +29,21 @@ from hydra_pkg import module_helper as MODULE_HELPER
 
 
 
+def remove_failed(param, input_files):
+    #remove the failed samples from the run log
+    failed = get_samples_to_copy(param, input_files)
+    failed = [sample.split('/')[0] for sample in failed]
+    
+    if len(failed) > 0:
+        HELPER.writeLog('The following samples did not pass the QC filter: '+
+                        ' '.join(failed)+'\n',
+                        param)
+        for idx in range(len(param['stub'])):
+            if param['stub'][idx] in failed:
+                param['run_log'][-1][idx] = False
+
 def get_faulty_samples(param, fqc_dir):
+    #extract the names of samples that did not pass the sequence quality check
     overview = []
     for stub in param['fastqc_stub']:
         #extract checkmarks
@@ -40,6 +54,7 @@ def get_faulty_samples(param, fqc_dir):
         if checks[1] not in ['PASS']:
             overview.append(stub)
     return overview
+
 
 def get_samples_to_copy(param, input_files):
     #reconstruct file names
@@ -59,7 +74,7 @@ def get_samples_to_copy(param, input_files):
     #use only the files that exist
     fqc_dir = param['working_dir']+'results/fastqc/'
     param['fastqc_stub'] = [fn for fn in param['fastqc_stub'] if os.path.exists(fqc_dir+fn)]
-    param['fastqc_overview'] = get_faulty_samples(param, fqc_dir)
+    return(get_faulty_samples(param, fqc_dir))
 
 
 def copy_files(param, input_files):
@@ -152,7 +167,6 @@ def extract_tables(param, icon_base, link_base, samples, include_report):
     fail_icon = '<img src="'+icon_base+'Icons/error.png">'
     warn_icon = '<img src="'+icon_base+'Icons/warning.png">'
 
-    print len(samples)
     #get the values for each sample (icons for pass, faile or warning)
     for idx in range(len(samples)):
         csv_file = open(fqc_dir+samples[idx]+'/summary.txt')
@@ -257,6 +271,15 @@ def read_raw_fastqc(param, output_files):
                              for vv in param['fast_qc_summary'][nam]])+'\n')
         filehandle.close()
 
+
+def get_bar_width(fig_width, param):
+    #calculates the bar plot width
+    bar_width = 0.8 
+    if len(param['fastqc_stub']) > 20:
+        bar_width = fig_width / float(len(param['fastqc_stub'])) * 10
+    return bar_width
+
+
 def plot_number_of_reads(param, output_files, out):
     """Creates a plot with the number of reads per sample and plots it
 
@@ -290,7 +313,7 @@ def plot_number_of_reads(param, output_files, out):
     fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(num_total_reads))
-    bar_width = fig_width / float(len(param['fastqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     _ = plt.bar(index,
                 num_total_reads,
@@ -338,7 +361,7 @@ def plot_gc_content(param, input_files, out):
     fig_width = min (MODULE_HELPER.get_max_image_width(), 3+len(param['fastqc_stub'])*0.4)
     fig.set_size_inches(fig_width, 8)
     index = np.arange(len(gc_content))
-    bar_width = fig_width / float(len(param['fastqc_stub'])) * 10
+    bar_width = get_bar_width(fig_width, param)
     opacity = 0.4
     _ = plt.bar(index,
                 gc_content,
@@ -392,7 +415,7 @@ def report(param, input_files='fastq_files', header='FastQC results'):
     """
 
     #assemble the full fastqc report
-    get_samples_to_copy(param, input_files)
+    param['fastqc_overview'] = get_samples_to_copy(param, input_files)
     copy_files(param, input_files)
     param['num_total_reads'] = [0]*param['num_samples']
     if len(param['fastqc_stub']) > 0:
@@ -423,6 +446,7 @@ def init(param):
     """
     MODULE_HELPER.check_parameter(param, key='fastqc_exec', dtype=str)
     MODULE_HELPER.check_parameter(param, key='include_full_fastqc_report', dtype=bool)
+    MODULE_HELPER.check_parameter(param, key='remove_failed', dtype=bool)
 
 
 def run_fastqc(filename, param):

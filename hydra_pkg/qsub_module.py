@@ -78,7 +78,6 @@ def submit_jobs(index, param, py_file, job_id, cores, mem_free):
     :Parameter py_file: wrapper that needs to be called to run the current step
     :Parameter cores: number of cores that should be used
     """
-
     cmd = (py_file +
            ' -i ' + str(index) +
            ' -n $NSLOTS' +
@@ -88,7 +87,6 @@ def submit_jobs(index, param, py_file, job_id, cores, mem_free):
     param['qsub_dir'] = param['working_dir']+'results/qsub/'
     if not os.path.exists(param['qsub_dir']):
         os.makedirs(param['qsub_dir'])
-
     qsub_dir = param['working_dir']+'results/qsub/'
     qsub_filename = qsub_dir+(param['stub'])[index]+'.qsub'
 

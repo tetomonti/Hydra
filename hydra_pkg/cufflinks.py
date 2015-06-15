@@ -101,6 +101,17 @@ def report(param):
     create_sub_report(param)
 
 
+def file_len(fname):
+    """Returns the number of lines in a file, to make sure all files have the same length
+
+    :fname: filename
+
+    """
+    with open(fname) as f:
+        for i, l in enumerate(f):
+            pass
+    return i + 1
+
 def finalize(param, input_files='count_files'):
     """
     This function collects Cufflinks results and generates a text file with the
@@ -114,25 +125,34 @@ def finalize(param, input_files='count_files'):
     #extracts the counts from the cufflinks output
     import csv
     #check which of these files are actually available
+
     working_files = [iFile for iFile in param[input_files] if iFile != '']
+        
     if len(working_files) > 0:
         #get gene annotation
         csv_file = open(working_files[0])
         csv_reader = csv.reader(csv_file, delimiter='\t')
         counts = [row[0]+'\t'+row[4] for row in csv_reader]
         csv_file.close()
+        no_lines = len(counts)
         #get all the expression values
         header = 'ENS_ID\tSymbol'
         for idx in range(param['num_samples']):
-            if param[input_files] != '':
-                header = header + '\t' + param['stub'][idx]
-                csv_file = open(param[input_files][idx])
-                csv_reader = csv.reader(csv_file, delimiter='\t')
-                i = 0
-                for row in csv_reader:
-                    counts[i] = counts[i] + '\t' + row[9]
-                    i += 1
-                csv_file.close()
+            if os.path.exists(param[input_files][idx]):
+                if file_len(param[input_files][idx]) != no_lines:
+                    HELPER.writeLog('WARNING: Sample - ' + 
+                                    param['stub'][idx] + 
+                                    ' has an unexpected number of lines, SKIPPING this sample', 
+                                    param)         
+                else:
+                    header = header + '\t' + param['stub'][idx]
+                    csv_file = open(param[input_files][idx])
+                    csv_reader = csv.reader(csv_file, delimiter='\t')
+                    i = 0
+                    for row in csv_reader:
+                        counts[i] = counts[i] + '\t' + row[9]
+                        i += 1
+                    csv_file.close()
         #output the file
         out_handle = open(param['working_dir']+'deliverables/cufflinks_counts_fpkm.txt', 'w')
         out_handle.write(header+'\n')
@@ -141,6 +161,7 @@ def finalize(param, input_files='count_files'):
         out_handle.close()
     else:
         print 'Cufflinks was not run successfully on any of the files..\n'
+
 
 def main():
     """ Main function that runs Cufflinks call

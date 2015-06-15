@@ -398,6 +398,25 @@ def is_module_finished(param):
         finished = len(success) == 1
     return finished
 
+def check_job_finished(param, index):
+    """Function that checks if the current job is already finished
+
+    :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :Parameter index: index of the current file we are working on
+    """   
+    #check if it is not a clean run and if module already completed
+    finished = False
+    if not param['clean_run']:
+        log_file = (param['working_dir']+'results/log/'+
+                    param['stub'][index]+'.log')        
+        file_handle = open(log_file)
+        for line in file_handle.readlines():
+            if 'ENDING %s |' %(param['current_flag']) in line.rstrip():
+                finished = True
+        file_handle.close()
+    return finished
+
+
 def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_free='standard'):
     """submit a job, which runs the same wrapper on every single file
 
@@ -428,7 +447,7 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_fr
             logfile = open(param['working_dir']+
                            'results/log/'+
                            param['stub'][idx]+
-                           '.log')
+                           '.log')            
             #check if the current module actually produces output files that are
             #used subsequently. (i.e. tophat or the trimmer as opposed to fastqc or bamqc)
             if  param['output_files'] != '':
@@ -444,6 +463,7 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_fr
                 else:
                     param[param['output_files']][idx] = retval.split(';')[0]
                     param[param['output_files']+'2'][idx] = retval.split(';')[1]
+                logfile.close()
         #add in the run log that all samples finished successfully
         param['run_log'].append([True]*param['num_samples'])
         param['run_log_headers'].append(param['current_flag'])
@@ -456,36 +476,38 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_fr
                                param['current_dir']+'/')
         if not os.path.exists(param['module_dir']):
             os.makedirs(param['module_dir'])
-
-        #write all parameters to file so the single subnodes can use it
+        #write all parameters to file so the single subnodes can use them
         dump_parameters(param)
 
         #generate a job id
-        job_id = 'RNASeq_'+str(random.randint(1, 1000))
+        job_id = 'HyDrA_'+str(random.randint(1, 10000))
 
         #submit all jobs
+        submitted = False
         for index in range(param['num_samples']):
-            #check if the current sample was sucessfully processed before,
-            #otherwise skip the subsequent steps
-            if param['run_log'][-1][index]:
+            #first check if the job was already finished and skip if the pipeline is in resume mode
+            #and also check if the step before was run sucessfully
+            if not check_job_finished(param, index) and param['run_log'][-1][index]:
                 if param['run_single_cpu']:
                     single_cpu_module.run_single_job(index, py_file)
                 else:
-                    qsub_module.submit_jobs(index, param, py_file, job_id, cores, mem_free)
+                    qsub_module.submit_jobs(index,
+                                            param,
+                                            py_file,
+                                            job_id,
+                                            cores,
+                                            mem_free)
+                    submitted = True
 
-        #wait for qsub scripts to finish
-        if not param['run_single_cpu']:
+        #wait for qsub scripts to finish if there were actually submitted jobs
+        if submitted:
             qsub_module.wait_for_qsub(param, job_id)
-
         #start a new log column for the current batch of jobs
         param['run_log'].append([False]*param['num_samples'])
         param['run_log_headers'].append(param['current_flag'])
-
         #check if all jobs finished successful
         check_queue_success(param)
-
         writeLog('++++++++++++++++++++++++++++\n\n', param)
-
 
 ###############################################################################
 ####       Reporting Functions  ###############################################

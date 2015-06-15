@@ -32,22 +32,30 @@ def init(param):
     if param['paired']:
         MODULE_HELPER.check_parameter(param, key='cutadapt_second_adapter', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cutadapt_m', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cutadapt_q_end', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cutadapt_q_start', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cutadapt_quality', dtype=str)
 
 
-def run_cutadapt(param, infile, outfile, adapter):
+def run_cutadapt(param, outfile, outfile2=''):
     """Runs cutadapt on a file that remove an adapter sequence
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     :Parameter infile: input filename
     :Parameter outfile: output filename
-    :Parameter adapter: adapter sequence
-
     """
     call = [param['cutadapt_exec']]
     call = call + ['-m', param['cutadapt_m']]
-    call = call + ['-a', adapter]
+    call = call + ['-q', param['cutadapt_q_start']+','+param['cutadapt_q_end']]
+    call = call + ['-a', param['cutadapt_first_adapter']]
+    if param['paired']:
+        call = call + ['-A', param['cutadapt_second_adapter']]    
     call = call + ['-o', outfile]
-    call.append(param[infile])
+    if param['paired']:
+        call = call + ['-p', outfile2]  
+    call.append(param['working_file'])
+    if param['paired']:
+        call.append(param['working_file2'])
 
     param['file_handle'].write(' '.join(call))
     output, error = subprocess.Popen(call,
@@ -86,20 +94,13 @@ def main():
     outfile = (param['module_dir']+
                param['outstub']+
                '.clipped.fastq.gz')
-    run_cutadapt(param,
-                 'working_file',
-                 outfile,
-                 param['cutadapt_first_adapter'])
 
     if not param['paired']:
+        run_cutadapt(param, outfile)
         MODULE_HELPER.wrapup_module(param, [outfile])
-    #calling it on the second fastq file if it is paired
     else:
         outfile2 = (param['module_dir']+
                     param['outstub']+
                     '.clipped.2.fastq.gz')
-        run_cutadapt(param,
-                     'working_file2',
-                     outfile2,
-                     param['cutadapt_second_adapter'])
+        run_cutadapt(param, outfile, outfile2)
         MODULE_HELPER.wrapup_module(param, [outfile, outfile2])

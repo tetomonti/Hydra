@@ -96,19 +96,18 @@ zipped_fastq         =    TRUE
 ############################################################################################################################################
 cutadapt_exec               =    cutadapt
 cutadapt_python_version     =    python
-cutadapt_m                  =    20     #minimum length of read (if the read is smaller than that it will be removed)
-
-############################################################################################################################################
-#Matching paired-end reads prior to running tophat
-match_pairs_exec            = paired_ends_intersect.py
-match_pairs_python_version  = python
-
+cutadapt_m                  =    20     #(20)minimum length of read (if the read is smaller than that it will be removed)
+cutadapt_q_end              =    20     #(20)minimum quality threshold for the end of the read, if it's below the threshold the read is trimmed
+cutadapt_q_start            =    20     #(20)minimum quality threshold for the beginning of the read
+cutadapt_quality            =    33     #(default 33) - if phred quality score is based 64 adjust accordingly
 
 ############################################################################################################################################
 #FAST QC
 ############################################################################################################################################
 fastqc_exec   		   =      	fastqc   
 include_full_fastqc_report 	   = 		TRUE     #Flag that controls whether the full reports should be included. Each report is around 4mb, so for larger datasets this blows up the report considerably
+remove_failed                  =          TRUE     #do not process samples that fail the per base sequence quality after trimming and adapter trimming
+
 
 ############################################################################################################################################
 #TOPHAT
