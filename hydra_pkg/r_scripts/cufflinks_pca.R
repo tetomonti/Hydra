@@ -17,6 +17,13 @@
 ###################################################################
 args <- commandArgs(trailingOnly = TRUE)
 
+#actual values for testing purposes
+#out_dir='./'
+#counts_file<-'deliverables/cufflinks_counts_fpkm.txt'
+#annot_file<-'deliverables/sample_info.txt'
+#stub='cufflinks'
+#paired='TRUE'
+
 if (length(args) != 10){
    print("You need to specify the annotation (-a), the raw counts (-c),")
    print("the working directory (-o), whether the reads are paired (-p), and the stub name (-s)")
@@ -42,26 +49,28 @@ paired<-chkPars('-p',keys,values)
 stub<-chkPars('-s',keys,values)
 
 
-#actual values for testing purposes
-#out_dir='./'
-#counts_file<-'deliverables/cufflinks_counts_fpkm.txt'
-#annot_file<-'deliverables/sample_info.txt'
-#stub='cufflinks'
-#paired='FALSE'
-
-
 #read phenotype file
 annot<-read.table(annot_file,header=T,sep='\t',as.is=T)
 rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 
 
 #read the raw counts file
-counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
+counts<-read.csv(counts_file,header=T,sep='\t',as.is=T)
 counts<-counts[-1,]
 mat<-as.matrix(counts[,-(1:2)])
 colnames(mat)<-gsub('[-\\.]','_',colnames(mat))
 mat<-apply(mat,2,as.numeric)
-data<-mat
+data<-as.matrix(log2(mat+1))
+
+#get annotation onl for samples that were sucessfully processed
+if (paired){
+   idx<-3
+}else{
+   idx<-2
+}
+names1<-gsub('[/_-]','.',annot[,3])
+names2<-gsub('[/_-]','.',colnames(counts))
+annot<-annot[names1%in%names2,]
 
 ###################################################################
 #PCA and clickme
@@ -133,8 +142,7 @@ if ('clickme' %in% rownames(installed.packages()) & ncol(data)>1){
 #Boxplots
 ###################################################################
 
-exp<-as.matrix(log2(data+1))
-exp<-as.matrix(exp[order(apply(exp,1,mad),decreasing = T)[1:5000],])
+exp<-as.matrix(data[order(apply(data,1,mad),decreasing = T)[1:5000],])
 
 png(paste0(out_dir,'report/',stub,'/',stub,'_boxplot.png'),
     height=800,

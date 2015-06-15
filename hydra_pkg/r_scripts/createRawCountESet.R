@@ -15,11 +15,11 @@
 
 ############
 #these are test parameters
-out_dir='./'
-counts_file<-'deliverables/htseq_raw_counts.txt'
-annot_file<-'deliverables/sample_info.txt'
-stub='htseq'
-paired='TRUE'
+#out_dir='./'
+#counts_file<-'deliverables/htseq_raw_counts.txt'
+#annot_file<-'deliverables/sample_info.txt'
+#stub='htseq'
+#paired=FALSE
 
 
 ###################################################################
@@ -60,9 +60,21 @@ annot<-read.table(annot_file,header=T,sep='\t',as.is=T)
 rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 
 counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
-rownames(counts)<-counts[,1]
+gene_names<-counts[,1]
+sample_names<-colnames(counts)[-1]
 counts<-as.matrix(counts[,-1])
-colnames(counts)<-gsub('[-\\.]','_',colnames(counts))
+colnames(counts)<-gsub('[-\\.]','_',sample_names)
+rownames(counts)<-gene_names
+
+#get annotation only for samples that were sucessfully processed
+if (paired){
+   idx<-3
+}else{
+   idx<-2
+}
+names1<-gsub('[-\\.]','_',annot[,idx])
+annot<-annot[names1%in%colnames(counts),]
+
 
 #create and save eSet
 suppressMessages(require(Biobase))
@@ -80,7 +92,7 @@ saveRDS(expr.data,file=paste0(out_dir,'deliverables/',stub,'_raw_counts.RDS'))
 suppressMessages(require(edgeR))
 
 eSet<-expr.data
-exprs(eSet)<-cpm(eSet,log=T)
+exprs(eSet)<-cpm(eSet)
 saveRDS(eSet,file=paste0(out_dir,'deliverables/',stub,'_normalized_counts.RDS'))
 
 
