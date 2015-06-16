@@ -20,8 +20,8 @@ test_requirements = [
 
 setup(
     name='hydra',
-    version='2.0.0',
-    description='A pipeline manager for RNASeq analysis',
+    version='1.0.0',
+    description='A pipeline manager for Sequencing analysis',
     long_description=readme + '\n\n' + history,
     author='Monti Lab',
     author_email='smonti@bu.edu',
@@ -42,6 +42,7 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     scripts=['scripts/hydra-rnaseq',
+             'scripts/hydra-snv',
              'scripts/paired_ends_intersect.py',
              'scripts/run_bamqc.py'],
     entry_points={

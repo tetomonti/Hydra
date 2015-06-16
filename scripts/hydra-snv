@@ -1,0 +1,68 @@
+# -*- coding: cp936 -*-
+#Copyright 2015 Daniel Gusenleitner, Stefano Monti
+
+#Licensed under the Apache License, Version 2.0 (the "License");
+#you may not use this file except in compliance with the License.
+#You may obtain a copy of the License at
+
+#    http://www.apache.org/licenses/LICENSE-2.0
+
+#Unless required by applicable law or agreed to in writing, software
+#distributed under the License is distributed on an "AS IS" BASIS,
+#WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#See the License for the specific language governing permissions and
+#limitations under the License.
+
+
+"""
+Usage: hydra-rnaseq -p parameter_file.txt
+-p parameter file				*[No default value]
+"""
+
+
+if __name__ == "__main__":
+## Import modules
+    import matplotlib
+    matplotlib.use('Agg')
+    import sys
+    import hydra_pkg.snv-pipeline as PIPELINE
+    import hydra_pkg.helper as HELPER
+
+    list_args = sys.argv[1:]
+
+    if '-h' in list_args:
+        print __doc__
+        sys.exit(0)
+    elif len(list_args) < 2 or '-p' not in list_args:
+        print __doc__
+        sys.exit(0)
+    else:
+        param, parameter_file, updates = HELPER.update_parameters(list_args)
+
+
+    #if we resume we specify the old parameter file
+#    HELPER.initialize_standard(param)
+#    HELPER.write_updated_file(updates, param, parameter_file)
+
+#    HELPER.initialize_qsub(param)
+#    HELPER.read_fastq_filenames(param)
+#    HELPER.initialize_logfiles(param)
+
+#    HELPER.writeLog('Initializing all module parameters ... \n', param)
+#    PIPELINE.initialize_all(param)
+
+#    HELPER.writeLog('Initializing successful!\n', param)
+#    HELPER.writeLog('####################################################\n', param)
+
+## run pipeline
+#    HELPER.writeLog('Running all modules: \n\n', param)
+#    PIPELINE.run_all(param)
+
+## reporting
+#    HELPER.report_start(param)
+#    PIPELINE.report_all(param)
+#    HELPER.report_finish(param['report'])
+
+
+
+
