@@ -122,7 +122,7 @@ Once you are done with your changes and installed them, try running one
 of the toy examples to make sure there were no unintended side effects::
 
    cd /restricted/projectnb/montilab-p/projects/pipeline_dev/unit_tests/human_paired_end
-   hydra -p param.txt
+   hydra-rnaseq -p param.txt
 
 
 Once you're sure everything works, use git to commit them::

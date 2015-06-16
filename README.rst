@@ -63,7 +63,7 @@ Within R install all necessary packages::
   source("http://bioconductor.org/biocLite.R")
   biocLite(c("Biobase",'edgeR'),ask=F)
   install.packages(c("devtools","knitr", "yaml", "rjson"), repos='http://cran.us.r-project.org')
-  devtools::install_github("clickme", "nachocab")
+  devtools::install_github("nachocab/clickme")
 
 
 
@@ -79,7 +79,7 @@ Then you can run the pipeline, while providing your parameter file.
 
 Example::
 
-   hydra -p param.txt
+   hydra-rnaseq -p param.txt
 
 
 A detailed description of the parameter file is provided `here <docs/user_docs/parameters.rst>`__ and an example is located here `here <parameters_example.txt>`__ .
