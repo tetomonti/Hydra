@@ -29,10 +29,10 @@ def init(param):
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
     MODULE_HELPER.check_parameter(param, key='cufflinks_exec', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_compatible_hits', dtype=str)
+    #MODULE_HELPER.check_parameter(param, key='cufflinks_compatible_hits', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cufflinks_total_hits', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_N', dtype=str)
-    MODULE_HELPER.check_parameter(param, key='cufflinks_u', dtype=str)
+    #MODULE_HELPER.check_parameter(param, key='cufflinks_N', dtype=str)
+    #MODULE_HELPER.check_parameter(param, key='cufflinks_u', dtype=str)
 
     #deriving the stranded parameter
     if param['stranded'] == 'reverse':
@@ -177,12 +177,12 @@ def main():
     #build cufflinks call:
     call = [param['cufflinks_exec']]
     #optional parameters
-    if param['cufflinks_compatible_hits'] == 'active':
-        call.append('--compatible-hits-norm')
-    if param['cufflinks_N'] == 'active':
-        call.append('-N')
-    if param['cufflinks_u'] == 'active':
-        call.append('-u')
+ #   if param['cufflinks_compatible_hits'] == 'active':
+ #       call.append('--compatible-hits-norm')
+#    if param['cufflinks_N'] == 'active':
+#        call.append('-N')
+#    if param['cufflinks_u'] == 'active':
+#        call.append('-u')
     if param['cufflinks_total_hits'] == 'active':
         call.append('--total-hits-norm')
 
@@ -196,13 +196,14 @@ def main():
     call.append(param['working_file'])
 
     param['file_handle'].write('CALL: '+' '.join(call)+'\n')
-    output, _ = subprocess.Popen(call,
-                                 stdout=subprocess.PIPE,
-                                 stderr=subprocess.PIPE).communicate()
+    output, error = subprocess.Popen(call,
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE).communicate() 
     param['file_handle'].write(output)
 
     #printing the error blows the log file up to several megabytes
-    #param['file_handle'].write(error)
+    param['file_handle'].write(error)
+
     #error handling
     if not os.path.exists(outdir+'genes.fpkm_tracking'):
         param['file_handle'].write('Error there was no cuffinks output\n')

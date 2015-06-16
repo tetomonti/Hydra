@@ -68,7 +68,7 @@ if (paired){
 }else{
    idx<-2
 }
-names1<-gsub('[/_-]','.',annot[,3])
+names1<-gsub('[/_-]','.',annot[,idx])
 names2<-gsub('[/_-]','.',colnames(counts))
 annot<-annot[names1%in%names2,]
 

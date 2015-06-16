@@ -35,7 +35,7 @@ cutadapt_second_adapter     =    AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTC
 QC_and_trim_only     =    FALSE
 
 #####choose which of the programs you want to run to quantify reads
-run_cufflinks        =    TRUE   # NOTE: Cufflinks does not work with single-end data and will not be run by default if your data is not paired-end sequencing data
+run_cufflinks        =    TRUE   
 run_htseq            =    TRUE
 run_featureCount     =    TRUE
 
@@ -149,11 +149,6 @@ bamqc_script                =  run_bamqc.py
 ############################################################################################################################################
 cufflinks_exec           = cufflinks     #on SCC we don't need to specify the location of the executable we just need to load the proper module
 cufflinks_compatible_hits = inactive           #Cufflinks counts only those fragments compatible with some reference transcript towards the number of mapped hits used in the FPKM denominator. (can be 'active' to turn it on) 
-
-#The following parameter all normalize the counts during the cufflinks run. However, if you intend to run edgeR afterwards you need raw counts not fpkm 
-cufflinks_total_hits     = active           #create FPKM (can be 'active' for turning this option on or anything else to turn it off)
-cufflinks_N              = active           #upper quantile normalization (can be 'active' for turning this option on or anything else to turn it off)
-cufflinks_u              = active           #multi read correct (can be 'active' for turning this option on or anything else to turn it off)
 
 
 ############################################################################################################################################
