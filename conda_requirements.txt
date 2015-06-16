@@ -1,0 +1,11 @@
+samtools
+bowtie2
+cufflinks
+cutadapt
+fastqc
+htseq
+pysam
+r >=3
+subread
+tophat
+python 2.7*

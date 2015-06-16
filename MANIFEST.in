@@ -1,0 +1,12 @@
+include AUTHORS.rst
+include HISTORY.rst
+include README.rst
+
+recursive-include tests *
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+recursive-include docs *.rst conf.py Makefile make.bat
+
+include hydra_pkg/r_scripts/*.R
+include hydra_pkg/Icons/*.png

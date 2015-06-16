@@ -1,0 +1,46 @@
+package:
+    name: python
+    version: '2.7.9'
+
+source:
+    fn: Python-2.7.9.tgz
+    url: https://www.python.org/ftp/python/2.7.9/Python-2.7.9.tgz
+    md5: 5eebcaa0030dc4061156d3429657fb83
+
+build:
+    number: 4
+#    string: monti_0
+
+    binary_has_prefix_files:
+        - lib/libpython2.7.so.1.0
+
+    has_prefix_files:
+        - bin/idle
+        - bin/pydoc
+        - bin/python2.7-config
+        - bin/2to3
+        - bin/smtpd.py
+        - lib/pkgconfig/python-2.7.pc
+        - lib/python2.7/_sysconfigdata.py
+        - lib/python2.7/config/Makefile
+
+    no_link:
+        - bin/python
+        - bin/python-config
+        - bin/python2
+        - bin/python2.7
+
+
+requirements:
+
+    run:
+        - "openssl 1.0.1*"
+        - "readline >=6.2.5"
+        - "sqlite"
+        - "system 5.8"
+        - "zlib 1.2*"
+        - pip
+
+
+about:
+   license: PSF

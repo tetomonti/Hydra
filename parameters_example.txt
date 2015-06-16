@@ -1,0 +1,172 @@
+#Last edited on 09/06/2015 by Daniel Gusenleitner
+#########################################################################################################
+# Standard parameters
+#########################################################################################################
+#The parameters in this first section change the most, and will need to be adjusted for each run
+#The second section includes the parameters for the cluster / parallelization, which only need to be set once
+#The others sections include mostly default values that can be adjusted, but work just fine as they are.
+
+#####working directory where a results and report directory will be created
+working_dir	       =    /restricted/projectnb/montilab-p/projects/pipeline_dev/unit_tests/human_paired_end/  
+
+#####file that contains 2 (for single end) or 3 (for paired end) columns with fastq | [fastq2]  | stub - see example in the repository
+raw_filenames	       =    /restricted/projectnb/montilab-p/projects/pipeline_dev/data/paired_end/raw_filenames_10K.txt
+
+#####paired end reads?
+paired	              =    TRUE      #are there paired end reads or single strand reads
+stranded             =    no        #(yes/no/reverse) is strand information available for each read
+
+
+#####Aligner and Indizes for alignment
+aligner                   =    star     #right now only 'skip', 'star' and 'tophat' are allowed
+tophat_index              =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/Bowtie2Index/genome
+star_index                =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/star_index/
+
+#####genome and genome annotation
+genome_annotation_gft     = /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Annotation/Archives/archive-2014-05-23-16-03-55/Genes/genes.gtf
+genome                    = /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/WholeGenomeFasta/genome.fa
+
+
+#####the adapters here specified work for Illumina TrueSeq if you need others check at https://github.com/marcelm/cutadapt/blob/master/README.md
+cutadapt_first_adapter      =    AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC 
+cutadapt_second_adapter     =    AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT 
+
+#####Option to run only the initial fastqc, then clip the standard illumina adapters and finally run another fastqc used to check if all adapters were trimmed before running the actual alignment
+QC_and_trim_only     =    FALSE
+
+#####choose which of the programs you want to run to quantify reads
+run_cufflinks        =    TRUE   
+run_htseq            =    TRUE
+run_featureCount     =    TRUE
+
+####remove intermediate files? (This will removes all large intermediate files except for bam files)
+remove_intermediate  =    TRUE
+
+
+#########################################################################################################
+# Cluster parameters
+#########################################################################################################
+#This section includes all cluster specific parameters. They need to be set once when installing the pipeline and can then be reused as is.
+run_single_cpu = FALSE      #this will circumvent the parallelization and run all samples on a single node
+
+#qsub parameters
+qsub_email          = name@bu.edu
+qsub_send_email     = FALSE
+qsub_memory         = 4g
+qsub_PROJECT        = gsc-p          #in some qsub systems you need to specify a project name (-P) for the purpose of accounting
+qsub_MACHINE        = scc
+qsub_RUNTIME_LIMIT  = 96:00:00    
+qsub_wait_time      = 10
+qsub_num_processors = 4-8
+
+
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+#####################################END OF STANDARD PARAMETERS##########################################
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+#########################################################################################################
+
+
+
+#########################################################################################################
+# General Hydra related parameters
+#########################################################################################################
+#should everything also be printed on the command line
+verbose              =    TRUE
+
+#different ways to run the pipeline
+clean_run            =    TRUE      #start pipeline from scratch or try to pick up at the last step that was performed successfully
+ask_before_deleting  =    TRUE      #pipeline will ask before deleting any file. If you submit the pipeline as a batch job you want to set this to FALSE
+run_failed_from_scratch = FALSE     #this function will rerun all samples that failed from scratch
+
+#Does the raw_filenames file have a header
+raw_file_header      =    TRUE
+
+#Are the rawfiles provided as zips?
+zipped_fastq         =    TRUE
+
+
+############################################################################################################################################
+# CUTADAPT
+############################################################################################################################################
+cutadapt_exec               =    cutadapt
+cutadapt_python_version     =    python
+cutadapt_m                  =    20     #(20)minimum length of read (if the read is smaller than that it will be removed)
+cutadapt_q_end              =    20     #(20)minimum quality threshold for the end of the read, if it's below the threshold the read is trimmed
+cutadapt_q_start            =    20     #(20)minimum quality threshold for the beginning of the read
+cutadapt_quality            =    33     #(default 33) - if phred quality score is based 64 adjust accordingly
+
+############################################################################################################################################
+#FAST QC
+############################################################################################################################################
+fastqc_exec   		   =      	fastqc   
+include_full_fastqc_report 	   = 		TRUE     #Flag that controls whether the full reports should be included. Each report is around 4mb, so for larger datasets this blows up the report considerably
+remove_failed                  =          TRUE     #do not process samples that fail the per base sequence quality after trimming and adapter trimming
+
+
+############################################################################################################################################
+#TOPHAT
+############################################################################################################################################
+tophat_exec                 =   tophat2     
+#The tophat index refers to the prefix of a bowtie2 index that must be built prior to running tophat2
+tophat_qual                 =   none        #  can be none, --solexa-quals or --solexa1.3-quals
+tophat_N                    =   2          #--read-mismatches   #Default is 2	
+tophat_gap_length           =   2                                #Default is 2
+tophat_edit_dist            =   2                               #Default is 2
+mate_inner_dist             =   50
+mate_std_dev                =   20
+
+######################################################################################
+#STAR ALIGNER
+######################################################################################
+star_exec                 =   STAR     
+
+#optional parameters (do not change unless you've read the documentation):
+outFilterType              = BySJout #default is BySJout
+outFilterMultimapNmax      = 20      #max number of multiple alignments allowed (def: 20)
+alignSJoverhangMin         = 8       #minimum overhang for unannotated junctions (def: 8)
+alignSJDBoverhangMin       = 1       #minimum overhang for annotated junctions (def: 1)
+outFilterMismatchNmax      = 999     #max number of mismatches per pair (def: 999 - inactive)
+outFilterMismatchNoverLmax = 0.04    #max number of mismatches per pair relative to the read length(def: 0.04 - 8 for paired reads with length 100)
+alignIntronMin             = 20      #minimum intron length
+alignIntronMax             = 1000000 #maximum intron length
+alignMatesGapMax           = 1000000 #maximum genomic distance between mates
+outputSAMtype              = BAM_SortedByCoordinate  #Can be BAM_SortedByCoordinate or BAM_unsorted
+
+############################################################################################################################################
+#BAMQC
+############################################################################################################################################
+bamqc_exec                  =  python
+bamqc_script                =  run_bamqc.py
+
+############################################################################################################################################
+#CUFFLINKS
+############################################################################################################################################
+cufflinks_exec           = cufflinks     #on SCC we don't need to specify the location of the executable we just need to load the proper module
+cufflinks_compatible_hits = inactive           #Cufflinks counts only those fragments compatible with some reference transcript towards the number of mapped hits used in the FPKM denominator. (can be 'active' to turn it on) 
+
+
+############################################################################################################################################
+#HT-Seq
+############################################################################################################################################
+HTSeq_exec    =  htseq-count
+sam_exec      =  samtools     #To run samtools view and pipe into htseq-count
+HTSeq_t       =  exon
+HTSeq_m       =  intersection-nonempty        #union, intersection-strict and intersection-nonempty
+HTSeq_id      =  gene_id       #Default, for most gtf files: gene_id
+Rscript_exec  =  Rscript
+
+############################################################################################################################################
+#featureCount
+############################################################################################################################################
+featureCount_exec     = featureCounts
+featureCount_t        = exon   #Feature level over which read summarization will be performed. 'exon' by default
+featureCount_id       = gene_id #Attribute type used to group features into meta-features (e.g. genes), when GTF file is provided. 'gene_id' by default (usually 'gene_id' for most annotation files)
+featureCount_by_meta  = TRUE   #Set this to true if you want to assemble feature counts to their meta-feature specified using the 'featureCount_id' parameter. If FALSE, will generate counts per feature specified using the featureCount_t parameter
+Rscript_exec          = Rscript
+

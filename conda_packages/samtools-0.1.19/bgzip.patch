@@ -1,0 +1,11 @@
+--- bgzip.c	2013-03-19 03:48:09.000000000 -0400
++++ bgzip_fix.c	2015-02-25 15:51:04.668674000 -0500
+@@ -72,7 +72,7 @@
+ 
+ static void fail(BGZF* fp)
+ {
+-    fprintf(stderr, "Error: %s\n", fp->error);
++    fprintf(stderr, "Error: %d\n", fp->errcode);
+     exit(1);
+ }
+ 

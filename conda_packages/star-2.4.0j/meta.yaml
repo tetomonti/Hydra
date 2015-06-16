@@ -1,0 +1,25 @@
+package:
+  name: star       # lower case name of package, may contain '-' but no spaces
+  version: "2.4.0j"    # version of package. Should use the PEP-386 verlib
+                      # conventions. Note that YAML will interpret
+                      # versions like 1.0 as floats, meaning that 1.0 will
+                      # be the same as 1. To avoid this, always put the
+                      # version in quotes, so that it will be interpreted
+                      # as a string.
+
+                      # The version cannot contain a dash '-' character.
+
+source:
+  fn: STAR_2.4.0j.tar.gz
+  url: https://github.com/alexdobin/STAR/archive/STAR_2.4.0j.tar.gz
+
+build:
+  # The build number should be incremented for new builds of the same version
+  number: 1       
+  string: monti_1
+
+about:
+  home: http://github.com/alexdobin/STAR
+  license: GPLv3
+
+

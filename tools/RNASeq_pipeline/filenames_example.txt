@@ -1,2 +1,0 @@
-FastQ_files1	FastQ_files2  sample_name
-/restricted/projectnb/montilab-p/projects/superfund/project4/rawdata/Tufts_Fh_PCB153_RNAseq/Sample_Sample01.R1.fastq.gz	/restricted/projectnb/montilab-p/projects/superfund/project4/rawdata/Tufts_Fh_PCB153_RNAseq/Sample_Sample01.R2.fastq.gz	NBH_DMSO_1
