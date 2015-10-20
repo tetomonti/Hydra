@@ -10,7 +10,7 @@ package:
                       # The version cannot contain a dash '-' character.
 
 source:
-   git_url: https://gusef@github.com/montilab/Hydra.git
+   git_url: https://vkartha@github.com/montilab/Hydra.git
    git_tag: 'v1.0.0'
 
 build:

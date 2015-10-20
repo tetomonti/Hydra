@@ -59,7 +59,7 @@ stub<-chkPars('-s',keys,values)
 annot<-read.table(annot_file,header=T,sep='\t',as.is=T)
 rownames(annot)<-gsub('[-\\.]','_',annot$sample_name)
 
-counts<-read.table(counts_file,header=T,sep='\t',as.is=T)
+counts<-read.table(counts_file,header=T,sep='\t',as.is=T,check.names=F)
 gene_names<-counts[,1]
 sample_names<-colnames(counts)[-1]
 counts<-as.matrix(counts[,-1])

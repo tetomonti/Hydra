@@ -160,6 +160,7 @@ cufflinks_u              = active           #multi read correct (can be 'active'
 ############################################################################################################################################
 HTSeq_exec    =  htseq-count
 sam_exec      =  samtools     #To run samtools view and pipe into htseq-count
+HTSeq_r       =  pos          #For paired-end data, alignment file has to be sorted either by name or alignment position. Default is name
 HTSeq_t       =  exon
 HTSeq_m       =  intersection-nonempty        #union, intersection-strict and intersection-nonempty
 HTSeq_id      =  gene_id       #Default, for most gtf files: gene_id
