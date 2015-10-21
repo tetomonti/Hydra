@@ -10,12 +10,12 @@ package:
                       # The version cannot contain a dash '-' character.
 
 source:
-   git_url: https://gusef@github.com/montilab/Hydra.git
+   git_url: https://montilab@github.com/montilab/Hydra.git
    git_tag: 'v1.0.0'
 
 build:
-  number: 0       # (defaults to 0)
-  string: monti_0       # (defaults to default conda build string plus the build
+  number: 1       # (defaults to 0)
+  string: monti_1       # (defaults to default conda build string plus the build
                   # number)
                   # The build string cannot contain a dash '-' character
 
@@ -57,7 +57,7 @@ test:
    commands:
     - python2.7 -c "import hydra_pkg"
     - python2.7 -c "import hydra_pkg.pipeline"
-    - hydra -h
+    - hydra-rnaseq -h
 
 about:
   home: https://github.com/yannpaul/CBMgithub

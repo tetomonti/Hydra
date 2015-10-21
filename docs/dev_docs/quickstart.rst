@@ -88,14 +88,14 @@ To get the current branch use::
 The source contains a "dev_requirements.txt" file that lists all the
 packages used in development. Install these using conda::
 
-  conda install -r dev_requirements.txt
+  conda install --file dev_requirements.txt
 
 This will force you to downgrade the readline module however you can just install this single module again::
 
   conda install \
      --override-channels \
      -c https://conda.binstar.org/montilab \
-     readline-6.2.3
+     readline
 
 
 .. warning::

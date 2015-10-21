@@ -19,7 +19,7 @@ For the current pipeline you can easily build the pipeline and all required pack
    cd <Hydra_repository>/conda_packages
    WORKSPACE=<WORKING_DIR>
    export CONDA_BLD_PATH=$WORKSPACE/conda_build_space
-   conda build hydra-2.0.0
+   conda build hydra-1.0.0
 
 This will build the hydra package and packages for all requirements. Next step you want to upload it to binstar.org so that everyone can access that package. For that we need to log into the binstar account first::
 
