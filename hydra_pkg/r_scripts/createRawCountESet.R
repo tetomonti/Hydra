@@ -19,7 +19,7 @@
 #counts_file<-'deliverables/htseq_raw_counts.txt'
 #annot_file<-'deliverables/sample_info.txt'
 #stub='htseq'
-#paired=FALSE
+#paired=TRUE
 
 
 ###################################################################
@@ -72,8 +72,16 @@ if (paired){
 }else{
    idx<-2
 }
-names1<-gsub('[-\\.]','_',annot[,idx])
-annot<-annot[names1%in%colnames(counts),]
+#fix potential sample name issue that arises when a sample starts with a number or an underscore
+#R prepends a 'X' in this case
+names1<-gsub('[/_-]','.',annot[,idx])
+odd_ids<-c(grep('^\\.',names1),grep('^\\d',names1))
+if (length(odd_ids)>0){
+   names1[odd_ids]<-paste0('X',names1[odd_ids])
+}
+names2<-gsub('[/_-]','.',colnames(counts))
+annot<-annot[match(names1,names2),]
+colnames(counts)<-rownames(annot)
 
 
 #create and save eSet
