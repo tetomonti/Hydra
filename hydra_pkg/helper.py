@@ -338,6 +338,7 @@ def check_queue_success(param):
     """Check how many jobs ran successful and prints that into the main log
 
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
+    :return parameter: failed number of samples
     """
     s_noend = []
     for idx in range(param['num_samples']):
@@ -363,16 +364,13 @@ def check_queue_success(param):
                 param[param['output_files']][idx] = ''
             s_noend.append(param['stub'][idx])
 
-    successful = True
-    #output error if not all samples finished successfully
-    #otherwise indicate that this step was completed sucessfully
+    #output number of unsucessfully run samples
     if len(s_noend) > 0:
         writeLog('error in samples %s' %(';'.join([s for s in s_noend])), param)
         writeLog('\n', param)
-        successful = False
     else:
         writeLog(param['current_flag']+' successful!\n\n', param)
-    return successful
+    return len(s_noend)
 
 def dump_parameters(param):
     """dumps the parameter object into a JSON object
@@ -506,8 +504,12 @@ def submit_job(param, py_file, input_files, output_files='', cores='1-8', mem_fr
         param['run_log'].append([False]*param['num_samples'])
         param['run_log_headers'].append(param['current_flag'])
         #check if all jobs finished successful
-        check_queue_success(param)
+        if check_queue_success(param) == param['num_samples']:
+            writeLog('All samples failed, aborting... \n',param)            
+            sys.exit(0)
         writeLog('++++++++++++++++++++++++++++\n\n', param)
+
+
 
 ###############################################################################
 ####       Reporting Functions  ###############################################
