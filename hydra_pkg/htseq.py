@@ -32,6 +32,11 @@ def init(param):
     MODULE_HELPER.check_parameter(param, key='HTSeq_exec', dtype=str)
     MODULE_HELPER.check_parameter(param, key='sam_exec', dtype=str)
     MODULE_HELPER.check_parameter(param, key='HTSeq_t', dtype=str)
+    MODULE_HELPER.check_parameter(param, 
+                                  key='HTSeq_r', 
+                                  dtype=str,
+                                  allowed=['name',
+                                           'pos'])
     MODULE_HELPER.check_parameter(param,
                                   key='HTSeq_m',
                                   dtype=str,
@@ -184,6 +189,7 @@ def main():
     call1 = [param['sam_exec'], 'view', param['working_file']]
     call2 = [param['HTSeq_exec']]
     call2 = call2 + ['-s', param['stranded']]
+    call2 = call2 + ['-r', param['HTSeq_r']]
     call2 = call2 + ['-t', param['HTSeq_t']]
     call2 = call2 + ['-i', param['HTSeq_id']]
     call2 = call2 + ['-m', param['HTSeq_m']]

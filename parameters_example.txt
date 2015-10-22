@@ -163,6 +163,7 @@ sam_exec      =  samtools     #To run samtools view and pipe into htseq-count
 HTSeq_t       =  exon
 HTSeq_m       =  intersection-nonempty        #union, intersection-strict and intersection-nonempty
 HTSeq_id      =  gene_id       #Default, for most gtf files: gene_id
+HTSeq_r       =  pos           #ordering of the alignment file, can be 'pos' or 'name'
 Rscript_exec  =  Rscript
 
 ############################################################################################################################################
