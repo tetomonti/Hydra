@@ -20,7 +20,25 @@ Usage: hydra-rnaseq -p parameter_file.txt
 """
 
 
+#if there is already a python path set it can lead to conflicts with the conda environment
+#this is a hack that prepends all conda python libraries.
+import os.path
+import sys
+def hack_path():
+    new_path = []
+    other_paths = []
+    python_base_path = os.path.dirname(os.path.dirname(sys.executable))
+    for dirname in sys.path:
+        if dirname.startswith(python_base_path):
+            new_path.append(dirname)
+        else:
+            other_paths.append(dirname)
+    sys.path = new_path + other_paths
+
 if __name__ == "__main__":
+
+    hack_path()
+
 ## Import modules
     import matplotlib
     matplotlib.use('Agg')
