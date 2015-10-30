@@ -14,8 +14,8 @@ source:
    git_tag: 'v1.0.0'
 
 build:
-  number: 1       # (defaults to 0)
-  string: monti_1       # (defaults to default conda build string plus the build
+  number: 2       # (defaults to 0)
+  string: monti_2       # (defaults to default conda build string plus the build
                   # number)
                   # The build string cannot contain a dash '-' character
 
