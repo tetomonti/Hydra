@@ -27,7 +27,7 @@ Use `conda` to install a basic developement environment::
   
   conda create \
     -p ./dev_env \
-    -c https://conda.binstar.org/montilab \
+    -c https://conda.anaconda.org/montilab \
     --yes \
     hydra
 
@@ -76,10 +76,6 @@ copy)::
   git clone https://github.com/montilab/Hydra.git
 
 
-To get the current branch use::
-
-  git clone https://user@github.com/montilab/Hydra.git -b v2.0.0
-
 
 
 6. Install Developer Tools
@@ -94,7 +90,7 @@ This will force you to downgrade the readline module however you can just instal
 
   conda install \
      --override-channels \
-     -c https://conda.binstar.org/montilab \
+     -c https://conda.anaconda.org/montilab \
      readline
 
 
