@@ -19,7 +19,8 @@ Running the pipeline
 
 **Pre-requisites**
 
-Below are the tools you need to install before running the pipeline. 
+Hydra requires Java 1.6+. All other tools are wrapped in a Conda environment, see below. 
+
 
 *1. Get Conda*
 
