@@ -85,19 +85,22 @@ def create_overview_table(param):
                     '/sample_stats.html"><img src="../Icons/fastqc_icon.png"></a></td>')
     table.append(temp)
 
-    #header
-    table.append(['Percentages based on total number of reads:'])
+    
+    #percent aligned makes only sense if we actually ran an alignment
+    if param['aligner'] != 'skip':
+        #header
+        table.append(['Percentages based on total number of reads:'])
 
-    #percent aligned
-    table.append(['Percent aligned'] +
-                 MODULE_HELPER.get_percentage(number1=param['bam_qc']['single_count_alignments'],
-                                              number2=param['num_total_reads'],
-                                              ntotal=num_s))
-    #percent uniquely aligned
-    table.append(['Percent uniquely aligned'] +
-                 MODULE_HELPER.get_percentage(number1=param['bam_qc']['unique_aligned_reads'],
-                                              number2=param['num_total_reads'],
-                                              ntotal=num_s))
+        #percent aligned
+        table.append(['Percent aligned'] +
+                     MODULE_HELPER.get_percentage(number1=param['bam_qc']['single_count_alignments'],
+                                                  number2=param['num_total_reads'],
+                                                  ntotal=num_s))
+        #percent uniquely aligned
+        table.append(['Percent uniquely aligned'] +
+                     MODULE_HELPER.get_percentage(number1=param['bam_qc']['unique_aligned_reads'],
+                                                  number2=param['num_total_reads'],
+                                                  ntotal=num_s))
     #header
     table.append(['Percentages based on total number of alignments:'])
     #percent single reads

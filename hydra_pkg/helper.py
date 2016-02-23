@@ -180,6 +180,8 @@ def initialize_standard(param):
     check_parameter(param, key='run_htseq', dtype=bool)
     check_parameter(param, key='run_featureCount', dtype=bool)
     check_parameter(param, key='zipped_fastq', dtype=bool)
+    check_parameter(param, key='skip_trimming', dtype=bool)
+
 
     qsub_module.initialize_qsub(param)
 

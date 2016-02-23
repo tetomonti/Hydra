@@ -70,17 +70,20 @@ def run_all(param):
         param['fastq_files'] = param['raw_files'][:]
         if param['paired']:
             param['fastq_files2'] = param['raw_files2'][:]
-        HELPER.submit_job(param,
-                          'run_cutadapt',
-                          input_files='raw_files',
-                          output_files='fastq_files')
-        HELPER.submit_job(param,
-                          'run_fastqc',
-                          input_files='fastq_files')
-        #if indicated remove samples that failed the QC
-        if param['remove_failed']:
-            hydra_pkg.fastqc.remove_failed(param, 
-                                           input_files='fastq_files')
+
+        if not param['skip_trimming']:
+            HELPER.submit_job(param,
+                              'run_cutadapt',
+                              input_files='raw_files',
+                              output_files='fastq_files')
+            HELPER.submit_job(param,
+                              'run_fastqc',
+                              input_files='fastq_files')
+
+            #if indicated remove samples that failed the QC
+            if param['remove_failed']:
+                hydra_pkg.fastqc.remove_failed(param, 
+                                               input_files='fastq_files')
 
         #do alignment if it's not just a fastqc run
         if not param['QC_and_trim_only']:
@@ -143,9 +146,10 @@ def report_all(param):
         hydra_pkg.fastqc.report(param,
                                 input_files='raw_files',
                                 header='FastQC results on the raw data')
-        hydra_pkg.fastqc.report(param,
-                                input_files='fastq_files',
-                                header='FastQC results after preprocessing')
+        if not param['skip_trimming']:
+            hydra_pkg.fastqc.report(param,
+                                    input_files='fastq_files',
+                                    header='FastQC results after preprocessing')
     hydra_pkg.bamqc.report(param)
     if param['run_cufflinks']:
         hydra_pkg.cufflinks.report(param)

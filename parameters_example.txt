@@ -28,6 +28,7 @@ genome                    = /restricted/projectnb/montilab-p/CBMrepositoryData/a
 
 
 #####the adapters here specified work for Illumina TrueSeq if you need others check at https://github.com/marcelm/cutadapt/blob/master/README.md
+skip_trimming			  =    FALSE
 cutadapt_first_adapter      =    AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC 
 cutadapt_second_adapter     =    AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGTAGATCTCGGTGGTCGCCGTATCATT 
 
