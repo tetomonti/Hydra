@@ -63,9 +63,8 @@ Within R install all necessary packages::
 
   source("http://bioconductor.org/biocLite.R")
   biocLite(c("Biobase",'edgeR'),ask=F)
-  install.packages(c("devtools","knitr", "yaml", "rjson"), repos='http://cran.us.r-project.org')
+  install.packages(c("devtools","knitr", "yaml", "rjson","codetools"), repos='http://cran.us.r-project.org')
   devtools::install_github("nachocab/clickme")
-
 
 
 Running the pipeline

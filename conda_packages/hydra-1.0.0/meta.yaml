@@ -39,7 +39,7 @@ requirements:
     - fastqc 0.11.2
     - htseq 0.6.1p1
     - pysam 0.7.7
-    - r 3.1.1
+    - r-base 3.3.1
     - subread 1.4.6
     - tophat 2.0.13
     - python 2.7*
