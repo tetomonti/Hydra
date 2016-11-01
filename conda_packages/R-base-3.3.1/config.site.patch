@@ -1,0 +1,11 @@
+--- config.site	2012-07-07 04:05:37.000000000 -0400
++++ config.site.vanilla	2015-04-14 12:38:25.151640000 -0400
+@@ -28,7 +28,7 @@
+ ## The paper size for the local (PostScript) printer.
+ ## It must either be left blank or set to one of 'a4' or 'letter'.
+ ## If left blank the system will use 'a4'.
+-## R_PAPERSIZE=a4
++R_PAPERSIZE=letter
+ 
+ ## Set the default behavior of R when ending a session
+ ## Set this to one of '--save' or '--no-save' depending whether you
