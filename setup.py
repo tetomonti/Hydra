@@ -54,6 +54,7 @@ setup(
             'run_htseq=hydra_pkg.htseq:main',
             'run_matched_pairs=hydra_pkg.matched_pairs:main',
             'run_tophat=hydra_pkg.tophat:main',
-            'run_star=hydra_pkg.star:main']
+            'run_star=hydra_pkg.star:main',
+            'run_bowtie2=hydra_pkg.bowtie2:main']
     }
 )
