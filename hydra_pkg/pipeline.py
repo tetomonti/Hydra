@@ -35,6 +35,7 @@ import hydra_pkg.cutadapt
 import hydra_pkg.htseq
 import hydra_pkg.featureCount
 import hydra_pkg.star
+import hydra_pkg.bowtie2
 
 import sys
 
@@ -55,7 +56,8 @@ def initialize_all(param):
         hydra_pkg.tophat.init(param)
     elif param['aligner'] == 'star':    
         hydra_pkg.star.init(param)
-
+    elif param['aligner'] == 'bowtie2':
+        hydra_pkg.bowtie2.init(param)
 
 def run_all(param):
     """this function defines the workflow of the pipeline
@@ -98,6 +100,14 @@ def run_all(param):
                 #running the aligner
                 HELPER.submit_job(param,
                                   'run_star',
+                                  input_files='fastq_files',
+                                  output_files='bam_files',
+                                  cores=param['qsub_num_processors'],
+                                  mem_free='32G')
+            elif param['aligner'] == 'bowtie2':
+                #running the aligner
+                HELPER.submit_job(param,
+                                  'run_bowtie2',
                                   input_files='fastq_files',
                                   output_files='bam_files',
                                   cores=param['qsub_num_processors'],
