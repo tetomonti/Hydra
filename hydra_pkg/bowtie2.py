@@ -21,11 +21,19 @@ from hydra_pkg import module_helper as MODULE_HELPER
 
 def init(param):
     """Initialization function that checks the all relevant bowtie2 parameters
-
     :Parameter param: dictionary that contains all general RNASeq pipeline parameters
     """
+    
     MODULE_HELPER.check_parameter(param, key='bowtie2_exec', dtype=str)
     MODULE_HELPER.check_parameter(param, key='bowtie2_index', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_type', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_N', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_D', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_R', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_L', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_i', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_rdg', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='bowtie2_rfg', dtype=str)
 
 
 def main():
