@@ -35,18 +35,16 @@ Hydra requires Java 1.6+. All other tools are wrapped in a Conda environment, se
    .. code:: bash
 
      module purge
-     module load anaconda/2.2.0
+     module load anaconda2/4.2.0
 
 
 *2. Create Dev Environment*
 
 Use `conda` to install a basic developement environment::
   
-  conda create \
-    -p ./dev_env \
-    -c https://conda.anaconda.org/montilab \
-    --yes \
-    hydra
+  conda env create \
+    reeder/dev_env \
+    -p ./dev_env 
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
@@ -61,11 +59,8 @@ Start R::
 
 Within R install all necessary packages::
 
-  source("http://bioconductor.org/biocLite.R")
-  biocLite(c("Biobase",'edgeR'),ask=F)
-  install.packages(c("devtools","knitr", "yaml", "rjson","codetools"), repos='http://cran.us.r-project.org')
-  devtools::install_github("nachocab/clickme")
-
+    require(devtools)
+    install_git("http://github.com/nachocab/clickme.git")
 
 Running the pipeline
 ====================
