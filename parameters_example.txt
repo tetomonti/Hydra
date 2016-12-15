@@ -18,9 +18,11 @@ stranded             =    no        #(yes/no/reverse) is strand information avai
 
 
 #####Aligner and Indizes for alignment
-aligner                   =    star     #right now only 'skip', 'star' and 'tophat' are allowed
+aligner                   =    star     #right now only 'skip', 'star', 'bowtie2', and 'tophat' are allowed
 tophat_index              =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/Bowtie2Index/genome
 star_index                =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/star_index/
+bowtie2_index              =   /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Sequence/Bowtie2Index/genome
+
 
 #####genome and genome annotation
 genome_annotation_gft     = /restricted/projectnb/montilab-p/CBMrepositoryData/annot/hg19_ensembl_GRCh37_tophat/Ensembl/GRCh37/Annotation/Archives/archive-2014-05-23-16-03-55/Genes/genes.gtf
@@ -138,6 +140,21 @@ alignIntronMin             = 20      #minimum intron length
 alignIntronMax             = 1000000 #maximum intron length
 alignMatesGapMax           = 1000000 #maximum genomic distance between mates
 outputSAMtype              = BAM_SortedByCoordinate  #Can be BAM_SortedByCoordinate or BAM_unsorted
+
+######################################################################################
+##BOWTIE ALIGNER
+#######################################################################################
+bowtie2_exec                =  bowtie2  
+#optional parameters (do not change unless you've read the documentation): 
+
+bowtie2_type    =       --local #--end-to-end or --local 
+bowtie2_N       =       0 #Number of mismatches allowed (0 or 1) 
+bowtie2_D       =       15 #Give up extending after <int> failed extends in a row 
+bowtie2_R       =       2  #For reads w/ repetitive seeds, try <int> sets of seeds 
+bowtie2_L       =       20 #length of seed substrings; must be >3, <32 
+bowtie2_i       =       S,1,0.75 #interval between seed substrings w/r/t read len
+bowtie2_rdg     =       5,3 
+bowtie2_rfg     =       5,3
 
 ############################################################################################################################################
 #BAMQC
