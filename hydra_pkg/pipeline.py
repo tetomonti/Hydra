@@ -117,10 +117,11 @@ def run_all(param):
                 sys.exit(0)
 
     if not param['QC_and_trim_only']:
-        #Bamqc
-        HELPER.submit_job(param,
-                          'run_bamqc',
-                          input_files='bam_files')
+        if not param['aligner'] == 'bowtie2':
+            #Bamqc
+            HELPER.submit_job(param,
+                              'run_bamqc',
+                              input_files='bam_files')
 
         #Getting the counts:
         if param['run_cufflinks']:

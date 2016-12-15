@@ -37,8 +37,11 @@ Hydra requires Java 1.6+. All other tools are wrapped in a Conda environment, se
      module purge
      module load anaconda2/4.2.0
 
+*2. Set Environment and Build Paths*
+  export CONDA_ENVS_PATH=<WORKING_DIR>/conda-envs
+  export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
 
-*2. Create Dev Environment*
+*3. Create Dev Environment*
 
 Use `conda` to install a basic developement environment::
   
@@ -48,7 +51,7 @@ Use `conda` to install a basic developement environment::
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
-*3. Install all necessary R packages*
+*4. Install all necessary R packages*
 Activate the environment so you have access to the R version that the pipeline uses::
  
   source activate ./dev_env
