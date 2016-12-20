@@ -127,6 +127,7 @@ def main():
     
     # Remove SAM file
     call4 = ['rm']
+    call4.append('-f')
     call4.append(outdir + 'accepted_hits.sam')
     
     param['file_handle'].write('CALL: '+' '.join(call4)+'\n')
