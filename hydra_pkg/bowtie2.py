@@ -125,7 +125,16 @@ def main():
     param['file_handle'].write(error)
     param['file_handle'].write(output)
     
-	#check if the run was successful
+    # Remove SAM file
+    call4 = ['rm']
+    call4.append(outdir + 'accepted_hits.sam')
+    
+    param['file_handle'].write('CALL: '+' '.join(call4)+'\n')
+    output, error = subprocess.Popen(call4, stdout = subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    param['file_handle'].write(error)
+    param['file_handle'].write(output)
+
+    #check if the run was successful
     if not os.path.exists(outdir+'accepted_hits.bam'):
         param['file_handle'].write('bowtie2 did not run successfully...')
         sys.exit(0)
