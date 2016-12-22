@@ -49,59 +49,65 @@ def extract_stats(input_file):
     #tag variables
     NH = 0
     NM = 0
+    XS = 0
     idx = 0
     for read in bam_file:
-       #get all the relevant tags
-        for tag in read.tags:
-            if tag[0] == 'NH':
-                NH = tag[1]
-            if tag[0] == 'NM':
-                NM = tag[1]
-        #number of aligned reads
-        total_aligned_reads += 1
-        unique_aligned_reads += 1/NH
+        if read.cigarstring != None:
+            #get all the relevant tags
+            for tag in read.tags:
+                if tag[0] == 'NH':
+                    NH = tag[1]
+                if tag[0] == 'NM':
+                    NM = tag[1]
+            
+            if NH == 0:
+                NH = 1
 
-        #number of mismatches
-        if NH == 1:
-            if NM >= 4:
-                num_unique_mismatches[4] = num_unique_mismatches[4]+1
+            #number of aligned reads
+            total_aligned_reads += 1
+            unique_aligned_reads += 1/NH
+
+            #number of mismatches
+            if NH == 1:
+                if NM >= 4:
+                    num_unique_mismatches[4] = num_unique_mismatches[4]+1
+                else:
+                    num_unique_mismatches[NM] = num_unique_mismatches[NM]+1
             else:
-                num_unique_mismatches[NM] = num_unique_mismatches[NM]+1
-        else:
-            if NM >= 4:
-                num_multiple_mismatches[4] = num_multiple_mismatches[4]+(1.0/float(NH))
+                if NM >= 4:
+                    num_multiple_mismatches[4] = num_multiple_mismatches[4]+(1.0/float(NH))
+                else:
+                    num_multiple_mismatches[NM] = num_multiple_mismatches[NM]+(1.0/float(NH))
+
+            #number of multiple reads
+            if NH >= 20:
+                num_multiread[19] = num_multiread[19]+(1.0/float(NH))
             else:
-                num_multiple_mismatches[NM] = num_multiple_mismatches[NM]+(1.0/float(NH))
+                num_multiread[NH-1] = num_multiread[NH-1]+(1.0/float(NH))
 
-        #number of multiple reads
-        if NH >= 20:
-            num_multiread[19] = num_multiread[19]+(1.0/float(NH))
-        else:
-            num_multiread[NH-1] = num_multiread[NH-1]+(1.0/float(NH))
+            #singletons, paired, proper paired, unmapped
+            is_singleton += int(not read.is_paired)
+            is_paired += int(read.is_paired)
+            is_proper_pair += int(read.is_proper_pair)
+            is_unmapped += int(read.is_unmapped)
 
-        #singletons, paired, proper paired, unmapped
-        is_singleton += int(not read.is_paired)
-        is_paired += int(read.is_paired)
-        is_proper_pair += int(read.is_proper_pair)
-        is_unmapped += int(read.is_unmapped)
+            #splicing, deletions, inserts
+            spliced = 'N' in read.cigarstring
+            insert = 'I' in read.cigarstring
+            delet = 'D' in read.cigarstring
 
-        #splicing, deletions, inserts
-        spliced = 'N' in read.cigarstring
-        insert = 'I' in read.cigarstring
-        delet = 'D' in read.cigarstring
+            #actual count
+            spliced_reads += int(spliced)
+            spliced_reads += int(spliced)
+            non_spliced_reads += int(not spliced)
+            reads_with_deletions += int(insert)
+            reads_with_inserts += int(delet)
 
-        #actual count
-        spliced_reads += int(spliced)
-        spliced_reads += int(spliced)
-        non_spliced_reads += int(not spliced)
-        reads_with_deletions += int(insert)
-        reads_with_inserts += int(delet)
-
-        #counting reads that are aligned multiple times only once
-        unique_spliced_reads += int(spliced)/NH
-        unique_non_spliced_reads += int(not spliced)/NH
-        unique_reads_with_deletions += int(insert)/NH
-        unique_reads_with_inserts += int(delet)/NH
+            #counting reads that are aligned multiple times only once
+            unique_spliced_reads += int(spliced)/NH
+            unique_non_spliced_reads += int(not spliced)/NH
+            unique_reads_with_deletions += int(insert)/NH
+            unique_reads_with_inserts += int(delet)/NH
         if idx % 1000000 == 0:
             print str(idx)+' reads done'
         idx += 1
