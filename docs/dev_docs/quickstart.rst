@@ -21,9 +21,9 @@ Below are all the steps you need to make changes to the pipeline.
      module load anaconda/2.2.0
 
 2. Set Environment and Build Paths
-==================================::
+==================================
 
-  
+  ::
     export CONDA_ENVS_PATH=<WORKING_DIR>/conda-envs
     export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
 
