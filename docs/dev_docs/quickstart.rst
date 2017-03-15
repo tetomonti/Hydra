@@ -20,8 +20,15 @@ Below are all the steps you need to make changes to the pipeline.
      module purge
      module load anaconda/2.2.0
 
+2. Set Environment and Build Paths
+==================================::
 
-2. Create Dev Environment
+  
+    export CONDA_ENVS_PATH=<WORKING_DIR>/conda-envs
+    export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
+
+
+3. Create Dev Environment
 =========================
 Use `conda` to install a basic developement environment::
   
