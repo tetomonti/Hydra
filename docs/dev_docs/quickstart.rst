@@ -39,7 +39,7 @@ Use `conda` to install a basic developement environment::
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
-3. Install all necessary R packages
+4. Install all necessary R packages
 ===================================
 Activate the environment so you have access to the R version that the pipeline uses::
  
@@ -51,10 +51,8 @@ Start R::
 
 Within R install all necessary packages::
 
-  source("http://bioconductor.org/biocLite.R")
-  biocLite(c("Biobase",'edgeR'),ask=F)
-  install.packages(c("devtools","knitr", "yaml", "rjson"), repos='http://cran.us.r-project.org')
-  devtools::install_github("clickme", "nachocab")
+    require(devtools)
+    install_git("http://github.com/nachocab/clickme.git")
 
 4. Activate the Environment
 ============================
