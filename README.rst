@@ -47,7 +47,7 @@ Hydra requires Java 1.6+. All other tools are wrapped in a Conda environment, se
 Use `conda` to install a basic developement environment::
   
   conda env create \
-    reeder/dev_env \
+    montilab/dev_env \
     -p ./dev_env 
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
