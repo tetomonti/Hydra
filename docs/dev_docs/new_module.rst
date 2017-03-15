@@ -397,9 +397,14 @@ In addition to the submit job function you can also write into the main log file
 5) Installing the changes
 -------------------------
 
-Once all the changes are done you can simply install and test them. For that you need the developer tools, 
+Once all the changes are done you need to install and test them. For that you need the developer tools, 
 if they are not already installed you can see `here <quickstart.rst>`__ how to install them:
 
+First, it is sometimes necessary to delete the **hydra-rnaseq** command.  This will ensure that the pipeline installs properly and will include the new modules.  From the directory containing the **./dev_env** folder enter::
+
+   rm dev_env/bin/hydra-rnaseq
+
+Next, re-install the pipeline
 
 .. code:: bash
 
