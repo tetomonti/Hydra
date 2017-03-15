@@ -23,7 +23,8 @@ Below are all the steps you need to make changes to the pipeline.
 2. Set Environment and Build Paths
 ==================================
 
-  ::
+Create a build and envs path to for conda package::
+    
     export CONDA_ENVS_PATH=<WORKING_DIR>/conda-envs
     export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
 
@@ -32,11 +33,9 @@ Below are all the steps you need to make changes to the pipeline.
 =========================
 Use `conda` to install a basic developement environment::
   
-  conda create \
-    -p ./dev_env \
-    -c https://conda.anaconda.org/montilab \
-    --yes \
-    hydra
+    conda env create \
+    montilab/dev_env \
+    -p ./dev_env
 
 This will create a `./dev_env folder that stores all the files needed to run the pipeline. For more details, please refer to the Developer's Guide. (LINK)
 
