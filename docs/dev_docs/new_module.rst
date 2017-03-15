@@ -404,7 +404,7 @@ First, it is sometimes necessary to delete the **hydra-rnaseq** command.  This w
 
    rm dev_env/bin/hydra-rnaseq
 
-Next, re-install the pipeline
+Next, re-install the pipeline from the Hydra clone folder
 
 .. code:: bash
 
@@ -416,7 +416,7 @@ of time (depending on the cluster load usually <1h)
 How to add a tool into the anaconda environment
 -----------------------------------------------
 
-A "star" package can be created by following the steps described in :ref:`rst_tutorial`
+A "star" package can be created by following the steps described `here <making_conda_packages.rst>`__.
 
 
 Supplement:
