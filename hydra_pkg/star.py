@@ -101,12 +101,10 @@ def main():
     call.append(outdir)
 
     #specify whether the fastq files are zipped
-    call.append('--readFilesCommand')
     if param['zipped_fastq']:
+        call.append('--readFilesCommand')
         call.append('gunzip')
         call.append('-c')
-    else:
-        call.append('UncompressionCommand')
 
     #adding the files we want to work on
     call.append('--readFilesIn')
