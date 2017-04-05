@@ -35,7 +35,7 @@ Hydra requires Java 1.6+. All other tools are wrapped in a Conda environment, se
    .. code:: bash
 
      module purge
-     module load anaconda2/4.2.0
+     module load anaconda2/4.3.0
 
 *2. Set Environment and Build Paths*::
 
