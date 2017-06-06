@@ -17,35 +17,37 @@ For the current pipeline you can easily build the pipeline and all required pack
 .. code:: bash
  
    cd <Hydra_repository>/conda_packages
-   WORKSPACE=<WORKING_DIR>
-   export CONDA_BLD_PATH=$WORKSPACE/conda_build_space
+   export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
+   export CONDA_ENVS_PATH=<WORKING_DIR>/conda-envs
+   
+export CONDA_BLD_PATH=<WORKING_DIR>/conda-bld
    conda build hydra-1.0.0
 
 This will build the hydra package and packages for all requirements. Next step you want to upload it to binstar.org so that everyone can access that package. For that we need to log into the binstar account first::
 
-   binstar login
+   anaconda login
 
 <in our case the user is: montilab>
 
 And upload all of the created packages to your account::
 
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/boost-1.51.0-py27.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/bowtie2-2.2.2-monti.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/cufflinks-2.2.0-monti.tar.bz2 
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/cutadapt-1.8.1-monti_0.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/eigen-3.2.4-monti.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/fastqc-0.11.2-monti_0.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/htseq-0.6.1p1-monti.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/hydra-1.0.0-monti_1.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/ncurses-5.9-4.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/pysam-0.7.7-monti.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/python-2.7.9-4.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/r-3.1.1-monti_0.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/readline-6.2-3.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/samtools-0.1.19-monti.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/star-2.4.1d-monti_1.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/subread-1.4.6-monti_0.tar.bz2
-   anaconda upload $WORKSPACE/conda_build_space/linux-64/tophat-2.0.13-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/boost-1.51.0-py27.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/bowtie2-2.2.2-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/cufflinks-2.2.0-monti.tar.bz2 
+   anaconda upload $CONDA_BLD_PATH/linux-64/cutadapt-1.8.1-monti_0.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/eigen-3.2.4-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/fastqc-0.11.2-monti_0.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/htseq-0.6.1p1-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/hydra-1.0.0-monti_1.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/ncurses-5.9-4.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/pysam-0.7.7-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/python-2.7.9-4.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/r-3.1.1-monti_0.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/readline-6.2-3.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/samtools-0.1.19-monti.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/star-2.4.1d-monti_1.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/subread-1.4.6-monti_0.tar.bz2
+   anaconda upload $CONDA_BLD_PATH/linux-64/tophat-2.0.13-monti.tar.bz2
 
 
 With that you can use `conda` to install a basic environment to run the pipeline::

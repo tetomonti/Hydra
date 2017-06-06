@@ -103,6 +103,7 @@ cutadapt_m                  =    20     #(20)minimum length of read (if the read
 cutadapt_q_end              =    20     #(20)minimum quality threshold for the end of the read, if it's below the threshold the read is trimmed
 cutadapt_q_start            =    20     #(20)minimum quality threshold for the beginning of the read
 cutadapt_quality            =    33     #(default 33) - if phred quality score is based 64 adjust accordingly
+cutadapt_u                   =    0      #force removal of first X bases (or laste -X bases)
 
 ############################################################################################################################################
 #FAST QC

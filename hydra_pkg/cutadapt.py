@@ -35,6 +35,7 @@ def init(param):
     MODULE_HELPER.check_parameter(param, key='cutadapt_q_end', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cutadapt_q_start', dtype=str)
     MODULE_HELPER.check_parameter(param, key='cutadapt_quality', dtype=str)
+    MODULE_HELPER.check_parameter(param, key='cutadapt_u', dtype=str)
 
 
 def run_cutadapt(param, outfile, outfile2=''):
@@ -47,7 +48,9 @@ def run_cutadapt(param, outfile, outfile2=''):
     call = [param['cutadapt_exec']]
     call = call + ['-m', param['cutadapt_m']]
     call = call + ['-q', param['cutadapt_q_start']+','+param['cutadapt_q_end']]
+    call = call + ['-u', param['cutadapt_u']]
     call = call + ['-a', param['cutadapt_first_adapter']]
+
     if param['paired']:
         call = call + ['-A', param['cutadapt_second_adapter']]    
     call = call + ['-o', outfile]

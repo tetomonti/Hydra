@@ -86,9 +86,10 @@ copy)::
 ==========================
 
 The source contains a "dev_requirements.txt" file that lists all the
-packages used in development. Install these using conda::
+packages used in development. Install these using conda.  Do this from the 
+directory that contains the ./dev_env folder::
 
-  conda install --file dev_requirements.txt
+  conda install --file <Directory that contains Hydra clone>/Hydra/dev_requirements.txt
 
 This will force you to downgrade the readline module however you can just install this single module again::
 
