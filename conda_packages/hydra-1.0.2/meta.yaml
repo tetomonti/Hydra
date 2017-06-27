@@ -1,0 +1,55 @@
+package:
+  name: hydra       # lower case name of package, may contain '-' but no spaces
+  version: "1.0.2"    # version of package. Should use the PEP-386 verlib
+                      # conventions. Note that YAML will interpret
+                      # versions like 1.0 as floats, meaning that 1.0 will
+                      # be the same as 1. To avoid this, always put the
+                      # version in quotes, so that it will be interpreted
+                      # as a string.
+
+                      # The version cannot contain a dash '-' character.
+
+source:
+   git_url: https://montilab@github.com/montilab/Hydra.git
+   git_tag: 'v1.0.2'
+
+build:
+  number: 2       # (defaults to 0)
+  string: monti_2       # (defaults to default conda build string plus the build
+                  # number)
+                  # The build string cannot contain a dash '-' character
+
+  detect_binary_files_with_prefix: true # (defaults to false)
+
+requirements:
+   build:
+    - python 2.7*
+    - matplotlib 1.4.3
+    - pysam
+    - numpy
+    - biopython
+    - mock
+    - nose
+    
+   run:
+    - matplotlib 1.4.3
+    - samtools 0.1.19
+    - bowtie2 2.2.8
+    - cufflinks 2.2.1
+    - cutadapt 1.12
+    - fastqc 0.11.5
+    - htseq 0.6.1p1
+    - pysam 0.8.3
+    - r 3.3.1
+    - subread 1.5.0.post3
+    - tophat 2.1.1
+    - python 2.7*
+    - mock
+    - nose
+    - numpy
+    - biopython
+    - star 2.5.2b
+
+about:
+  home: https://github.com/yannpaul/CBMgithub
+  license: BSD

@@ -1,0 +1,12 @@
+[console_scripts]
+run_bamqc = hydra_pkg.bamqc:main
+run_bowtie2 = hydra_pkg.bowtie2:main
+run_cufflinks = hydra_pkg.cufflinks:main
+run_cutadapt = hydra_pkg.cutadapt:main
+run_fastqc = hydra_pkg.fastqc:main
+run_featureCount = hydra_pkg.featureCount:main
+run_htseq = hydra_pkg.htseq:main
+run_matched_pairs = hydra_pkg.matched_pairs:main
+run_star = hydra_pkg.star:main
+run_tophat = hydra_pkg.tophat:main
+
